@@ -1,0 +1,32 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="DateOnlyTimeOnly.AspNet" Version="1.0.3" />
+    <PackageReference Include="DateOnlyTimeOnly.AspNet.Swashbuckle" Version="1.0.3" />
+    <PackageReference Include="Google.Protobuf" Version="3.21.4" />
+    <PackageReference Include="Grpc.Tools" Version="2.47.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="PhoenixToolkits.Protobuf.ExtendTypes" Version="0.0.6" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
+    <PackageReference Include="Tgs.MessageQueue.Nats" Version="2.1.6" />
+    <PackageReference Include="Tgs.WebApi.Toolkits" Version="0.0.13" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Tgs.Promotion.DepositAccumulateRoulette.Background.Core\Tgs.Promotion.DepositAccumulateRoulette.Background.Core.csproj" />
+    <ProjectReference Include="..\Tgs.Promotion.DepositAccumulateRoulette.Background.Repositories\Tgs.Promotion.DepositAccumulateRoulette.Background.Repositories.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Protobuf Include="Protos\Protos.proto" GrpcServices="None" Access="Internal" />
+  </ItemGroup>
+
+</Project>

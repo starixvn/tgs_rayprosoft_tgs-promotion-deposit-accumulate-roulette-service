@@ -1,0 +1,103 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.2.32519.379
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tgs.Promotion.DepositAccumulateRouletteService", "Tgs.Promotion.DepositAccumulateRouletteService\Tgs.Promotion.DepositAccumulateRouletteService.csproj", "{E9AB04E5-B94D-433E-AED0-B30CC0DA70D9}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tgs.Promotion.DepositAccumulateRoulette.Core", "Tgs.Promotion.DepositAccumulateRoulette.Core\Tgs.Promotion.DepositAccumulateRoulette.Core.csproj", "{1E084E52-A65A-4A5C-82B1-67724705F945}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tgs.Promotion.DepositAccumulateRoulette.Client", "Tgs.Promotion.DepositAccumulateRoulette.Client\Tgs.Promotion.DepositAccumulateRoulette.Client.csproj", "{0AB60702-69CA-4ABF-8BEE-8F40F92E0A80}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tgs.Promotion.DepositAccumulateRoulette.Background", "Tgs.Promotion.DepositAccumulateRoulette.Background\Tgs.Promotion.DepositAccumulateRoulette.Background.csproj", "{03979C39-4C19-4463-B4D9-C20DD4AF9743}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tgs.Promotion.DepositAccumulateRoulette.Background.Core", "Tgs.Promotion.DepositAccumulateRoulette.Background.Core\Tgs.Promotion.DepositAccumulateRoulette.Background.Core.csproj", "{C1EF87A4-5584-415F-B2DD-D85C2C0CC883}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tgs.Promotion.DepositAccumulateRoulette.Common", "Tgs.Promotion.DepositAccumulateRoulette.Common\Tgs.Promotion.DepositAccumulateRoulette.Common.csproj", "{F58BAA61-C524-4CF1-953A-51B1049860C1}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tgs.Promotion.DepositAccumulateRoulette.Common.UnitTests", "Tgs.Promotion.DepositAccumulateRoulette.Common.UnitTests\Tgs.Promotion.DepositAccumulateRoulette.Common.UnitTests.csproj", "{54598E80-919F-4A1A-9B0F-B2CFE7114AB0}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tgs.Promotion.DepositAccumulateRoulette.Background.IntegrationTests", "Tgs.Promotion.DepositAccumulateRoulette.Background.IntegrationTests\Tgs.Promotion.DepositAccumulateRoulette.Background.IntegrationTests.csproj", "{6434CB72-658D-4C4F-81B5-8C866A81F0F4}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tgs.Promotion.DepositAccumulateRoulette.Background.Core.UnitTests", "Tgs.Promotion.DepositAccumulateRoulette.Background.Core.UnitTests\Tgs.Promotion.DepositAccumulateRoulette.Background.Core.UnitTests.csproj", "{97A0EFB0-A10F-46F6-8B02-553B6F87EC19}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tgs.Promotion.DepositAccumulateRouletteService.UnitTests", "Tgs.Promotion.DepositAccumulateRouletteService.UnitTests\Tgs.Promotion.DepositAccumulateRouletteService.UnitTests.csproj", "{56BF7D01-A77F-430A-9140-8F87378A9B1E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tgs.Promotion.DepositAccumulateRoulette.Core.UnitTests", "Tgs.Promotion.DepositAccumulateRoulette.Core.UnitTests\Tgs.Promotion.DepositAccumulateRoulette.Core.UnitTests.csproj", "{1C445781-F4AB-46EB-93C2-E1291553C230}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tgs.Promotion.DepositAccumulateRouletteService.IntegrationTests", "Tgs.Promotion.DepositAccumulateRouletteService.IntegrationTests\Tgs.Promotion.DepositAccumulateRouletteService.IntegrationTests.csproj", "{813236F9-B30D-40DA-956F-E204B6D8A371}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tgs.Promotion.DepositAccumulateRoulette.Background.Repositories", "Tgs.Promotion.DepositAccumulateRoulette.Background.Repositories\Tgs.Promotion.DepositAccumulateRoulette.Background.Repositories.csproj", "{EA4904D3-A683-4698-8538-80E70FA7BEC8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tgs.Promotion.DepositAccumulateRoulette.Repositories", "Tgs.Promotion.DepositAccumulateRoulette.Repositories\Tgs.Promotion.DepositAccumulateRoulette.Repositories.csproj", "{8ADB1798-F0EF-42B5-80F6-6DD437139FB8}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E9AB04E5-B94D-433E-AED0-B30CC0DA70D9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E9AB04E5-B94D-433E-AED0-B30CC0DA70D9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E9AB04E5-B94D-433E-AED0-B30CC0DA70D9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E9AB04E5-B94D-433E-AED0-B30CC0DA70D9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1E084E52-A65A-4A5C-82B1-67724705F945}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1E084E52-A65A-4A5C-82B1-67724705F945}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1E084E52-A65A-4A5C-82B1-67724705F945}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1E084E52-A65A-4A5C-82B1-67724705F945}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0AB60702-69CA-4ABF-8BEE-8F40F92E0A80}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0AB60702-69CA-4ABF-8BEE-8F40F92E0A80}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0AB60702-69CA-4ABF-8BEE-8F40F92E0A80}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0AB60702-69CA-4ABF-8BEE-8F40F92E0A80}.Release|Any CPU.Build.0 = Release|Any CPU
+		{03979C39-4C19-4463-B4D9-C20DD4AF9743}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{03979C39-4C19-4463-B4D9-C20DD4AF9743}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{03979C39-4C19-4463-B4D9-C20DD4AF9743}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{03979C39-4C19-4463-B4D9-C20DD4AF9743}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C1EF87A4-5584-415F-B2DD-D85C2C0CC883}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C1EF87A4-5584-415F-B2DD-D85C2C0CC883}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C1EF87A4-5584-415F-B2DD-D85C2C0CC883}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C1EF87A4-5584-415F-B2DD-D85C2C0CC883}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F58BAA61-C524-4CF1-953A-51B1049860C1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F58BAA61-C524-4CF1-953A-51B1049860C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F58BAA61-C524-4CF1-953A-51B1049860C1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F58BAA61-C524-4CF1-953A-51B1049860C1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{54598E80-919F-4A1A-9B0F-B2CFE7114AB0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{54598E80-919F-4A1A-9B0F-B2CFE7114AB0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{54598E80-919F-4A1A-9B0F-B2CFE7114AB0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{54598E80-919F-4A1A-9B0F-B2CFE7114AB0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6434CB72-658D-4C4F-81B5-8C866A81F0F4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6434CB72-658D-4C4F-81B5-8C866A81F0F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6434CB72-658D-4C4F-81B5-8C866A81F0F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6434CB72-658D-4C4F-81B5-8C866A81F0F4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{97A0EFB0-A10F-46F6-8B02-553B6F87EC19}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{97A0EFB0-A10F-46F6-8B02-553B6F87EC19}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{97A0EFB0-A10F-46F6-8B02-553B6F87EC19}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{97A0EFB0-A10F-46F6-8B02-553B6F87EC19}.Release|Any CPU.Build.0 = Release|Any CPU
+		{56BF7D01-A77F-430A-9140-8F87378A9B1E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{56BF7D01-A77F-430A-9140-8F87378A9B1E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{56BF7D01-A77F-430A-9140-8F87378A9B1E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{56BF7D01-A77F-430A-9140-8F87378A9B1E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1C445781-F4AB-46EB-93C2-E1291553C230}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1C445781-F4AB-46EB-93C2-E1291553C230}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1C445781-F4AB-46EB-93C2-E1291553C230}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1C445781-F4AB-46EB-93C2-E1291553C230}.Release|Any CPU.Build.0 = Release|Any CPU
+		{813236F9-B30D-40DA-956F-E204B6D8A371}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{813236F9-B30D-40DA-956F-E204B6D8A371}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{813236F9-B30D-40DA-956F-E204B6D8A371}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{813236F9-B30D-40DA-956F-E204B6D8A371}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EA4904D3-A683-4698-8538-80E70FA7BEC8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EA4904D3-A683-4698-8538-80E70FA7BEC8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EA4904D3-A683-4698-8538-80E70FA7BEC8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EA4904D3-A683-4698-8538-80E70FA7BEC8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8ADB1798-F0EF-42B5-80F6-6DD437139FB8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8ADB1798-F0EF-42B5-80F6-6DD437139FB8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8ADB1798-F0EF-42B5-80F6-6DD437139FB8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8ADB1798-F0EF-42B5-80F6-6DD437139FB8}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {39FDC096-FC93-4869-9966-F22CBA7D7029}
+	EndGlobalSection
+EndGlobal

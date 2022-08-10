@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Google.Protobuf" Version="3.21.4" />
+    <PackageReference Include="Grpc.Tools" Version="2.47.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.2.32">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="PhoenixToolkits.Protobuf.ExtendTypes" Version="0.0.6" />
+    <PackageReference Include="Tgs.MessageQueue.Nats" Version="2.1.6" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Protobuf Include="..\Tgs.Promotion.DepositAccumulateRouletteService\Protos\depositaccumulateroulette.proto" Link="Protos\depositaccumulateroulette.proto" GrpcServices="None" Access="Internal" />
+  </ItemGroup>
+
+</Project>

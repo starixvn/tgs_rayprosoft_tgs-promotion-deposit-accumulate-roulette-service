@@ -1,0 +1,47 @@
+﻿{
+   "CodeGenerationMode": 2,
+   "ContextClassName": "TgsContext",
+   "ContextNamespace": "Entities",
+   "DefaultDacpacSchema": null,
+   "FilterSchemas": true,
+   "IncludeConnectionString": false,
+   "ModelNamespace": "Entities",
+   "OutputContextPath": "Entities",
+   "OutputPath": "Entities\\Models",
+   "ProjectRootNamespace": "Tgs.Promotion.DepositAccumulateRoulette.Repositories",
+   "Schemas": [
+      {
+         "Name": "dbo"
+      }
+   ],
+   "SelectedHandlebarsLanguage": 0,
+   "SelectedToBeGenerated": 0,
+   "Tables": [
+      {
+         "Name": "dbo.deposit_accumulate_roulette_events",
+         "ObjectType": 0
+      },
+      {
+         "Name": "dbo.deposit_accumulate_roulette_game_events",
+         "ObjectType": 0
+      }
+   ],
+   "UiHint": "Tgs",
+   "UseBoolPropertiesWithoutDefaultSql": false,
+   "UseDatabaseNames": false,
+   "UseDbContextSplitting": true,
+   "UseFluentApiOnly": true,
+   "UseHandleBars": false,
+   "UseHierarchyId": false,
+   "UseInflector": true,
+   "UseLegacyPluralizer": false,
+   "UseManyToManyEntity": true,
+   "UseNoConstructor": false,
+   "UseNoDefaultConstructor": false,
+   "UseNoNavigations": false,
+   "UseNoObjectFilter": false,
+   "UseNodaTime": false,
+   "UseNullableReferences": true,
+   "UseSchemaFolders": false,
+   "UseSpatial": false
+}

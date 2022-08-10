@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+option csharp_namespace = "Tgs.Promotion.DepositAccumulateRouletteService.Protos";
+
+import "phoenix/protobuf/guid.proto";
+
+message RouletteSettingQueryRequest {
+	phoenix.protobuf.GuidValue promotion_id = 1;
+}
+
+message RouletteSettingQueryResponse {
+	phoenix.protobuf.GuidValue promotion_id = 1;
+	repeated RouletteItem items = 2;
+}
+
+message RouletteItem {
+	phoenix.protobuf.GuidValue id = 1;
+	string title = 2;
+}
