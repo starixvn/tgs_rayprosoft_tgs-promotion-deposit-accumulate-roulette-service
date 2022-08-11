@@ -13,6 +13,7 @@ internal class RouletteCommandService : IGetService<RouletteCommand, RouletteExc
 	private readonly IRouletteCountService _rouletteCountService;
 	private readonly IShuffleService _shuffleService;
 	private readonly IStatisticsService _statisticsService;
+	private readonly ICommandService<DistributeBonusCommand> _distributeService;
 	private readonly IPromotionServiceClient _promotionServiceClient;
 	private readonly IPlayerServiceClient _playerServiceClient;
 
@@ -22,6 +23,7 @@ internal class RouletteCommandService : IGetService<RouletteCommand, RouletteExc
 		IRouletteCountService rouletteCountService,
 		IShuffleService shuffleService,
 		IStatisticsService statisticsService,
+		ICommandService<DistributeBonusCommand> distributeService,
 		IPromotionServiceClient promotionServiceClient,
 		IPlayerServiceClient playerServiceClient)
 	{
@@ -29,7 +31,8 @@ internal class RouletteCommandService : IGetService<RouletteCommand, RouletteExc
 		_getPromotionService = getPromotionService ?? throw new ArgumentNullException(nameof(getPromotionService));
 		_rouletteCountService = rouletteCountService ?? throw new ArgumentNullException(nameof(rouletteCountService));
 		_shuffleService = shuffleService ?? throw new ArgumentNullException(nameof(shuffleService));
-		_statisticsService = statisticsService;
+		_statisticsService = statisticsService ?? throw new ArgumentNullException(nameof(statisticsService));
+		_distributeService = distributeService ?? throw new ArgumentNullException(nameof(distributeService));
 		_promotionServiceClient = promotionServiceClient ?? throw new ArgumentNullException(nameof(promotionServiceClient));
 		_playerServiceClient = playerServiceClient ?? throw new ArgumentNullException(nameof(playerServiceClient));
 	}
@@ -55,22 +58,21 @@ internal class RouletteCommandService : IGetService<RouletteCommand, RouletteExc
 		if (rouletteItems.Length == 0)
 			throw new InvalidOperationException($"Promotion {command.PromotionId} does not have any roulette items.");
 
-		var rouletteCountInfo = await _rouletteCountService.GetRemainingRouletteCountAsync(
+		var countInfo = await _rouletteCountService.DecreaseRouletteCountAsync(
 			command.PromotionId,
 			command.PlayerCode,
-			cancellationToken).ConfigureAwait(false);
+			cancellationToken);
 
-		if (rouletteCountInfo.DepositAccumulateRouletteEventId is null
-			|| rouletteCountInfo.RouletteCount == 0)
+		if (countInfo.UseEvent is null || countInfo.BeforeTotalCount <= 0)
 		{
 			return new RouletteExchangeResult(null, 0);
 		}
 
-		var (rouletteResult, remainingRouletteCount) = await ProcessRouletteAsync(
+		var rouletteResult = await ProcessRouletteAsync(
 			command,
 			rouletteItems,
 			player.BrandId,
-			rouletteCountInfo.DepositAccumulateRouletteEventId.Value,
+			countInfo,
 			cancellationToken).ConfigureAwait(false);
 
 		_ = Task.Run(async () =>
@@ -83,29 +85,28 @@ internal class RouletteCommandService : IGetService<RouletteCommand, RouletteExc
 
 			// 派發作業
 
-			//await _distributeService.ExecuteAsync(new DistributeBonusCommand(
-			//    command.PromotionId,
-			//    command.PlayerCode,
-			//    command.Date,
-			//    bonus,
-			//    bucket)).ConfigureAwait(false);
+			await _distributeService.ExecuteAsync(new DistributeBonusCommand(
+				command.PromotionId,
+				command.PlayerCode,
+				countInfo.UseEvent.EventId,
+				countInfo.BeforeEventCount,
+				rouletteResult.Bonus,
+				rouletteResult.Bucket),
+				default).ConfigureAwait(false);
 		});
 
 		return new RouletteExchangeResult(
 			new RouletteResult(rouletteResult.RouletteId, rouletteResult.ItemIndex),
-			remainingRouletteCount);
+			countInfo.AfterTotalCount);
 	}
 
-	private async ValueTask<(ProcessRouletteResult Result, int RemainingRouletteCount)> ProcessRouletteAsync(
+	private async ValueTask<ProcessRouletteResult> ProcessRouletteAsync(
 		RouletteCommand command,
 		RouletteItem[] rouletteItems,
 		Guid brandId,
-		Guid depositAccumulateRouletteEventId,
+		RouletteCountInfo countInfo,
 		CancellationToken cancellationToken)
 	{
-		var remainingCount = await _rouletteCountService.DecreaseRouletteCountAsync(command.PromotionId,
-			command.PlayerCode, depositAccumulateRouletteEventId, cancellationToken);
-
 		try
 		{
 			var itemIndex = await PlayRouletteAsync(command, rouletteItems).ConfigureAwait(false);
@@ -115,17 +116,17 @@ internal class RouletteCommandService : IGetService<RouletteCommand, RouletteExc
 				rouletteItems,
 				brandId,
 				itemIndex,
-				depositAccumulateRouletteEventId,
+				countInfo.UseEvent!.EventId,
 				cancellationToken).ConfigureAwait(false);
 
-			return (result, remainingCount);
+			return result;
 		}
 		catch
 		{
 			_ = await _rouletteCountService.IncreaseRouletteCountAsync(
 				command.PromotionId,
 				command.PlayerCode,
-				depositAccumulateRouletteEventId,
+				countInfo.UseEvent!.Date,
 				cancellationToken);
 
 			throw;

@@ -2,20 +2,14 @@
 
 internal interface IRouletteCountService
 {
-	public ValueTask<RouletteCountInfo> GetRemainingRouletteCountAsync(
+	ValueTask<RouletteCountInfo> DecreaseRouletteCountAsync(
 		Guid promotionId,
 		string playerCode,
 		CancellationToken cancellationToken = default);
 
-	ValueTask<int> DecreaseRouletteCountAsync(
+	ValueTask<RouletteCountInfo> IncreaseRouletteCountAsync(
 		Guid promotionId,
 		string playerCode,
-		Guid depositAccumulateRouletteEventId,
-		CancellationToken cancellationToken = default);
-
-	ValueTask<int> IncreaseRouletteCountAsync(
-		Guid promotionId,
-		string playerCode,
-		Guid depositAccumulateRouletteEventId,
+		DateOnly countDistributeDate,
 		CancellationToken cancellationToken = default);
 }

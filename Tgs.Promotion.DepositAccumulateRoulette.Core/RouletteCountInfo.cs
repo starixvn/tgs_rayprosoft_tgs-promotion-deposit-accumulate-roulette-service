@@ -1,5 +1,10 @@
-﻿namespace Tgs.Promotion.DepositAccumulateRoulette.Core;
+﻿using Tgs.Promotion.DepositAccumulateRoulette.Common;
+
+namespace Tgs.Promotion.DepositAccumulateRoulette.Core;
 
 internal record RouletteCountInfo(
-	Guid? DepositAccumulateRouletteEventId,
-	int RouletteCount);
+	DepositAccumulateRouletteEventInfo? UseEvent,
+	int BeforeEventCount,
+	int AfterEventCount,
+	int BeforeTotalCount,
+	int AfterTotalCount);

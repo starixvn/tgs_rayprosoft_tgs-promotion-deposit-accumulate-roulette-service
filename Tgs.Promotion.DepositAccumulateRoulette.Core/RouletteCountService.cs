@@ -21,46 +21,35 @@ internal class RouletteCountService : IRouletteCountService
 		_usedCountQueryService = usedCountQueryService ?? throw new ArgumentNullException(nameof(usedCountQueryService));
 	}
 
-	public async ValueTask<int> DecreaseRouletteCountAsync(
+	public ValueTask<RouletteCountInfo> DecreaseRouletteCountAsync(
 		Guid promotionId,
 		string playerCode,
-		Guid depositAccumulateRouletteEventId,
 		CancellationToken cancellationToken = default)
 	{
-		var countKey = GetRouletteCountRedisKey(promotionId, playerCode, depositAccumulateRouletteEventId);
-		var count = await _redisDatabase.StringDecrementAsync(countKey).ConfigureAwait(false);
-		return (int)count;
+		//var countKey = GetRouletteCountRedisKey(promotionId, playerCode, depositAccumulateRouletteEventId);
+
+		//var keyExist = await _redisDatabase.KeyExistsAsync(countKey).ConfigureAwait(false)''
+		//if ()
+
+		//	var count = await _redisDatabase.StringDecrementAsync(countKey).ConfigureAwait(false);
+		//return (int)count;
+
+		var info = new RouletteCountInfo(null, 0, 0, 0, 0);
+		return ValueTask.FromResult(info);
 	}
 
-	public async ValueTask<int> IncreaseRouletteCountAsync(Guid promotionId, string playerCode, Guid depositAccumulateRouletteEventId,
-		CancellationToken cancellationToken = default)
-	{
-		var countKey = GetRouletteCountRedisKey(promotionId, playerCode, depositAccumulateRouletteEventId);
-		var count = await _redisDatabase.StringIncrementAsync(countKey).ConfigureAwait(false);
-		return (int)count;
-	}
-
-	public async ValueTask<RouletteCountInfo> GetRemainingRouletteCountAsync(
-				Guid promotionId,
+	public ValueTask<RouletteCountInfo> IncreaseRouletteCountAsync(
+		Guid promotionId,
 		string playerCode,
+		DateOnly countDistributeDate,
 		CancellationToken cancellationToken = default)
 	{
-		var now = DateTimeOffset.Now;
+		//var countKey = GetRouletteCountRedisKey(promotionId, playerCode, depositAccumulateRouletteEventId);
+		//var count = await _redisDatabase.StringIncrementAsync(countKey).ConfigureAwait(false);
+		//return (int)count;
 
-		// assume the change date is 8:00 UTC+8
-		var recordDate = DateOnly.FromDateTime(now.ToOffset(TimeSpan.FromHours(8 - 8)).AddMinutes(-1).DateTime);
-
-		var eventIdKey = GetEventIdRedisKey(promotionId, playerCode, recordDate);
-		var eventIdValue = await _redisDatabase.StringGetAsync(eventIdKey).ConfigureAwait(false);
-		var eventId = Guid.TryParse(eventIdValue, out var id) && id != Guid.Empty ? id : (Guid?)null;
-
-		var countKey = GetRouletteCountRedisKey(promotionId, playerCode, eventId);
-		var countValue = await _redisDatabase.StringGetAsync(countKey).ConfigureAwait(false);
-
-		return countValue.HasValue
-			? new RouletteCountInfo(eventId, (int)countValue)
-			: await GetRemainingRouletteCountFromDatabaseAsync(promotionId, playerCode, recordDate, cancellationToken)
-				.ConfigureAwait(false);
+		var info = new RouletteCountInfo(null, 0, 0, 0, 0);
+		return ValueTask.FromResult(info);
 	}
 
 	private static string GetEventIdRedisKey(Guid promotionId, string playerCode, DateOnly queryDate)
@@ -71,66 +60,89 @@ internal class RouletteCountService : IRouletteCountService
 			? $"Promotion.DepositAccumulateRoulette:RouletteCount:{promotionId}:{playerCode}:{eventId:D}"
 			: $"Promotion.DepositAccumulateRoulette:RouletteCount:{promotionId}:{playerCode}:null";
 
-	private async Task<RouletteCountInfo> GetRemainingRouletteCountFromDatabaseAsync(
-		Guid promotionId,
-		string playerCode,
-		DateOnly recordDate,
-		CancellationToken cancellationToken)
-	{
-		var events = await _depositEventQueryService
-			.QueryAsync(new GetDepositAccumulateEventsQuery(promotionId, playerCode, recordDate), cancellationToken)
-			.ToArrayAsync(cancellationToken)
-			.ConfigureAwait(false);
+	//private async ValueTask<RouletteCountInfo> GetRemainingRouletteCountAsync(
+	//	Guid promotionId,
+	//	string playerCode,
+	//	CancellationToken cancellationToken = default)
+	//{
+	//	var now = DateTimeOffset.Now;
 
-		if (events.Length == 0)
-		{
-			var eventIdKey = GetEventIdRedisKey(promotionId, playerCode, recordDate);
-			_ = await _redisDatabase.StringSetAsync(eventIdKey, Guid.Empty.ToString("D"), TimeSpan.FromDays(1), When.NotExists).ConfigureAwait(false);
+	//	// assume the change date is 8:00 UTC+8
+	//	var recordDate = DateOnly.FromDateTime(now.ToOffset(TimeSpan.FromHours(8 - 8)).AddMinutes(-1).DateTime);
 
-			var countKey = GetRouletteCountRedisKey(promotionId, playerCode, null);
-			_ = await _redisDatabase.StringSetAsync(countKey, 0, TimeSpan.FromDays(1), When.NotExists).ConfigureAwait(false);
+	//	var eventIdKey = GetEventIdRedisKey(promotionId, playerCode, recordDate);
+	//	var eventIdValue = await _redisDatabase.StringGetAsync(eventIdKey).ConfigureAwait(false);
+	//	var eventId = Guid.TryParse(eventIdValue, out var id) && id != Guid.Empty ? id : (Guid?)null;
 
-			return new RouletteCountInfo(null, 0);
-		}
+	//	var countKey = GetRouletteCountRedisKey(promotionId, playerCode, eventId);
+	//	var countValue = await _redisDatabase.StringGetAsync(countKey).ConfigureAwait(false);
 
-		foreach (var evt in events.OrderBy(e => e.Date))
-		{
-			var index = Array.IndexOf(events, evt);
+	//	return countValue.HasValue
+	//		? new RouletteCountInfo(eventId, (int)countValue)
+	//		: await GetRemainingRouletteCountFromDatabaseAsync(promotionId, playerCode, recordDate, cancellationToken)
+	//			.ConfigureAwait(false);
+	//}
 
-			var countKey = GetRouletteCountRedisKey(promotionId, playerCode, evt.EventId);
-			var countValue = await _redisDatabase.StringGetAsync(countKey).ConfigureAwait(false);
+	//private async Task<RouletteCountInfo> GetRemainingRouletteCountFromDatabaseAsync(
+	//	Guid promotionId,
+	//	string playerCode,
+	//	DateOnly recordDate,
+	//	CancellationToken cancellationToken)
+	//{
+	//	var events = await _depositEventQueryService
+	//		.QueryAsync(new GetDepositAccumulateEventsQuery(promotionId, playerCode, recordDate), cancellationToken)
+	//		.ToArrayAsync(cancellationToken)
+	//		.ConfigureAwait(false);
 
-			var count = countValue.HasValue ? (int)countValue : 0;
-			if (count > 0)
-			{
-				return new RouletteCountInfo(evt.EventId, count);
-			}
+	//	if (events.Length == 0)
+	//	{
+	//		var eventIdKey = GetEventIdRedisKey(promotionId, playerCode, recordDate);
+	//		_ = await _redisDatabase.StringSetAsync(eventIdKey, Guid.Empty.ToString("D"), TimeSpan.FromDays(1), When.NotExists).ConfigureAwait(false);
 
-			var usedCount = await _usedCountQueryService.GetAsync(
-				new RouletteUsedCountQuery(promotionId, playerCode, evt.EventId),
-				cancellationToken).ConfigureAwait(false);
+	//		var countKey = GetRouletteCountRedisKey(promotionId, playerCode, null);
+	//		_ = await _redisDatabase.StringSetAsync(countKey, 0, TimeSpan.FromDays(1), When.NotExists).ConfigureAwait(false);
 
-			count = evt.RouletteCount - usedCount;
-			count = count > 0 ? count : 0;
+	//		return new RouletteCountInfo(null, 0);
+	//	}
 
-			if (count > 0 || index == events.Length - 1)
-			{
-				var eventIdKey = GetEventIdRedisKey(promotionId, playerCode, recordDate);
+	//	foreach (var evt in events.OrderBy(e => e.Date))
+	//	{
+	//		var index = Array.IndexOf(events, evt);
 
-				_ = await _redisDatabase.StringSetAsync(
-						eventIdKey,
-						evt.EventId.ToString("D"),
-						TimeSpan.FromDays(1),
-						When.Always)
-					.ConfigureAwait(false);
+	//		var countKey = GetRouletteCountRedisKey(promotionId, playerCode, evt.EventId);
+	//		var countValue = await _redisDatabase.StringGetAsync(countKey).ConfigureAwait(false);
 
-				_ = await _redisDatabase.StringSetAsync(countKey, count, TimeSpan.FromDays(1), When.Always)
-					.ConfigureAwait(false);
+	//		var count = countValue.HasValue ? (int)countValue : 0;
+	//		if (count > 0)
+	//		{
+	//			return new RouletteCountInfo(evt.EventId, count);
+	//		}
 
-				return new RouletteCountInfo(evt.EventId, count);
-			}
-		}
+	//		var usedCount = await _usedCountQueryService.GetAsync(
+	//			new RouletteUsedCountQuery(promotionId, playerCode, evt.EventId),
+	//			cancellationToken).ConfigureAwait(false);
 
-		return new RouletteCountInfo(null, 0);
-	}
+	//		count = evt.RouletteCount - usedCount;
+	//		count = count > 0 ? count : 0;
+
+	//		if (count > 0 || index == events.Length - 1)
+	//		{
+	//			var eventIdKey = GetEventIdRedisKey(promotionId, playerCode, recordDate);
+
+	//			_ = await _redisDatabase.StringSetAsync(
+	//					eventIdKey,
+	//					evt.EventId.ToString("D"),
+	//					TimeSpan.FromDays(1),
+	//					When.Always)
+	//				.ConfigureAwait(false);
+
+	//			_ = await _redisDatabase.StringSetAsync(countKey, count, TimeSpan.FromDays(1), When.Always)
+	//				.ConfigureAwait(false);
+
+	//			return new RouletteCountInfo(evt.EventId, count);
+	//		}
+	//	}
+
+	//	return new RouletteCountInfo(null, 0);
+	//}
 }
