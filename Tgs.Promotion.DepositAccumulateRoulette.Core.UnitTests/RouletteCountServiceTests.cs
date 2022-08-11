@@ -225,15 +225,15 @@ internal class RouletteCountServiceTests
 			$"Promotion.DepositAccumulateRoulette:RouletteCount:{promotionId}:{playerCode}";
 
 		_ = fakeRedisDatabase.StringGetAsync(
-				Arg.Is<RedisKey>($"{countKeyPrefix}:{events[0].Date}"))
+				Arg.Is<RedisKey>($"{countKeyPrefix}:{events[0].Date:O}"))
 			.Returns(3);
 
 		_ = fakeRedisDatabase.StringGetAsync(
-				Arg.Is<RedisKey>($"{countKeyPrefix}:{events[1].Date}"))
+				Arg.Is<RedisKey>($"{countKeyPrefix}:{events[1].Date:O}"))
 			.Returns(4);
 
 		_ = fakeRedisDatabase.StringDecrementAsync(
-				Arg.Is<RedisKey>($"{countKeyPrefix}:{events[0].Date}"))
+				Arg.Is<RedisKey>($"{countKeyPrefix}:{events[0].Date:O}"))
 			.Returns(2);
 
 		var sut = new RouletteCountService(fakeRedisDatabase, fakeEventQueryService, fakeUsedCountQueryService, fakeSystemClock);
