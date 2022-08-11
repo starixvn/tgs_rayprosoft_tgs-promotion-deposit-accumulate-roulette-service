@@ -30,7 +30,8 @@ public static class ServiceCollectionExtensions
 		_ = services
 			.AddSingleton<IDistributePlanHasher, DistributePlanHasher>()
 			.AddSingleton<IStatisticsService, StatisticsService>()
-			.AddSingleton<IShuffleService, ShuffleService>();
+			.AddSingleton<IShuffleService, ShuffleService>()
+			.AddSingleton<ISystemClock, SystemClock>();
 
 		_ = services
 			.AddTransient<IRouletteCountService>(sp =>

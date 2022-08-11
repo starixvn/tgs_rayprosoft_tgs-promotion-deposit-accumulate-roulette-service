@@ -1,4 +1,5 @@
-﻿using NSubstitute;
+﻿using System.Linq.Expressions;
+using NSubstitute;
 using StackExchange.Redis;
 using Tgs.Promotion.DepositAccumulateRoulette.Common;
 using Tgs.Promotion.DepositAccumulateRoulette.Core.ApplicationServices;
@@ -8,187 +9,239 @@ namespace Tgs.Promotion.DepositAccumulateRoulette.Core.UnitTests;
 
 internal class RouletteCountServiceTests
 {
-	//[Test]
-	//public async Task Get_RouletteCount_When_Hit_Redis_Cache()
-	//{
-	//	var fakeRedisDatabase = Substitute.For<IDatabase>();
-	//	var fakeEventQueryService =
-	//		Substitute.For<IQueryService<GetDepositAccumulateEventsQuery, DepositAccumulateRouletteEventInfo>>();
-	//	var fakeUsedCountQueryService = Substitute.For<IGetService<RouletteUsedCountQuery, int>>();
+	[Test]
+	public async Task Decrease_RouletteCount_When_Hit_Redis_Cache()
+	{
+		var fakeRedisDatabase = Substitute.For<IDatabase>();
+		var fakeEventQueryService =
+			Substitute.For<IQueryService<GetDepositAccumulateEventsQuery, DepositAccumulateRouletteEventInfo>>();
+		var fakeUsedCountQueryService = Substitute.For<IGetService<RouletteUsedCountQuery, int>>();
+		var fakeSystemClock = Substitute.For<ISystemClock>();
 
-	//	var promotionId = Guid.NewGuid();
-	//	var playerCode = "player1";
+		var promotionId = Guid.NewGuid();
+		var playerCode = "player1";
+		var brandId = Guid.NewGuid();
 
-	//	var expected = new RouletteCountInfo(Guid.NewGuid(), 3);
+		var events = new DepositAccumulateRouletteEventInfo[]
+		{
+			new DepositAccumulateRouletteEventInfo(
+				Guid.NewGuid(),
+				playerCode,
+				brandId,
+				promotionId,
+				DateOnly.Parse("2022-08-10"),
+				5,
+				2400)
+		};
 
-	//	_ = fakeRedisDatabase.StringGetAsync(
-	//		Arg.Is<RedisKey>(x => x.ToString().StartsWith("Promotion.DepositAccumulateRoulette:EventId")))
-	//		.Returns(expected.DepositAccumulateRouletteEventId!.Value.ToString("D"));
+		var expected = new RouletteCountInfo(events[0], 3, 2, 3, 2);
 
-	//	var countKey =
-	//		$"Promotion.DepositAccumulateRoulette:RouletteCount:{promotionId}:{playerCode}:{expected.DepositAccumulateRouletteEventId}";
+		_ = fakeSystemClock.UtcNow.Returns(new DateTimeOffset(2022, 08, 11, 6, 0, 0, TimeSpan.FromHours(8)));
 
-	//	_ = fakeRedisDatabase.StringGetAsync(
-	//			Arg.Is((RedisKey)countKey))
-	//		.Returns(expected.RouletteCount);
+		_ = fakeEventQueryService.QueryAsync(
+				Arg.Is(new GetDepositAccumulateEventsQuery(
+					promotionId,
+					playerCode,
+					DateOnly.Parse("2022-08-10"))),
+				Arg.Any<CancellationToken>())
+			.Returns(events.ToAsyncEnumerable());
 
-	//	var sut = new RouletteCountService(fakeRedisDatabase, fakeEventQueryService, fakeUsedCountQueryService);
+		var countKey =
+			$"Promotion.DepositAccumulateRoulette:RouletteCount:{promotionId}:{playerCode}:{events[0].Date:O}";
 
-	//	var actual = await sut.GetRemainingRouletteCountAsync(promotionId, playerCode).ConfigureAwait(false);
+		_ = fakeRedisDatabase.StringGetAsync(
+			Arg.Is<RedisKey>(countKey))
+			.Returns(3);
 
-	//	Assert.AreEqual(expected, actual);
+		_ = fakeRedisDatabase.StringDecrementAsync(
+				Arg.Is<RedisKey>(countKey))
+			.Returns(2);
 
-	//	_ = fakeEventQueryService
-	//		.DidNotReceive()
-	//		.QueryAsync(Arg.Is<GetDepositAccumulateEventsQuery>(x =>
-	//			x.PromotionId == promotionId && x.PlayerCode == playerCode));
-	//}
+		var sut = new RouletteCountService(fakeRedisDatabase, fakeEventQueryService, fakeUsedCountQueryService, fakeSystemClock);
 
-	//[Test]
-	//public async Task Get_RouletteCount_When_Miss_Redis_Cache()
-	//{
-	//	var fakeRedisDatabase = Substitute.For<IDatabase>();
-	//	var fakeEventQueryService =
-	//		Substitute.For<IQueryService<GetDepositAccumulateEventsQuery, DepositAccumulateRouletteEventInfo>>();
-	//	var fakeUsedCountQueryService = Substitute.For<IGetService<RouletteUsedCountQuery, int>>();
+		var actual = await sut.DecreaseRouletteCountAsync(promotionId, playerCode).ConfigureAwait(false);
 
-	//	var promotionId = Guid.NewGuid();
-	//	var playerCode = "player1";
-	//	var brandId = Guid.NewGuid();
+		Assert.AreEqual(expected, actual);
+	}
 
-	//	var expected = new RouletteCountInfo(Guid.NewGuid(), 1);
+	[Test]
+	public async Task Decrease_RouletteCount_When_Miss_Redis_Cache()
+	{
+		var fakeRedisDatabase = Substitute.For<IDatabase>();
+		var fakeEventQueryService =
+			Substitute.For<IQueryService<GetDepositAccumulateEventsQuery, DepositAccumulateRouletteEventInfo>>();
+		var fakeUsedCountQueryService = Substitute.For<IGetService<RouletteUsedCountQuery, int>>();
+		var fakeSystemClock = Substitute.For<ISystemClock>();
 
-	//	var events = new DepositAccumulateRouletteEventInfo[]
-	//	{
-	//		new DepositAccumulateRouletteEventInfo(
-	//			expected.DepositAccumulateRouletteEventId!.Value,
-	//			playerCode,
-	//			brandId,
-	//			promotionId,
-	//			DateOnly.Parse("2022-08-09"),
-	//			3,
-	//			1500)
-	//	};
+		var promotionId = Guid.NewGuid();
+		var playerCode = "player1";
+		var brandId = Guid.NewGuid();
 
-	//	_ = fakeEventQueryService.QueryAsync(
-	//			Arg.Is<GetDepositAccumulateEventsQuery>(x =>
-	//				x.PromotionId == promotionId && x.PlayerCode == playerCode))
-	//		.Returns(events.ToAsyncEnumerable());
+		var events = new DepositAccumulateRouletteEventInfo[]
+		{
+			new DepositAccumulateRouletteEventInfo(
+				Guid.NewGuid(),
+				playerCode,
+				brandId,
+				promotionId,
+				DateOnly.Parse("2022-08-11"),
+				5,
+				2400)
+		};
 
-	//	_ = fakeUsedCountQueryService.GetAsync(
-	//			Arg.Is<RouletteUsedCountQuery>(x =>
-	//				x.PromotionId == promotionId && x.PlayerCode == playerCode
-	//											 && x.DepositAccumulateRouletteEventId ==
-	//											 expected.DepositAccumulateRouletteEventId))
-	//		.Returns(2);
+		var expected = new RouletteCountInfo(events[0], 3, 2, 3, 2);
 
-	//	var sut = new RouletteCountService(fakeRedisDatabase, fakeEventQueryService, fakeUsedCountQueryService);
+		_ = fakeSystemClock.UtcNow.Returns(new DateTimeOffset(2022, 08, 11, 7, 30, 0, TimeSpan.FromHours(8)));
 
-	//	var actual = await sut.GetRemainingRouletteCountAsync(promotionId, playerCode).ConfigureAwait(false);
+		_ = fakeEventQueryService.QueryAsync(
+				Arg.Is(new GetDepositAccumulateEventsQuery(
+					promotionId,
+					playerCode,
+					DateOnly.Parse("2022-08-11"))),
+				Arg.Any<CancellationToken>())
+			.Returns(events.ToAsyncEnumerable());
 
-	//	Assert.AreEqual(expected, actual);
+		var countKey =
+			$"Promotion.DepositAccumulateRoulette:RouletteCount:{promotionId}:{playerCode}:{events[0].Date:O}";
 
-	//	_ = fakeEventQueryService
-	//		.Received(1)
-	//		.QueryAsync(Arg.Is<GetDepositAccumulateEventsQuery>(x =>
-	//			x.PromotionId == promotionId && x.PlayerCode == playerCode));
+		_ = fakeRedisDatabase.StringGetAsync(
+				Arg.Is<RedisKey>(countKey))
+			.Returns((int?)null);
 
-	//	_ = fakeRedisDatabase
-	//		.Received(1)
-	//		.StringSetAsync(
-	//			Arg.Is<RedisKey>(x => x.ToString().StartsWith("Promotion.DepositAccumulateRoulette:EventId")),
-	//			Arg.Is((RedisValue)expected.DepositAccumulateRouletteEventId!.Value.ToString("D")),
-	//			Arg.Any<TimeSpan>(),
-	//			Arg.Any<When>());
+		_ = fakeUsedCountQueryService.GetAsync(
+				Arg.Is(new RouletteUsedCountQuery(
+					promotionId,
+					playerCode,
+					events[0].EventId)))
+			.Returns(2);
 
-	//	var countKey =
-	//		$"Promotion.DepositAccumulateRoulette:RouletteCount:{promotionId}:{playerCode}:{expected.DepositAccumulateRouletteEventId}";
+		_ = fakeRedisDatabase.StringSetAsync(
+				Arg.Is<RedisKey>(countKey),
+				Arg.Is<RedisValue>(3),
+				Arg.Any<TimeSpan>())
+			.Returns(true);
 
-	//	_ = fakeRedisDatabase
-	//		.Received(1)
-	//		.StringSetAsync(
-	//			Arg.Is((RedisKey)countKey),
-	//			Arg.Is((RedisValue)expected.RouletteCount),
-	//			Arg.Any<TimeSpan>(),
-	//			Arg.Any<When>());
-	//}
+		_ = fakeRedisDatabase.StringDecrementAsync(
+				Arg.Is<RedisKey>(countKey))
+			.Returns(2);
 
-	//[Test]
-	//public async Task Get_RouletteCount_When_Miss_Redis_Cache_And_Two_Events_Returns()
-	//{
-	//	var fakeRedisDatabase = Substitute.For<IDatabase>();
-	//	var fakeEventQueryService =
-	//		Substitute.For<IQueryService<GetDepositAccumulateEventsQuery, DepositAccumulateRouletteEventInfo>>();
-	//	var fakeUsedCountQueryService = Substitute.For<IGetService<RouletteUsedCountQuery, int>>();
+		var sut = new RouletteCountService(fakeRedisDatabase, fakeEventQueryService, fakeUsedCountQueryService, fakeSystemClock);
 
-	//	var promotionId = Guid.NewGuid();
-	//	var playerCode = "player1";
-	//	var brandId = Guid.NewGuid();
+		var actual = await sut.DecreaseRouletteCountAsync(promotionId, playerCode).ConfigureAwait(false);
 
-	//	var expected = new RouletteCountInfo(Guid.NewGuid(), 1);
+		Assert.AreEqual(expected, actual);
+	}
 
-	//	var events = new DepositAccumulateRouletteEventInfo[]
-	//	{
-	//		new DepositAccumulateRouletteEventInfo(
-	//			expected.DepositAccumulateRouletteEventId!.Value,
-	//			playerCode,
-	//			brandId,
-	//			promotionId,
-	//			DateOnly.Parse("2022-08-09"),
-	//			3,
-	//			1500),
-	//		new DepositAccumulateRouletteEventInfo(
-	//			Guid.NewGuid(),
-	//			playerCode,
-	//			brandId,
-	//			promotionId,
-	//			DateOnly.Parse("2022-08-10"),
-	//			2,
-	//			1000)
-	//	};
+	[Test]
+	public async Task Decrease_RouletteCount_When_Event_Data_Are_Empty()
+	{
+		var fakeRedisDatabase = Substitute.For<IDatabase>();
+		var fakeEventQueryService =
+			Substitute.For<IQueryService<GetDepositAccumulateEventsQuery, DepositAccumulateRouletteEventInfo>>();
+		var fakeUsedCountQueryService = Substitute.For<IGetService<RouletteUsedCountQuery, int>>();
+		var fakeSystemClock = Substitute.For<ISystemClock>();
 
-	//	_ = fakeEventQueryService.QueryAsync(
-	//			Arg.Is<GetDepositAccumulateEventsQuery>(x =>
-	//				x.PromotionId == promotionId && x.PlayerCode == playerCode))
-	//		.Returns(events.ToAsyncEnumerable());
+		var promotionId = Guid.NewGuid();
+		var playerCode = "player1";
+		var brandId = Guid.NewGuid();
 
-	//	_ = fakeUsedCountQueryService.GetAsync(
-	//			Arg.Is<RouletteUsedCountQuery>(x =>
-	//				x.PromotionId == promotionId && x.PlayerCode == playerCode
-	//											 && x.DepositAccumulateRouletteEventId ==
-	//											 expected.DepositAccumulateRouletteEventId))
-	//		.Returns(2);
+		var expected = new RouletteCountInfo(null, 0, 0, 0, 0);
 
-	//	var sut = new RouletteCountService(fakeRedisDatabase, fakeEventQueryService, fakeUsedCountQueryService);
+		_ = fakeSystemClock.UtcNow.Returns(new DateTimeOffset(2022, 08, 11, 7, 30, 0, TimeSpan.FromHours(8)));
 
-	//	var actual = await sut.GetRemainingRouletteCountAsync(promotionId, playerCode).ConfigureAwait(false);
+		_ = fakeEventQueryService.QueryAsync(
+				Arg.Is(new GetDepositAccumulateEventsQuery(
+					promotionId,
+					playerCode,
+					DateOnly.Parse("2022-08-11"))),
+				Arg.Any<CancellationToken>())
+			.Returns(Array.Empty<DepositAccumulateRouletteEventInfo>().ToAsyncEnumerable());
 
-	//	Assert.AreEqual(expected, actual);
+		var sut = new RouletteCountService(fakeRedisDatabase, fakeEventQueryService, fakeUsedCountQueryService, fakeSystemClock);
 
-	//	_ = fakeEventQueryService
-	//		.Received(1)
-	//		.QueryAsync(Arg.Is<GetDepositAccumulateEventsQuery>(x =>
-	//			x.PromotionId == promotionId && x.PlayerCode == playerCode));
+		var actual = await sut.DecreaseRouletteCountAsync(promotionId, playerCode).ConfigureAwait(false);
 
-	//	_ = fakeRedisDatabase
-	//		.Received(1)
-	//		.StringSetAsync(
-	//			Arg.Is<RedisKey>(x => x.ToString().StartsWith("Promotion.DepositAccumulateRoulette:EventId")),
-	//			Arg.Is((RedisValue)expected.DepositAccumulateRouletteEventId!.Value.ToString("D")),
-	//			Arg.Any<TimeSpan>(),
-	//			Arg.Any<When>());
+		Assert.AreEqual(expected, actual);
 
-	//	var countKey =
-	//		$"Promotion.DepositAccumulateRoulette:RouletteCount:{promotionId}:{playerCode}:{expected.DepositAccumulateRouletteEventId}";
+		var keyPrefix = $"Promotion.DepositAccumulateRoulette:RouletteCount:{promotionId}:{playerCode}";
 
-	//	_ = fakeRedisDatabase
-	//		.Received(1)
-	//		.StringSetAsync(
-	//			Arg.Is((RedisKey)countKey),
-	//			Arg.Is((RedisValue)expected.RouletteCount),
-	//			Arg.Any<TimeSpan>(),
-	//			Arg.Any<When>());
-	//}
+		_ = fakeRedisDatabase
+			.Received(0)
+			.StringGetAsync(
+				Arg.Is<RedisKey>(x => x.ToString().StartsWith(keyPrefix)));
+
+		_ = fakeRedisDatabase
+			.Received(0)
+			.StringDecrementAsync(
+				Arg.Is<RedisKey>(x => x.ToString().StartsWith(keyPrefix)));
+	}
+
+	[Test]
+	public async Task Get_RouletteCount_With_Two_Events_Returns()
+	{
+		var fakeRedisDatabase = Substitute.For<IDatabase>();
+		var fakeEventQueryService =
+			Substitute.For<IQueryService<GetDepositAccumulateEventsQuery, DepositAccumulateRouletteEventInfo>>();
+		var fakeUsedCountQueryService = Substitute.For<IGetService<RouletteUsedCountQuery, int>>();
+		var fakeSystemClock = Substitute.For<ISystemClock>();
+
+		var promotionId = Guid.NewGuid();
+		var playerCode = "player1";
+		var brandId = Guid.NewGuid();
+
+		var events = new DepositAccumulateRouletteEventInfo[]
+		{
+			new DepositAccumulateRouletteEventInfo(
+				Guid.NewGuid(),
+				playerCode,
+				brandId,
+				promotionId,
+				DateOnly.Parse("2022-08-10"),
+				5,
+				2400),
+			new DepositAccumulateRouletteEventInfo(
+				Guid.NewGuid(),
+				playerCode,
+				brandId,
+				promotionId,
+				DateOnly.Parse("2022-08-11"),
+				4,
+				1200)
+		};
+
+		var expected = new RouletteCountInfo(events[0], 3, 2, 7, 6);
+
+		_ = fakeSystemClock.UtcNow.Returns(new DateTimeOffset(2022, 08, 11, 6, 0, 0, TimeSpan.FromHours(8)));
+
+		_ = fakeEventQueryService.QueryAsync(
+				Arg.Is(new GetDepositAccumulateEventsQuery(
+					promotionId,
+					playerCode,
+					DateOnly.Parse("2022-08-10"))),
+				Arg.Any<CancellationToken>())
+			.Returns(events.ToAsyncEnumerable());
+
+		var countKeyPrefix =
+			$"Promotion.DepositAccumulateRoulette:RouletteCount:{promotionId}:{playerCode}";
+
+		_ = fakeRedisDatabase.StringGetAsync(
+				Arg.Is<RedisKey>($"{countKeyPrefix}:{events[0].Date}"))
+			.Returns(3);
+
+		_ = fakeRedisDatabase.StringGetAsync(
+				Arg.Is<RedisKey>($"{countKeyPrefix}:{events[1].Date}"))
+			.Returns(4);
+
+		_ = fakeRedisDatabase.StringDecrementAsync(
+				Arg.Is<RedisKey>($"{countKeyPrefix}:{events[0].Date}"))
+			.Returns(2);
+
+		var sut = new RouletteCountService(fakeRedisDatabase, fakeEventQueryService, fakeUsedCountQueryService, fakeSystemClock);
+
+		var actual = await sut.DecreaseRouletteCountAsync(promotionId, playerCode).ConfigureAwait(false);
+
+		Assert.AreEqual(expected, actual);
+	}
 
 	//[Test]
 	//public async Task Get_RouletteCount_When_Miss_Redis_Cache_And_Two_Events_Returns_And_First_Events_Has_Run_Out_Of_Roulette_Count()
