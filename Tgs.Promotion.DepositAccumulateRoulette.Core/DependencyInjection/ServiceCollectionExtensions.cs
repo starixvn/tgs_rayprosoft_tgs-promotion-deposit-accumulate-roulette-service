@@ -3,10 +3,11 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Tgs.Promotion.Clients;
 using Tgs.Promotion.DepositAccumulateRoulette.Common;
+using Tgs.Promotion.DepositAccumulateRoulette.Core;
 using Tgs.Promotion.DepositAccumulateRoulette.Core.ApplicationServices;
 using Tgs.ServiceUtility;
 
-namespace Tgs.Promotion.DepositAccumulateRoulette.Core.DependencyInjection;
+namespace Microsoft.Extensions.DependencyInjection;
 
 public static class ServiceCollectionExtensions
 {
@@ -29,25 +30,9 @@ public static class ServiceCollectionExtensions
 		_ = services
 			.AddSingleton<IDistributePlanHasher, DistributePlanHasher>()
 			.AddSingleton<IStatisticsService, StatisticsService>()
-			.AddSingleton<IShuffleService, ShuffleService>()
-			.Decorate<IShuffleService, MemoryCachedShuffleService>();
+			.AddSingleton<IShuffleService, ShuffleService>();
 
 		_ = services
-			.Decorate<IGetService<GetPromotionDistributePlanQuery, PromotionDistributePlanInfo>, MemoryCachedGetPromotionDistributePlanQueryService>();
-
-		_ = services
-			//.AddTransient<
-			//	IQueryService<GetDepositAccumulateEventsQuery, DepositAccumulateRouletteEventInfo>,
-			//	GetDepositAccumulateEventsQueryService>()
-			//.Decorate<IQueryService<GetDepositAccumulateEventsQuery, DepositAccumulateRouletteEventInfo>, RedisCachedGetDepositAccumulateEventQueryService>()
-			.Decorate<IQueryService<GetDepositAccumulateEventsQuery, DepositAccumulateRouletteEventInfo>>(
-				(inner, sp) =>
-				{
-					var redisCacheManager = sp.GetRequiredService<RedisConnectionManager>();
-
-					return new RedisCachedGetDepositAccumulateEventQueryService(inner, redisCacheManager.Database);
-				})
-			.AddTransient<IClearDepositAccumulateRouletteEventCache, RedisCachedGetDepositAccumulateEventQueryService>()
 			.AddTransient<IRouletteCountService>(sp =>
 			{
 				var redisConnectionManager = sp.GetRequiredService<RedisConnectionManager>();

@@ -1,6 +1,6 @@
 ﻿namespace Tgs.Promotion.DepositAccumulateRoulette.Core.ApplicationServices;
 
-internal record GetDepositAccumulateEventsQuery(
+public record GetDepositAccumulateEventsQuery(
 	Guid PromotionId,
 	string PlayerCode,
 	DateOnly QueryDate);

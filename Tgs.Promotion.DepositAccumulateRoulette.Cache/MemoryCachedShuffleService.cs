@@ -1,7 +1,8 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
 using Tgs.Promotion.DepositAccumulateRoulette.Common;
+using Tgs.Promotion.DepositAccumulateRoulette.Core;
 
-namespace Tgs.Promotion.DepositAccumulateRoulette.Core;
+namespace Tgs.Promotion.DepositAccumulateRoulette.Cache;
 
 internal class MemoryCachedShuffleService : IShuffleService
 {

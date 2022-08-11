@@ -3,13 +3,13 @@ using System.Text.Json;
 using DateOnlyTimeOnly.AspNet.Converters;
 using StackExchange.Redis;
 using Tgs.Promotion.DepositAccumulateRoulette.Common;
+using Tgs.Promotion.DepositAccumulateRoulette.Core.ApplicationServices;
 using Tgs.ServiceUtility;
 
-namespace Tgs.Promotion.DepositAccumulateRoulette.Core.ApplicationServices;
+namespace Tgs.Promotion.DepositAccumulateRoulette.Cache;
 
 internal class RedisCachedGetDepositAccumulateEventQueryService :
-	IQueryService<GetDepositAccumulateEventsQuery, DepositAccumulateRouletteEventInfo>,
-	IClearDepositAccumulateRouletteEventCache
+	IQueryService<GetDepositAccumulateEventsQuery, DepositAccumulateRouletteEventInfo>
 {
 	private readonly JsonSerializerOptions _jsonSerializerOptions = new()
 	{
@@ -20,8 +20,8 @@ internal class RedisCachedGetDepositAccumulateEventQueryService :
 	private readonly IQueryService<GetDepositAccumulateEventsQuery, DepositAccumulateRouletteEventInfo> _queryService;
 
 	public RedisCachedGetDepositAccumulateEventQueryService(
-		IQueryService<GetDepositAccumulateEventsQuery, DepositAccumulateRouletteEventInfo> queryService,
-		IDatabase redisDatabase)
+		IDatabase redisDatabase,
+		IQueryService<GetDepositAccumulateEventsQuery, DepositAccumulateRouletteEventInfo> queryService)
 	{
 		_redisDatabase = redisDatabase ?? throw new ArgumentNullException(nameof(redisDatabase));
 		_queryService = queryService ?? throw new ArgumentNullException(nameof(queryService));
@@ -68,15 +68,5 @@ internal class RedisCachedGetDepositAccumulateEventQueryService :
 				yield return evt;
 			}
 		}
-	}
-
-	public async ValueTask ClearCacheAsync(Guid promotionId, string playerCode)
-	{
-		var key = $"Promotion:DepositAccumulateRoulette:DepositEventInfo:{promotionId}:{playerCode}";
-
-		var score = DateTimeOffset.UtcNow.ToOffset(TimeSpan.FromHours(8D)).Ticks;
-
-		_ = await _redisDatabase.SortedSetRemoveRangeByScoreAsync(key, start: 0, stop: score, exclude: Exclude.Stop)
-			.ConfigureAwait(false);
 	}
 }

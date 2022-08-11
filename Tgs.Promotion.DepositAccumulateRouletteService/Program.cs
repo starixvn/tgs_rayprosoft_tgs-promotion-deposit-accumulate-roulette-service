@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using Tgs.Promotion.DepositAccumulateRoulette.Core;
-using Tgs.Promotion.DepositAccumulateRoulette.Core.DependencyInjection;
 using Tgs.Promotion.DepositAccumulateRouletteService.MessageQueue;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -46,6 +45,11 @@ builder.Services
 	{
 		var config = sp.GetRequiredService<IConfiguration>();
 		options.RedisConnectionString = config.GetConnectionString("Redis");
+	})
+	.AddDepositAccumulateRouletteCache(sp =>
+	{
+		var redisConnectionManager = sp.GetRequiredService<RedisConnectionManager>();
+		return redisConnectionManager.Database;
 	})
 	.AddPromotionClientServices((options, sp) =>
 	{

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Tgs.Promotion.DepositAccumulateRoulette.Common;
+using Tgs.Promotion.DepositAccumulateRoulette.Core;
 using Tgs.Promotion.DepositAccumulateRoulette.Core.ApplicationServices;
 using Tgs.ServiceUtility;
 
@@ -19,5 +20,12 @@ public class RouletteController : ControllerBase
 		var result = await commandService.GetAsync(command).ConfigureAwait(false);
 
 		return result;
+	}
+
+	[HttpPost("event/cache/clear")]
+	public async Task CacheClearAsync(
+		[FromServices] IClearDepositAccumulateRouletteEventCache clearCacheService)
+	{
+		await clearCacheService.ClearCacheAsync(Guid.NewGuid(), "player1").ConfigureAwait(false);
 	}
 }

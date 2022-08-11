@@ -6,7 +6,7 @@ using Tgs.Promotion.DepositAccumulateRoulette.Common;
 using Tgs.Promotion.DepositAccumulateRoulette.Core.ApplicationServices;
 using Tgs.ServiceUtility;
 
-namespace Tgs.Promotion.DepositAccumulateRoulette.Core.UnitTests;
+namespace Tgs.Promotion.DepositAccumulateRoulette.Cache.UnitTests;
 
 internal class RedisCachedGetDepositAccumulateEventQueryServiceTests
 {
@@ -61,15 +61,15 @@ internal class RedisCachedGetDepositAccumulateEventQueryServiceTests
 				order: Arg.Any<Order>())
 			.Returns(redisData);
 
-		//var sut = new RedisCachedGetDepositAccumulateEventQueryService(fakeRedisDatabase, fakeSourceService);
+		var sut = new RedisCachedGetDepositAccumulateEventQueryService(fakeRedisDatabase, fakeSourceService);
 
-		//var actual = await sut.QueryAsync(query).ToArrayAsync().ConfigureAwait(false);
+		var actual = await sut.QueryAsync(query).ToArrayAsync().ConfigureAwait(false);
 
-		//CollectionAssert.AreEqual(expected, actual);
+		CollectionAssert.AreEqual(expected, actual);
 
-		//_ = fakeSourceService
-		//	.DidNotReceive()
-		//	.QueryAsync(Arg.Is(query));
+		_ = fakeSourceService
+			.DidNotReceive()
+			.QueryAsync(Arg.Is(query));
 	}
 
 	[Test]
@@ -110,10 +110,10 @@ internal class RedisCachedGetDepositAccumulateEventQueryServiceTests
 			.QueryAsync(Arg.Is(query))
 			.Returns(expected.ToAsyncEnumerable());
 
-		//var sut = new RedisCachedGetDepositAccumulateEventQueryService(fakeRedisDatabase, fakeSourceService);
+		var sut = new RedisCachedGetDepositAccumulateEventQueryService(fakeRedisDatabase, fakeSourceService);
 
-		//var actual = await sut.QueryAsync(query).ToArrayAsync().ConfigureAwait(false);
+		var actual = await sut.QueryAsync(query).ToArrayAsync().ConfigureAwait(false);
 
-		//CollectionAssert.AreEqual(expected, actual);
+		CollectionAssert.AreEqual(expected, actual);
 	}
 }
