@@ -25,10 +25,12 @@ public static class ServiceCollectionExtensions
 			.Decorate<IQueryService<GetDepositAccumulateEventsQuery, DepositAccumulateRouletteEventInfo>>((inner, sp) =>
 			{
 				var redisDatabase = resolveRedisDatabase(sp);
-				return new RedisCachedGetDepositAccumulateEventQueryService(redisDatabase, inner);
+				return ActivatorUtilities.CreateInstance<RedisCachedGetDepositAccumulateEventQueryService>(sp,
+					redisDatabase, inner);
 			});
 
 		_ = services
+			.AddSingleton<ISystemClock, SystemClock>()
 			.AddSingleton<IClearDepositAccumulateRouletteEventCache>(sp =>
 			{
 				var redisDatabase = resolveRedisDatabase(sp);

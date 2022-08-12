@@ -18,13 +18,16 @@ internal class RedisCachedGetDepositAccumulateEventQueryService :
 
 	private readonly IDatabase _redisDatabase;
 	private readonly IQueryService<GetDepositAccumulateEventsQuery, DepositAccumulateRouletteEventInfo> _queryService;
+	private readonly ISystemClock _systemClock;
 
 	public RedisCachedGetDepositAccumulateEventQueryService(
 		IDatabase redisDatabase,
-		IQueryService<GetDepositAccumulateEventsQuery, DepositAccumulateRouletteEventInfo> queryService)
+		IQueryService<GetDepositAccumulateEventsQuery, DepositAccumulateRouletteEventInfo> queryService,
+		ISystemClock systemClock)
 	{
 		_redisDatabase = redisDatabase ?? throw new ArgumentNullException(nameof(redisDatabase));
 		_queryService = queryService ?? throw new ArgumentNullException(nameof(queryService));
+		_systemClock = systemClock ?? throw new ArgumentNullException(nameof(systemClock));
 	}
 
 	public async IAsyncEnumerable<DepositAccumulateRouletteEventInfo> QueryAsync(GetDepositAccumulateEventsQuery query,
@@ -32,8 +35,10 @@ internal class RedisCachedGetDepositAccumulateEventQueryService :
 	{
 		var key = $"Promotion:DepositAccumulateRoulette:DepositEventInfo:{query.PromotionId}:{query.PlayerCode}";
 
-		var score = new DateTimeOffset(query.QueryDate.Year, query.QueryDate.Month, query.QueryDate.Day, 8, 0, 0,
-			TimeSpan.FromHours(8D)).Ticks;
+		var now = _systemClock.UtcNow.ToOffset(TimeSpan.FromHours(8D));
+		var currentDate = DateOnly.FromDateTime(now.DateTime);
+		var queryDateTime = query.QueryDate.ToDateTime(new TimeOnly(7, 0));
+		var score = queryDateTime.Ticks;
 
 		var values = await _redisDatabase
 			.SortedSetRangeByScoreAsync(key, start: score, exclude: Exclude.None, order: Order.Ascending)
@@ -44,8 +49,8 @@ internal class RedisCachedGetDepositAccumulateEventQueryService :
 			foreach (var value in values)
 			{
 				yield return JsonSerializer.Deserialize<DepositAccumulateRouletteEventInfo>(
-						value!,
-						_jsonSerializerOptions)!;
+					value!,
+					_jsonSerializerOptions)!;
 			}
 		}
 		else
@@ -58,12 +63,12 @@ internal class RedisCachedGetDepositAccumulateEventQueryService :
 			foreach (var evt in events)
 			{
 				var data = JsonSerializer.Serialize(evt, _jsonSerializerOptions);
-				var expired = new DateTimeOffset(evt.Date.Year, evt.Date.Month, evt.Date.Day + 1, 8, 0, 0, TimeSpan.FromHours(8D)).Ticks;
+				var expired = currentDate == query.QueryDate
+					? evt.Date.AddDays(1).ToDateTime(new TimeOnly(8, 0)).Ticks
+					: now.AddMinutes(5D).Ticks;
 
-				if (score >= expired)
-					continue;
-
-				_ = await _redisDatabase.SortedSetAddAsync(key, data, expired, SortedSetWhen.NotExists).ConfigureAwait(false);
+				_ = await _redisDatabase.SortedSetAddAsync(key, data, expired)
+					.ConfigureAwait(false);
 
 				yield return evt;
 			}
