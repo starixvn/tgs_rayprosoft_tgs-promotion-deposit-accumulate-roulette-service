@@ -1,8 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Google.Protobuf;
+using Microsoft.AspNetCore.Mvc;
+using Tgs.MessageQueue;
 using Tgs.Promotion.DepositAccumulateRoulette.Common;
 using Tgs.Promotion.DepositAccumulateRoulette.Core;
-using Tgs.Promotion.DepositAccumulateRoulette.Core.ApplicationServices;
-using Tgs.ServiceUtility;
+using Tgs.Promotion.DepositAccumulateRouletteService.Protos;
 
 namespace Tgs.Promotion.DepositAccumulateRouletteService.Controllers;
 
@@ -12,14 +13,27 @@ public class RouletteController : ControllerBase
 {
 	[HttpPost]
 	public async Task<RouletteResult?> RouletteAsync(
-		[FromServices] IGetService<RouletteCommand, RouletteResult> commandService,
+		[FromServices] IMessageSender messageSender,
 		[FromBody] ViewModel model)
 	{
-		var command = new RouletteCommand(model.PromotionId, model.PlayerCode);
+		var request = new RouletteRequest
+		{
+			PromotionId = model.PromotionId,
+			PlayerCode = model.PlayerCode
+		};
 
-		var result = await commandService.GetAsync(command).ConfigureAwait(false);
+		var responseData = await messageSender.RequestAsync(
+				"tgs.promotion.depositaccumulateroulette.roulette.play",
+				request.ToByteArray(),
+				HttpContext.RequestAborted)
+			.ConfigureAwait(false);
 
-		return result;
+		var response = RouletteResponse.Parser.ParseFrom(responseData.Span);
+
+		return new RouletteResult(
+			response.Id,
+			response.ItemIndex,
+			response.RemainingCount);
 	}
 
 	[HttpPost("event/cache/clear")]

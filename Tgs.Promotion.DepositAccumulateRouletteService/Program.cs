@@ -23,6 +23,9 @@ builder.Services
 			.AddProcessor<RouletteSettingQueryProcessor>(
 				"tgs.promotion.depositaccumulateroulette.roulettesetting.query",
 				"tgs.promotion.depositaccumulateroulette.roulettesetting.query")
+			.AddProcessor<RouletteProcessor>(
+				"tgs.promotion.depositaccumulateroulette.roulette.play",
+				"tgs.promotion.depositaccumulateroulette.roulette.play")
 			.SetSessionReplySubject($"tgs.promotion.depositaccumulateroulette.worker.{Environment.MachineName}.reply");
 	})
 	.AddNatsGlobPatternExchange("*");
