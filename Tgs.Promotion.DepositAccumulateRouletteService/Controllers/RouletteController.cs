@@ -11,8 +11,8 @@ namespace Tgs.Promotion.DepositAccumulateRouletteService.Controllers;
 public class RouletteController : ControllerBase
 {
 	[HttpPost]
-	public async Task<RouletteExchangeResult?> RouletteAsync(
-		[FromServices] IGetService<RouletteCommand, RouletteExchangeResult> commandService,
+	public async Task<RouletteResult?> RouletteAsync(
+		[FromServices] IGetService<RouletteCommand, RouletteResult> commandService,
 		[FromBody] ViewModel model)
 	{
 		var command = new RouletteCommand(model.PromotionId, model.PlayerCode);

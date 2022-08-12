@@ -6,7 +6,7 @@ using Tgs.ServiceUtility;
 
 namespace Tgs.Promotion.DepositAccumulateRoulette.Core.ApplicationServices;
 
-internal class RouletteCommandService : IGetService<RouletteCommand, RouletteExchangeResult>
+internal class RouletteCommandService : IGetService<RouletteCommand, RouletteResult>
 {
 	private readonly ITgsRepository _tgsRepository;
 	private readonly IGetService<GetDepositAccumulateRoulettePromotionQuery, DepositAccumulateRoulettePromotion?> _getPromotionService;
@@ -37,7 +37,7 @@ internal class RouletteCommandService : IGetService<RouletteCommand, RouletteExc
 		_playerServiceClient = playerServiceClient ?? throw new ArgumentNullException(nameof(playerServiceClient));
 	}
 
-	public async ValueTask<RouletteExchangeResult> GetAsync(
+	public async ValueTask<RouletteResult> GetAsync(
 		RouletteCommand command, CancellationToken cancellationToken = default)
 	{
 		var player = await _playerServiceClient.GetPlayerInfoAsync(command.PlayerCode, cancellationToken)
@@ -65,7 +65,7 @@ internal class RouletteCommandService : IGetService<RouletteCommand, RouletteExc
 
 		if (countInfo.UseEvent is null || countInfo.BeforeTotalCount <= 0)
 		{
-			return new RouletteExchangeResult(null, 0);
+			return new RouletteResult(null, -1, 0);
 		}
 
 		var rouletteResult = await ProcessRouletteAsync(
@@ -83,8 +83,6 @@ internal class RouletteCommandService : IGetService<RouletteCommand, RouletteExc
 				rouletteResult.RecordId,
 				default).ConfigureAwait(false);
 
-			// 派發作業
-
 			await _distributeService.ExecuteAsync(new DistributeBonusCommand(
 				command.PromotionId,
 				command.PlayerCode,
@@ -95,8 +93,9 @@ internal class RouletteCommandService : IGetService<RouletteCommand, RouletteExc
 				default).ConfigureAwait(false);
 		});
 
-		return new RouletteExchangeResult(
-			new RouletteResult(rouletteResult.RouletteId, rouletteResult.ItemIndex),
+		return new RouletteResult(
+			rouletteResult.RouletteId,
+			rouletteResult.ItemIndex,
 			countInfo.AfterTotalCount);
 	}
 

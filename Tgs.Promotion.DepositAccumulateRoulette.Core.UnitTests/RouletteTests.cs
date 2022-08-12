@@ -99,7 +99,8 @@ internal class RouletteTests
 		var actual = await sut.GetAsync(command);
 
 		Assert.IsNotNull(actual);
-		Assert.IsNotNull(actual.Result);
+		Assert.IsNotNull(actual.Id);
+		Assert.AreNotEqual(-1, actual.ItemIndex);
 		Assert.AreEqual(2, actual.RemainingCount);
 
 		_ = fakeTgsRepository
@@ -331,7 +332,8 @@ internal class RouletteTests
 		var actual = await sut.GetAsync(command);
 
 		Assert.IsNotNull(actual);
-		Assert.IsNull(actual.Result);
+		Assert.IsNull(actual.Id);
+		Assert.AreEqual(-1, actual.ItemIndex);
 		Assert.AreEqual(0, actual.RemainingCount);
 
 		_ = fakeTgsRepository
