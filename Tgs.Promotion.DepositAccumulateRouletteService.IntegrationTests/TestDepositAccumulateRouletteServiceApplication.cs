@@ -1,6 +1,11 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿using System.Reflection;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Tgs.Promotion.DepositAccumulateRoulette.Repositories.Entities;
 
 namespace Tgs.Promotion.DepositAccumulateRouletteService.IntegrationTests;
 
@@ -20,18 +25,17 @@ internal class TestDepositAccumulateRouletteServiceApplication : WebApplicationF
 
 		_ = builder.ConfigureServices(services => services
 			.AddFakeNatsMessageQueue()
-			//.Replace(ServiceDescriptor.Singleton(sp =>
-			//{
-			//    var dbContextOptionsBuilder = new DbContextOptionsBuilder<TgsContext>();
+			.Replace(ServiceDescriptor.Singleton(sp =>
+			{
+				var dbContextOptionsBuilder = new DbContextOptionsBuilder<TgsContext>();
 
-			//    _ = dbContextOptionsBuilder
-			//        .UseInMemoryDatabase(Guid.NewGuid().ToString())
-			//        .ConfigureWarnings(x => x.Ignore(
-			//            InMemoryEventId.TransactionIgnoredWarning));
+				_ = dbContextOptionsBuilder
+					.UseInMemoryDatabase(Guid.NewGuid().ToString())
+					.ConfigureWarnings(x => x.Ignore(
+						InMemoryEventId.TransactionIgnoredWarning));
 
-			//    return new TgsContext(dbContextOptionsBuilder.Options);
-			//}))
-			);
+				return new TgsContext(dbContextOptionsBuilder.Options);
+			})));
 
 		_webHostConfiguration?.Invoke(builder);
 	}

@@ -1,11 +1,6 @@
 ﻿using System.Reflection;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
-using Tgs.Promotion.Clients;
-using Tgs.Promotion.DepositAccumulateRoulette.Common;
+using StackExchange.Redis;
 using Tgs.Promotion.DepositAccumulateRoulette.Core;
-using Tgs.Promotion.DepositAccumulateRoulette.Core.ApplicationServices;
-using Tgs.ServiceUtility;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
@@ -13,18 +8,9 @@ public static class ServiceCollectionExtensions
 {
 	public static IServiceCollection AddDepositAccumulateRouletteCore(
 		this IServiceCollection services,
-		Action<PromotionServiceOptions, IServiceProvider> configure)
+		Func<IServiceProvider, IDatabase> resolveRedisDatabase)
 	{
 		_ = services
-			.AddOptions<PromotionServiceOptions>()
-			.Configure(configure)
-			.Services
-			.AddSingleton(sp =>
-			{
-				var options = sp.GetRequiredService<IOptions<PromotionServiceOptions>>().Value;
-
-				return new RedisConnectionManager(options.RedisConnectionString);
-			})
 			.RegisterAllServiceUtilityTypes(Assembly.GetExecutingAssembly(), ServiceLifetime.Transient);
 
 		_ = services
@@ -36,10 +22,9 @@ public static class ServiceCollectionExtensions
 		_ = services
 			.AddTransient<IRouletteCountService>(sp =>
 			{
-				var redisConnectionManager = sp.GetRequiredService<RedisConnectionManager>();
+				var database = resolveRedisDatabase(sp);
 
-				return ActivatorUtilities.CreateInstance<RouletteCountService>(sp,
-					redisConnectionManager.Database);
+				return ActivatorUtilities.CreateInstance<RouletteCountService>(sp, database);
 			});
 
 		return services;

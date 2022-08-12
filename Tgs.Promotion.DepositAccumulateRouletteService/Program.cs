@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Tgs.Promotion.DepositAccumulateRoulette.Core;
+using Tgs.Promotion.DepositAccumulateRouletteService;
 using Tgs.Promotion.DepositAccumulateRouletteService.MessageQueue;
+using IRedisConnectionManager = Tgs.Promotion.DepositAccumulateRouletteService.IRedisConnectionManager;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,6 +33,11 @@ builder.Services
 	.AddNatsGlobPatternExchange("*");
 
 builder.Services
+	.AddSingleton<IRedisConnectionManager>(sp =>
+	{
+		var config = sp.GetRequiredService<IConfiguration>();
+		return new RedisConnectionManager(config.GetConnectionString("Redis"));
+	})
 	.AddDepositAccumulateRouletteCommon()
 	.AddMemoryCache()
 	.AddDepositAccumulateRouletteRepositories(
@@ -41,17 +48,17 @@ builder.Services
 		},
 		resolveRedisDatabase: sp =>
 		{
-			var redisConnectionManager = sp.GetRequiredService<RedisConnectionManager>();
+			var redisConnectionManager = sp.GetRequiredService<IRedisConnectionManager>();
 			return redisConnectionManager.Database;
 		})
-	.AddDepositAccumulateRouletteCore((options, sp) =>
+	.AddDepositAccumulateRouletteCore(sp =>
 	{
-		var config = sp.GetRequiredService<IConfiguration>();
-		options.RedisConnectionString = config.GetConnectionString("Redis");
+		var redisConnectionManager = sp.GetRequiredService<IRedisConnectionManager>();
+		return redisConnectionManager.Database;
 	})
 	.AddDepositAccumulateRouletteCache(sp =>
 	{
-		var redisConnectionManager = sp.GetRequiredService<RedisConnectionManager>();
+		var redisConnectionManager = sp.GetRequiredService<IRedisConnectionManager>();
 		return redisConnectionManager.Database;
 	})
 	.AddPromotionClientServices((options, sp) =>
