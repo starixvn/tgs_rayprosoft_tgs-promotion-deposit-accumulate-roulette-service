@@ -123,7 +123,7 @@ internal class RouletteCommandService : IGetService<RouletteCommand, RouletteExc
 		}
 		catch
 		{
-			_ = await _rouletteCountService.IncreaseRouletteCountAsync(
+			await _rouletteCountService.IncreaseRouletteCountAsync(
 				command.PromotionId,
 				command.PlayerCode,
 				countInfo.UseEvent!.Date,

@@ -43,28 +43,23 @@ internal class RouletteCountService : IRouletteCountService
 
 		foreach (var info in events)
 		{
-			var before = await GetRouletteCountAsync(promotionId, playerCode, info.Date);
-			if (!before.HasValue)
-			{
-				var usedCount = await _usedCountQueryService.GetAsync(
-								new RouletteUsedCountQuery(promotionId, playerCode, info.EventId),
-								cancellationToken).ConfigureAwait(false);
+			var cachedCount = await GetRouletteCountAsync(promotionId, playerCode, info.Date)
+				.ConfigureAwait(false);
 
-				before = info.RouletteCount - usedCount;
-				await SetRouletteCountAsync(promotionId, playerCode, info.Date, before.Value);
-			}
+			var before = cachedCount ??
+						 await SetRouletteCountAsync(promotionId, playerCode, info, cancellationToken)
+							 .ConfigureAwait(false);
 
-			var after = before.Value;
-			if (before.Value > 0 && useEvent is null)
+			var after = before;
+			if (before > 0 && useEvent is null)
 			{
 				after = await DecreaseRouletteCountAsync(promotionId, playerCode, info.Date).ConfigureAwait(false);
+
+				if (after >= 0)
+					useEvent = info;
 			}
 
-			counts[info.Date] = new CountInfo(before.Value, after);
-			if (after < 0)
-				continue;
-
-			useEvent ??= info;
+			counts[info.Date] = new CountInfo(before, after);
 		}
 
 		var countInfo = useEvent == null ? null : counts[useEvent.Date];
@@ -87,39 +82,53 @@ internal class RouletteCountService : IRouletteCountService
 			totalCountInfo.After);
 	}
 
-	public ValueTask<RouletteCountInfo> IncreaseRouletteCountAsync(
+	public async ValueTask IncreaseRouletteCountAsync(
 		Guid promotionId,
 		string playerCode,
 		DateOnly countDistributeDate,
 		CancellationToken cancellationToken = default)
 	{
-		//var countKey = GetRouletteCountRedisKey(promotionId, playerCode, depositAccumulateRouletteEventId);
-		//var count = await _redisDatabase.StringIncrementAsync(countKey).ConfigureAwait(false);
-		//return (int)count;
+		var key = GetCountKey(promotionId, playerCode, countDistributeDate);
 
-		var info = new RouletteCountInfo(null, 0, 0, 0, 0);
-		return ValueTask.FromResult(info);
+		_ = await _redisDatabase.StringIncrementAsync(key).ConfigureAwait(false);
+	}
+
+	private static string GetCountKey(Guid promotionId, string playerCode, DateOnly date)
+	{
+		var key = $"Promotion.DepositAccumulateRoulette:RouletteCount:{promotionId}:{playerCode}:{date:O}";
+		return key;
+	}
+
+	private async ValueTask<int> SetRouletteCountAsync(Guid promotionId,
+		string playerCode,
+		DepositAccumulateRouletteEventInfo eventInfo,
+		CancellationToken cancellationToken)
+	{
+		var usedCount = await _usedCountQueryService.GetAsync(
+			new RouletteUsedCountQuery(promotionId, playerCode, eventInfo.EventId),
+			cancellationToken).ConfigureAwait(false);
+
+		var count = eventInfo.RouletteCount >= usedCount ? eventInfo.RouletteCount - usedCount : 0;
+
+		var key = GetCountKey(promotionId, playerCode, eventInfo.Date);
+
+		_ = await _redisDatabase.StringSetAsync(key, count, TimeSpan.FromDays(2)).ConfigureAwait(false);
+
+		return count;
 	}
 
 	private async ValueTask<int?> GetRouletteCountAsync(Guid promotionId, string playerCode, DateOnly date)
 	{
-		var key = $"Promotion.DepositAccumulateRoulette:RouletteCount:{promotionId}:{playerCode}:{date:O}";
+		var key = GetCountKey(promotionId, playerCode, date);
 
 		var value = await _redisDatabase.StringGetAsync(key).ConfigureAwait(false);
 
 		return value.HasValue ? (int)value! : null;
 	}
 
-	private async ValueTask SetRouletteCountAsync(Guid promotionId, string playerCode, DateOnly date, int count)
-	{
-		var key = $"Promotion.DepositAccumulateRoulette:RouletteCount:{promotionId}:{playerCode}:{date:O}";
-
-		_ = await _redisDatabase.StringSetAsync(key, count, TimeSpan.FromDays(2)).ConfigureAwait(false);
-	}
-
 	private async ValueTask<int> DecreaseRouletteCountAsync(Guid promotionId, string playerCode, DateOnly date)
 	{
-		var key = $"Promotion.DepositAccumulateRoulette:RouletteCount:{promotionId}:{playerCode}:{date:O}";
+		var key = GetCountKey(promotionId, playerCode, date);
 
 		return (int)await _redisDatabase.StringDecrementAsync(key).ConfigureAwait(false);
 	}

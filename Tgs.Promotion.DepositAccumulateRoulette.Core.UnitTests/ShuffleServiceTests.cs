@@ -1,7 +1,4 @@
-﻿using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Options;
-using NSubstitute;
-using Tgs.Promotion.DepositAccumulateRoulette.Common;
+﻿using Tgs.Promotion.DepositAccumulateRoulette.Common;
 
 namespace Tgs.Promotion.DepositAccumulateRoulette.Core.UnitTests;
 

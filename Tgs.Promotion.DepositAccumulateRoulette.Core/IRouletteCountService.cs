@@ -7,7 +7,7 @@ internal interface IRouletteCountService
 		string playerCode,
 		CancellationToken cancellationToken = default);
 
-	ValueTask<RouletteCountInfo> IncreaseRouletteCountAsync(
+	ValueTask IncreaseRouletteCountAsync(
 		Guid promotionId,
 		string playerCode,
 		DateOnly countDistributeDate,
