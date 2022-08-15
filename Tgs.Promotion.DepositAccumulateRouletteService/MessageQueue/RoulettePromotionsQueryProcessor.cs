@@ -1,17 +1,18 @@
-﻿using System.Text;
-using System.Text.Json;
+﻿using System.Data;
+using Google.Protobuf;
 using Tgs.MessageQueue;
+using Tgs.Promotion.Clients.Protos;
 using Tgs.Promotion.DepositAccumulateRoulette.Core;
 using Tgs.Promotion.DepositAccumulateRoulette.Core.ApplicationServices;
 using Tgs.ServiceUtility;
 
 namespace Tgs.Promotion.DepositAccumulateRouletteService.MessageQueue;
 
-public class RouletteAvailableCountsQueryProcessor : IMessageProcessor
+public class RoulettePromotionsQueryProcessor : IMessageProcessor
 {
 	private readonly IQueryService<GetPlayerAvailableRoulettePromotionsQuery, RoulettePromotionInfo> _queryService;
 
-	public RouletteAvailableCountsQueryProcessor(
+	public RoulettePromotionsQueryProcessor(
 		IQueryService<GetPlayerAvailableRoulettePromotionsQuery, RoulettePromotionInfo> queryService)
 	{
 		_queryService = queryService ?? throw new ArgumentNullException(nameof(queryService));
@@ -20,15 +21,22 @@ public class RouletteAvailableCountsQueryProcessor : IMessageProcessor
 	public async ValueTask<ReadOnlyMemory<byte>> HandleAsync(
 		ReadOnlyMemory<byte> data, CancellationToken cancellationToken = default)
 	{
-		var playerCode = Encoding.UTF8.GetString(data.Span);
+		var request = RoulettePromotionsReqest.Parser.ParseFrom(data.Span);
 
 		var promotionInfos = await _queryService
-			.QueryAsync(new GetPlayerAvailableRoulettePromotionsQuery(playerCode), cancellationToken)
+			.QueryAsync(new GetPlayerAvailableRoulettePromotionsQuery(request.PlayerCode), cancellationToken)
 			.ToArrayAsync(cancellationToken)
 			.ConfigureAwait(false);
 
-		var json = JsonSerializer.SerializeToUtf8Bytes(promotionInfos);
+		var promotions = promotionInfos.Select(p => new RoulettePromotion
+		{
+			PromotionId = p.PromotionId,
+			RouletteCount = p.RouletteCount
+		});
 
-		return json;
+		var response = new RoulettePromotionsResponse();
+		response.Promotions.AddRange(promotions);
+
+		return response.ToByteArray();
 	}
 }

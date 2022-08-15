@@ -15,6 +15,7 @@ public static class ServiceCollectionExtensions
 		=> services
 			.AddDbContext<TgsContext>(dbOptionsConfigure)
 			.AddTransient<ITgsRepository, TgsRepository>()
+			.AddSingleton<ISystemClock, SystemClock>()
 			.AddSingleton<IStatisticsRepository>(sp =>
 			{
 				var redisDatabase = resolveRedisDatabase(sp);
