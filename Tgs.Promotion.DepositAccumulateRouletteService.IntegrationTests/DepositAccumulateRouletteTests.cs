@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
-using NSubstitute.ReturnsExtensions;
 using StackExchange.Redis;
 using Tgs.MessageQueue;
 using Tgs.PlayerService.Client;
@@ -8,7 +7,6 @@ using Tgs.Promotion.Clients;
 using Tgs.Promotion.DepositAccumulateRoulette.Client;
 using Tgs.Promotion.DepositAccumulateRoulette.Common;
 using Tgs.Promotion.DepositAccumulateRoulette.Core;
-using Tgs.Promotion.DepositAccumulateRoulette.Repositories.Entities;
 using Tgs.Promotion.DepositAccumulateRouletteService.MessageQueue;
 using static Tgs.Promotion.DepositAccumulateRoulette.Core.ApplicationServices.GetDepositAccumulateRoulettePromotionQueryService;
 
@@ -24,7 +22,8 @@ internal class DepositAccumulateRouletteTests
 
 		await using var web = new TestDepositAccumulateRouletteServiceApplication(
 			builder => builder.ConfigureServices(
-				services => services.AddSingleton(fakePromotionServiceClient)));
+				services => services
+					.AddSingleton(fakePromotionServiceClient)));
 
 		var sut = new DepositAccumulateRouletteClient(fakeMessageSender);
 
@@ -86,6 +85,7 @@ internal class DepositAccumulateRouletteTests
 		var fakeMessageSender = Substitute.For<IMessageSender>();
 		var fakePromotionServiceClient = Substitute.For<IPromotionServiceClient>();
 		var fakeStatisticsRepository = Substitute.For<IStatisticsRepository>();
+		var fakeEventRepository = Substitute.For<IDepositAccumulateRouletteEventRepository>();
 		var fakePlayerServiceClient = Substitute.For<IPlayerServiceClient>();
 		var fakeRedisDatabase = Substitute.For<IDatabase>();
 
@@ -94,7 +94,10 @@ internal class DepositAccumulateRouletteTests
 				.AddSingleton(fakePromotionServiceClient)
 				.AddSingleton(fakeStatisticsRepository)
 				.AddSingleton(fakePlayerServiceClient)
+				.AddSingleton(fakeEventRepository)
 				.AddSingleton<IRedisConnectionManager>(_ => new StubRedisConnectionManager(fakeRedisDatabase))));
+
+		var serviceScope = web.Services.CreateAsyncScope();
 
 		var sut = new DepositAccumulateRouletteClient(fakeMessageSender);
 
@@ -117,24 +120,20 @@ internal class DepositAccumulateRouletteTests
 
 		var settings = new DepositAccumulateRouletteSettings(depositItems, rouletteItems);
 
-		await using var serviceScope = web.Services.CreateAsyncScope();
+		var eventInfo = new DepositAccumulateRouletteEventInfo(
+			Guid.NewGuid(),
+			playerCode,
+			brandId,
+			promotionId,
+			DateOnly.FromDateTime(DateTime.Now),
+			4,
+			2000);
 
-		var dbContext = serviceScope.ServiceProvider.GetRequiredService<TgsContext>();
-		var database = serviceScope.ServiceProvider.GetRequiredService<IRedisConnectionManager>().Database;
-
-		var eventInfo = new DepositAccumulateRouletteEvent
-		{
-			Id = Guid.NewGuid(),
-			Date = DateOnly.FromDateTime(DateTime.Now),
-			PlayerCode = playerCode,
-			PromotionId = promotionId,
-			RouletteCount = 4,
-			TotalDepositAmount = 3000
-		};
-
-		_ = await dbContext.DepositAccumulateRouletteEvents.AddAsync(eventInfo);
-
-		_ = await dbContext.SaveChangesAsync();
+		_ = fakeEventRepository.GetDepositAccumulateRouletteEventInfosAsync(
+				Arg.Is(promotionId),
+				Arg.Is(playerCode),
+				Arg.Any<CancellationToken>())
+			.Returns(new[] { eventInfo }.ToAsyncEnumerable());
 
 		_ = fakePlayerServiceClient.GetPlayerInfoAsync(Arg.Is(playerCode))
 			.Returns(new PlayerInfo

@@ -21,5 +21,18 @@ public static class ServiceCollectionExtensions
 
 				return ActivatorUtilities.CreateInstance<StatisticsRepository>(sp, redisDatabase);
 			})
+			.AddTransient<IDepositAccumulateRouletteEventRepository>(
+				sp =>
+				{
+					var redisDatabase = resolveRedisDatabase(sp);
+
+					return ActivatorUtilities.CreateInstance<DepositAccumulateRouletteEventRepository>(sp, redisDatabase);
+				})
+			.AddTransient<IDepositAccumulateRouletteEventHandler>(sp =>
+			{
+				var redisDatabase = resolveRedisDatabase(sp);
+
+				return ActivatorUtilities.CreateInstance<DepositAccumulateRouletteEventRepository>(sp, redisDatabase);
+			})
 			.AddSerialNumberGenerator();
 }

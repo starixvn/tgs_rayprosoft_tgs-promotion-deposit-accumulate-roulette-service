@@ -6,6 +6,12 @@
     <Nullable>enable</Nullable>
 
     <IsPackable>false</IsPackable>
+
+    <EnableNETAnalyzers>True</EnableNETAnalyzers>
+
+    <RunAnalyzersDuringBuild>True</RunAnalyzersDuringBuild>
+
+    <RunAnalyzersDuringLiveAnalysis>True</RunAnalyzersDuringLiveAnalysis>
   </PropertyGroup>
 
   <ItemGroup>

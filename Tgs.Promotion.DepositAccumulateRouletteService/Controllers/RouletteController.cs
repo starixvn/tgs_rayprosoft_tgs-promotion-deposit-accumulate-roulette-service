@@ -38,8 +38,8 @@ public class RouletteController : ControllerBase
 
 	[HttpPost("event/cache/clear")]
 	public async Task CacheClearAsync(
-		[FromServices] IClearDepositAccumulateRouletteEventCache clearCacheService)
+		[FromServices] IDepositAccumulateRouletteEventHandler eventHandler)
 	{
-		await clearCacheService.ClearCacheAsync(Guid.NewGuid(), "player1").ConfigureAwait(false);
+		await eventHandler.ClearExpiredEventsAsync(Guid.NewGuid(), "player1").ConfigureAwait(false);
 	}
 }

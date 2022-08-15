@@ -15,27 +15,10 @@ namespace Microsoft.Extensions.DependencyInjection;
 public static class ServiceCollectionExtensions
 {
 	public static IServiceCollection AddDepositAccumulateRouletteCache(
-		this IServiceCollection services,
-		Func<IServiceProvider, IDatabase> resolveRedisDatabase)
+		this IServiceCollection services)
 	{
 		_ = services
 			.Decorate<IGetService<GetPromotionDistributePlanQuery, PromotionDistributePlanInfo>, MemoryCachedGetPromotionDistributePlanQueryService>();
-
-		_ = services
-			.Decorate<IQueryService<GetDepositAccumulateEventsQuery, DepositAccumulateRouletteEventInfo>>((inner, sp) =>
-			{
-				var redisDatabase = resolveRedisDatabase(sp);
-				return ActivatorUtilities.CreateInstance<RedisCachedGetDepositAccumulateEventQueryService>(sp,
-					redisDatabase, inner);
-			});
-
-		_ = services
-			.AddSingleton<ISystemClock, SystemClock>()
-			.AddSingleton<IClearDepositAccumulateRouletteEventCache>(sp =>
-			{
-				var redisDatabase = resolveRedisDatabase(sp);
-				return ActivatorUtilities.CreateInstance<ClearDepositAccumulateRouletteEventCacheService>(sp, redisDatabase);
-			});
 
 		return services;
 	}

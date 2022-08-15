@@ -31,9 +31,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tgs.Promotion.DepositAccumu
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tgs.Promotion.DepositAccumulateRoulette.Repositories", "Tgs.Promotion.DepositAccumulateRoulette.Repositories\Tgs.Promotion.DepositAccumulateRoulette.Repositories.csproj", "{8ADB1798-F0EF-42B5-80F6-6DD437139FB8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tgs.Promotion.DepositAccumulateRoulette.Cache", "Tgs.Promotion.DepositAccumulateRoulette.Cache\Tgs.Promotion.DepositAccumulateRoulette.Cache.csproj", "{4E0566DD-FDE2-4DFE-BBBA-8D0A732C1881}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tgs.Promotion.DepositAccumulateRoulette.Cache", "Tgs.Promotion.DepositAccumulateRoulette.Cache\Tgs.Promotion.DepositAccumulateRoulette.Cache.csproj", "{4E0566DD-FDE2-4DFE-BBBA-8D0A732C1881}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tgs.Promotion.DepositAccumulateRoulette.Cache.UnitTests", "Tgs.Promotion.DepositAccumulateRoulette.Cache.UnitTests\Tgs.Promotion.DepositAccumulateRoulette.Cache.UnitTests.csproj", "{627AEACD-DAD8-41E6-9616-5F1DAFDDBC50}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tgs.Promotion.DepositAccumulateRoulette.Cache.UnitTests", "Tgs.Promotion.DepositAccumulateRoulette.Cache.UnitTests\Tgs.Promotion.DepositAccumulateRoulette.Cache.UnitTests.csproj", "{627AEACD-DAD8-41E6-9616-5F1DAFDDBC50}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tgs.Promotion.DepositAccumulateRoulette.Repositories.UnitTests", "Tgs.Promotion.DepositAccumulateRoulette.Repositories.UnitTests\Tgs.Promotion.DepositAccumulateRoulette.Repositories.UnitTests.csproj", "{17DBCEA4-5B5E-4450-A6B4-A5F2C974F2B6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -105,6 +107,10 @@ Global
 		{627AEACD-DAD8-41E6-9616-5F1DAFDDBC50}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{627AEACD-DAD8-41E6-9616-5F1DAFDDBC50}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{627AEACD-DAD8-41E6-9616-5F1DAFDDBC50}.Release|Any CPU.Build.0 = Release|Any CPU
+		{17DBCEA4-5B5E-4450-A6B4-A5F2C974F2B6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{17DBCEA4-5B5E-4450-A6B4-A5F2C974F2B6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{17DBCEA4-5B5E-4450-A6B4-A5F2C974F2B6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{17DBCEA4-5B5E-4450-A6B4-A5F2C974F2B6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

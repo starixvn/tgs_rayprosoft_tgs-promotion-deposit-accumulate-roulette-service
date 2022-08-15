@@ -1,21 +1,19 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using DateOnlyTimeOnly.AspNet.Converters;
 using NSubstitute;
 using StackExchange.Redis;
 using Tgs.Promotion.DepositAccumulateRoulette.Common;
-using Tgs.Promotion.DepositAccumulateRoulette.Core.ApplicationServices;
-using Tgs.ServiceUtility;
+using Tgs.Promotion.DepositAccumulateRoulette.Core;
 
-namespace Tgs.Promotion.DepositAccumulateRoulette.Cache.UnitTests;
+namespace Tgs.Promotion.DepositAccumulateRoulette.Repositories.UnitTests;
 
-internal class RedisCachedGetDepositAccumulateEventQueryServiceTests
+public class DepositAccumulateRouletteEventRepositoryTests
 {
 	[Test]
 	public async Task Get_Data_When_Hit_Cache()
 	{
 		var fakeRedisDatabase = Substitute.For<IDatabase>();
-		var fakeSourceService =
-			Substitute.For<IQueryService<GetDepositAccumulateEventsQuery, DepositAccumulateRouletteEventInfo>>();
+		var fakeTgsRepository = Substitute.For<ITgsRepository>();
 
 		var fakeSystemClock = Substitute.For<ISystemClock>();
 
@@ -40,41 +38,45 @@ internal class RedisCachedGetDepositAccumulateEventQueryServiceTests
 				2200)
 		};
 
+		var queryDate = DateOnly.Parse("2022-08-12");
+		var now = new DateTimeOffset(2022, 8, 12, 8, 0, 0, TimeSpan.FromHours(8D));
+
 		var redisData = expected
 			.Select(value => (RedisValue)JsonSerializer.Serialize(value, jsonSerializerOptions))
 			.ToArray();
 
-		var query = new GetDepositAccumulateEventsQuery(promotionId, playerCode, DateOnly.Parse("2022-08-12"));
+		var redisKey = $"Promotion:DepositAccumulateRoulette:DepositEvents:{promotionId}:{playerCode}";
 
-		var redisKey = $"Promotion:DepositAccumulateRoulette:DepositEventInfo:{query.PromotionId}:{query.PlayerCode}";
-
-		_ = fakeSystemClock.UtcNow
-			.Returns(new DateTimeOffset(2022, 8, 12, 8, 0, 0, TimeSpan.FromHours(8D)));
+		_ = fakeSystemClock.UtcNow.Returns(now);
 
 		_ = fakeRedisDatabase.SortedSetRangeByScoreAsync(
 				key: Arg.Is<RedisKey>(redisKey),
-				start: Arg.Any<double>(),
+				start: Arg.Is<double>(now.Ticks),
 				exclude: Arg.Any<Exclude>(),
 				order: Arg.Any<Order>())
 			.Returns(redisData);
 
-		var sut = new RedisCachedGetDepositAccumulateEventQueryService(fakeRedisDatabase, fakeSourceService, fakeSystemClock);
+		var sut = new DepositAccumulateRouletteEventRepository(fakeRedisDatabase, fakeTgsRepository, fakeSystemClock);
 
-		var actual = await sut.QueryAsync(query).ToArrayAsync().ConfigureAwait(false);
+		var actual = await sut
+			.GetDepositAccumulateRouletteEventInfosAsync(promotionId, playerCode)
+			.ToArrayAsync().ConfigureAwait(false);
 
 		CollectionAssert.AreEqual(expected, actual);
 
-		_ = fakeSourceService
+		_ = fakeTgsRepository
 			.DidNotReceive()
-			.QueryAsync(Arg.Is(query));
+			.GetDepositAccumulateRouletteEventInfosAsync(
+				Arg.Is(promotionId),
+				Arg.Is(playerCode),
+					Arg.Is(queryDate));
 	}
 
 	[Test]
 	public async Task Get_Data_When_Miss_Cache()
 	{
 		var fakeRedisDatabase = Substitute.For<IDatabase>();
-		var fakeSourceService =
-			Substitute.For<IQueryService<GetDepositAccumulateEventsQuery, DepositAccumulateRouletteEventInfo>>();
+		var fakeTgsRepository = Substitute.For<ITgsRepository>();
 		var fakeSystemClock = Substitute.For<ISystemClock>();
 
 		var brandId = Guid.NewGuid();
@@ -93,33 +95,41 @@ internal class RedisCachedGetDepositAccumulateEventQueryServiceTests
 				1500)
 		};
 
-		var query = new GetDepositAccumulateEventsQuery(promotionId, playerCode, DateOnly.Parse("2022-08-12"));
+		var queryDate = DateOnly.Parse("2022-08-12");
+		var now = new DateTimeOffset(2022, 8, 12, 8, 0, 0, TimeSpan.FromHours(8D));
 
-		var redisKey = $"Promotion:DepositAccumulateRoulette:DepositEventInfo:{query.PromotionId}:{query.PlayerCode}";
+		var redisKey = $"Promotion:DepositAccumulateRoulette:DepositEvents:{promotionId}:{playerCode}";
 
-		_ = fakeSystemClock.UtcNow
-			.Returns(new DateTimeOffset(2022, 8, 12, 8, 0, 0, TimeSpan.FromHours(8D)));
+		_ = fakeSystemClock.UtcNow.Returns(now);
 
 		_ = fakeRedisDatabase.SortedSetRangeByScoreAsync(
 				key: Arg.Is<RedisKey>(redisKey),
-				start: Arg.Any<double>(),
+				start: Arg.Is<double>(now.Ticks),
 				exclude: Arg.Any<Exclude>(),
 				order: Arg.Any<Order>())
 			.Returns(Array.Empty<RedisValue>());
 
-		_ = fakeSourceService
-			.QueryAsync(Arg.Is(query))
+		_ = fakeTgsRepository
+			.GetDepositAccumulateRouletteEventInfosAsync(
+				Arg.Is(promotionId),
+				Arg.Is(playerCode),
+				Arg.Is(queryDate))
 			.Returns(expected.ToAsyncEnumerable());
 
-		var sut = new RedisCachedGetDepositAccumulateEventQueryService(fakeRedisDatabase, fakeSourceService, fakeSystemClock);
+		var sut = new DepositAccumulateRouletteEventRepository(fakeRedisDatabase, fakeTgsRepository, fakeSystemClock);
 
-		var actual = await sut.QueryAsync(query).ToArrayAsync().ConfigureAwait(false);
+		var actual = await sut
+			.GetDepositAccumulateRouletteEventInfosAsync(promotionId, playerCode)
+			.ToArrayAsync().ConfigureAwait(false);
 
 		CollectionAssert.AreEqual(expected, actual);
 
-		_ = fakeSourceService
+		_ = fakeTgsRepository
 			.Received(1)
-			.QueryAsync(Arg.Is(query));
+			.GetDepositAccumulateRouletteEventInfosAsync(
+				Arg.Is(promotionId),
+				Arg.Is(playerCode),
+				Arg.Is(queryDate));
 
 		_ = fakeRedisDatabase
 			.Received(1)
@@ -133,8 +143,7 @@ internal class RedisCachedGetDepositAccumulateEventQueryServiceTests
 	public async Task Get_Data_When_Hit_Cache_And_CurrentDate_Is_Different_From_QueryDate()
 	{
 		var fakeRedisDatabase = Substitute.For<IDatabase>();
-		var fakeSourceService =
-			Substitute.For<IQueryService<GetDepositAccumulateEventsQuery, DepositAccumulateRouletteEventInfo>>();
+		var fakeTgsRepository = Substitute.For<ITgsRepository>();
 		var fakeSystemClock = Substitute.For<ISystemClock>();
 
 		var jsonSerializerOptions = new JsonSerializerOptions
@@ -166,38 +175,45 @@ internal class RedisCachedGetDepositAccumulateEventQueryServiceTests
 				2200)
 		};
 
+		var queryDate = DateOnly.Parse("2022-08-11");
+		var now = new DateTimeOffset(2022, 8, 12, 7, 20, 0, TimeSpan.FromHours(8D));
+
 		var redisData = expected
 			.Select(value => (RedisValue)JsonSerializer.Serialize(value, jsonSerializerOptions))
 			.ToArray();
 
-		var query = new GetDepositAccumulateEventsQuery(promotionId, playerCode, DateOnly.Parse("2022-08-11"));
+		var redisKey = $"Promotion:DepositAccumulateRoulette:DepositEvents:{promotionId}:{playerCode}";
 
-		var redisKey = $"Promotion:DepositAccumulateRoulette:DepositEventInfo:{query.PromotionId}:{query.PlayerCode}";
+		_ = fakeSystemClock.UtcNow.Returns(now);
 
 		_ = fakeRedisDatabase.SortedSetRangeByScoreAsync(
 				key: Arg.Is<RedisKey>(redisKey),
-				start: Arg.Any<double>(),
+				start: Arg.Is<double>(now.Ticks),
 				exclude: Arg.Any<Exclude>(),
 				order: Arg.Any<Order>())
 			.Returns(redisData);
 
-		var sut = new RedisCachedGetDepositAccumulateEventQueryService(fakeRedisDatabase, fakeSourceService, fakeSystemClock);
+		var sut = new DepositAccumulateRouletteEventRepository(fakeRedisDatabase, fakeTgsRepository, fakeSystemClock);
 
-		var actual = await sut.QueryAsync(query).ToArrayAsync().ConfigureAwait(false);
+		var actual = await sut
+			.GetDepositAccumulateRouletteEventInfosAsync(promotionId, playerCode)
+			.ToArrayAsync().ConfigureAwait(false);
 
 		CollectionAssert.AreEqual(expected, actual);
 
-		_ = fakeSourceService
+		_ = fakeTgsRepository
 			.DidNotReceive()
-			.QueryAsync(Arg.Is(query));
+			.GetDepositAccumulateRouletteEventInfosAsync(
+				Arg.Is(promotionId),
+				Arg.Is(playerCode),
+				Arg.Is(queryDate));
 	}
 
 	[Test]
 	public async Task Get_Data_When_Miss_Cache_And_CurrentDate_Is_Different_From_QueryDate()
 	{
 		var fakeRedisDatabase = Substitute.For<IDatabase>();
-		var fakeSourceService =
-			Substitute.For<IQueryService<GetDepositAccumulateEventsQuery, DepositAccumulateRouletteEventInfo>>();
+		var fakeTgsRepository = Substitute.For<ITgsRepository>();
 		var fakeSystemClock = Substitute.For<ISystemClock>();
 
 		var brandId = Guid.NewGuid();
@@ -224,34 +240,42 @@ internal class RedisCachedGetDepositAccumulateEventQueryServiceTests
 				2200)
 		};
 
+		var queryDate = DateOnly.Parse("2022-08-11");
 		var now = new DateTimeOffset(2022, 8, 12, 7, 20, 0, TimeSpan.FromHours(8D));
 
-		var query = new GetDepositAccumulateEventsQuery(promotionId, playerCode, DateOnly.Parse("2022-08-11"));
+		var redisKey = $"Promotion:DepositAccumulateRoulette:DepositEvents:{promotionId}:{playerCode}";
 
-		var redisKey = $"Promotion:DepositAccumulateRoulette:DepositEventInfo:{query.PromotionId}:{query.PlayerCode}";
-
-		_ = fakeSystemClock.UtcNow.Returns(now);
+		_ = fakeSystemClock.UtcNow
+			.Returns(now);
 
 		_ = fakeRedisDatabase.SortedSetRangeByScoreAsync(
 				key: Arg.Is<RedisKey>(redisKey),
-				start: Arg.Any<double>(),
+				start: Arg.Is<double>(now.Ticks),
 				exclude: Arg.Any<Exclude>(),
 				order: Arg.Any<Order>())
 			.Returns(Array.Empty<RedisValue>());
 
-		_ = fakeSourceService
-			.QueryAsync(Arg.Is(query))
+		_ = fakeTgsRepository
+			.GetDepositAccumulateRouletteEventInfosAsync(
+				Arg.Is(promotionId),
+				Arg.Is(playerCode),
+				Arg.Is(queryDate))
 			.Returns(expected.ToAsyncEnumerable());
 
-		var sut = new RedisCachedGetDepositAccumulateEventQueryService(fakeRedisDatabase, fakeSourceService, fakeSystemClock);
+		var sut = new DepositAccumulateRouletteEventRepository(fakeRedisDatabase, fakeTgsRepository, fakeSystemClock);
 
-		var actual = await sut.QueryAsync(query).ToArrayAsync().ConfigureAwait(false);
+		var actual = await sut
+			.GetDepositAccumulateRouletteEventInfosAsync(promotionId, playerCode)
+			.ToArrayAsync().ConfigureAwait(false);
 
 		CollectionAssert.AreEqual(expected, actual);
 
-		_ = fakeSourceService
+		_ = fakeTgsRepository
 			.Received(1)
-			.QueryAsync(Arg.Is(query));
+			.GetDepositAccumulateRouletteEventInfosAsync(
+				Arg.Is(promotionId),
+				Arg.Is(playerCode),
+				Arg.Is(queryDate));
 
 		_ = fakeRedisDatabase
 			.Received(2)

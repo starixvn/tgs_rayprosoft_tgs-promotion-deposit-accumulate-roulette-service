@@ -1,4 +1,4 @@
-﻿namespace Tgs.Promotion.DepositAccumulateRoulette.Cache;
+﻿namespace Tgs.Promotion.DepositAccumulateRoulette.Repositories;
 
 internal interface ISystemClock
 {

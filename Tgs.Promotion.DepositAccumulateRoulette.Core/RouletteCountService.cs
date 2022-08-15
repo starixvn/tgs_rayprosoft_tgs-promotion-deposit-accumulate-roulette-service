@@ -8,20 +8,17 @@ namespace Tgs.Promotion.DepositAccumulateRoulette.Core;
 internal class RouletteCountService : IRouletteCountService
 {
 	private readonly IDatabase _redisDatabase;
-	private readonly IQueryService<GetDepositAccumulateEventsQuery, DepositAccumulateRouletteEventInfo> _depositEventQueryService;
+	private readonly IDepositAccumulateRouletteEventRepository _eventRepository;
 	private readonly IGetService<RouletteUsedCountQuery, int> _usedCountQueryService;
-	private readonly ISystemClock _systemClock;
 
 	public RouletteCountService(
 		IDatabase redisDatabase,
-		IQueryService<GetDepositAccumulateEventsQuery, DepositAccumulateRouletteEventInfo> depositEventQueryService,
-		IGetService<RouletteUsedCountQuery, int> usedCountQueryService,
-		ISystemClock systemClock)
+		IDepositAccumulateRouletteEventRepository eventRepository,
+		IGetService<RouletteUsedCountQuery, int> usedCountQueryService)
 	{
 		_redisDatabase = redisDatabase ?? throw new ArgumentNullException(nameof(redisDatabase));
-		_depositEventQueryService = depositEventQueryService ?? throw new ArgumentNullException(nameof(depositEventQueryService));
+		_eventRepository = eventRepository ?? throw new ArgumentNullException(nameof(eventRepository));
 		_usedCountQueryService = usedCountQueryService ?? throw new ArgumentNullException(nameof(usedCountQueryService));
-		_systemClock = systemClock ?? throw new ArgumentNullException(nameof(systemClock));
 	}
 
 	public async ValueTask<RouletteCountInfo> DecreaseRouletteCountAsync(
@@ -29,13 +26,8 @@ internal class RouletteCountService : IRouletteCountService
 		string playerCode,
 		CancellationToken cancellationToken = default)
 	{
-		var now = _systemClock.UtcNow;
-
-		// assume the query date is 7:00 UTC+8
-		var queryDate = DateOnly.FromDateTime(now.ToOffset(TimeSpan.FromHours(8 - 7)).DateTime);
-
-		var events = await _depositEventQueryService
-			.QueryAsync(new GetDepositAccumulateEventsQuery(promotionId, playerCode, queryDate), cancellationToken)
+		var events = await _eventRepository
+			.GetDepositAccumulateRouletteEventInfosAsync(promotionId, playerCode, cancellationToken)
 			.ToArrayAsync(cancellationToken).ConfigureAwait(false);
 
 		DepositAccumulateRouletteEventInfo? useEvent = null;

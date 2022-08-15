@@ -13,10 +13,8 @@ internal class RouletteCountServiceTests
 	public async Task Decrease_RouletteCount_When_Hit_Redis_Cache()
 	{
 		var fakeRedisDatabase = Substitute.For<IDatabase>();
-		var fakeEventQueryService =
-			Substitute.For<IQueryService<GetDepositAccumulateEventsQuery, DepositAccumulateRouletteEventInfo>>();
+		var fakeEventRepository = Substitute.For<IDepositAccumulateRouletteEventRepository>();
 		var fakeUsedCountQueryService = Substitute.For<IGetService<RouletteUsedCountQuery, int>>();
-		var fakeSystemClock = Substitute.For<ISystemClock>();
 
 		var promotionId = Guid.NewGuid();
 		var playerCode = "player1";
@@ -36,13 +34,9 @@ internal class RouletteCountServiceTests
 
 		var expected = new RouletteCountInfo(events[0], 3, 2, 3, 2);
 
-		_ = fakeSystemClock.UtcNow.Returns(new DateTimeOffset(2022, 08, 11, 6, 0, 0, TimeSpan.FromHours(8)));
-
-		_ = fakeEventQueryService.QueryAsync(
-				Arg.Is(new GetDepositAccumulateEventsQuery(
-					promotionId,
-					playerCode,
-					DateOnly.Parse("2022-08-10"))),
+		_ = fakeEventRepository.GetDepositAccumulateRouletteEventInfosAsync(
+				Arg.Is(promotionId),
+				Arg.Is(playerCode),
 				Arg.Any<CancellationToken>())
 			.Returns(events.ToAsyncEnumerable());
 
@@ -57,8 +51,7 @@ internal class RouletteCountServiceTests
 				Arg.Is<RedisKey>(countKey))
 			.Returns(2);
 
-		var sut = new RouletteCountService(fakeRedisDatabase, fakeEventQueryService, fakeUsedCountQueryService,
-			fakeSystemClock);
+		var sut = new RouletteCountService(fakeRedisDatabase, fakeEventRepository, fakeUsedCountQueryService);
 
 		var actual = await sut.DecreaseRouletteCountAsync(promotionId, playerCode).ConfigureAwait(false);
 
@@ -69,10 +62,8 @@ internal class RouletteCountServiceTests
 	public async Task Decrease_RouletteCount_When_Miss_Redis_Cache()
 	{
 		var fakeRedisDatabase = Substitute.For<IDatabase>();
-		var fakeEventQueryService =
-			Substitute.For<IQueryService<GetDepositAccumulateEventsQuery, DepositAccumulateRouletteEventInfo>>();
+		var fakeEventRepository = Substitute.For<IDepositAccumulateRouletteEventRepository>();
 		var fakeUsedCountQueryService = Substitute.For<IGetService<RouletteUsedCountQuery, int>>();
-		var fakeSystemClock = Substitute.For<ISystemClock>();
 
 		var promotionId = Guid.NewGuid();
 		var playerCode = "player1";
@@ -92,13 +83,9 @@ internal class RouletteCountServiceTests
 
 		var expected = new RouletteCountInfo(events[0], 3, 2, 3, 2);
 
-		_ = fakeSystemClock.UtcNow.Returns(new DateTimeOffset(2022, 08, 11, 7, 30, 0, TimeSpan.FromHours(8)));
-
-		_ = fakeEventQueryService.QueryAsync(
-				Arg.Is(new GetDepositAccumulateEventsQuery(
-					promotionId,
-					playerCode,
-					DateOnly.Parse("2022-08-11"))),
+		_ = fakeEventRepository.GetDepositAccumulateRouletteEventInfosAsync(
+				Arg.Is(promotionId),
+				Arg.Is(playerCode),
 				Arg.Any<CancellationToken>())
 			.Returns(events.ToAsyncEnumerable());
 
@@ -126,8 +113,7 @@ internal class RouletteCountServiceTests
 				Arg.Is<RedisKey>(countKey))
 			.Returns(2);
 
-		var sut = new RouletteCountService(fakeRedisDatabase, fakeEventQueryService, fakeUsedCountQueryService,
-			fakeSystemClock);
+		var sut = new RouletteCountService(fakeRedisDatabase, fakeEventRepository, fakeUsedCountQueryService);
 
 		var actual = await sut.DecreaseRouletteCountAsync(promotionId, playerCode).ConfigureAwait(false);
 
@@ -138,10 +124,8 @@ internal class RouletteCountServiceTests
 	public async Task Decrease_RouletteCount_When_Event_Data_Is_Empty()
 	{
 		var fakeRedisDatabase = Substitute.For<IDatabase>();
-		var fakeEventQueryService =
-			Substitute.For<IQueryService<GetDepositAccumulateEventsQuery, DepositAccumulateRouletteEventInfo>>();
+		var fakeEventRepository = Substitute.For<IDepositAccumulateRouletteEventRepository>();
 		var fakeUsedCountQueryService = Substitute.For<IGetService<RouletteUsedCountQuery, int>>();
-		var fakeSystemClock = Substitute.For<ISystemClock>();
 
 		var promotionId = Guid.NewGuid();
 		var playerCode = "player1";
@@ -149,18 +133,13 @@ internal class RouletteCountServiceTests
 
 		var expected = new RouletteCountInfo(null, 0, 0, 0, 0);
 
-		_ = fakeSystemClock.UtcNow.Returns(new DateTimeOffset(2022, 08, 11, 7, 30, 0, TimeSpan.FromHours(8)));
-
-		_ = fakeEventQueryService.QueryAsync(
-				Arg.Is(new GetDepositAccumulateEventsQuery(
-					promotionId,
-					playerCode,
-					DateOnly.Parse("2022-08-11"))),
-				Arg.Any<CancellationToken>())
+		_ = fakeEventRepository.GetDepositAccumulateRouletteEventInfosAsync(
+					Arg.Is(promotionId),
+					Arg.Is(playerCode),
+					Arg.Any<CancellationToken>())
 			.Returns(Array.Empty<DepositAccumulateRouletteEventInfo>().ToAsyncEnumerable());
 
-		var sut = new RouletteCountService(fakeRedisDatabase, fakeEventQueryService, fakeUsedCountQueryService,
-			fakeSystemClock);
+		var sut = new RouletteCountService(fakeRedisDatabase, fakeEventRepository, fakeUsedCountQueryService);
 
 		var actual = await sut.DecreaseRouletteCountAsync(promotionId, playerCode).ConfigureAwait(false);
 
@@ -183,10 +162,8 @@ internal class RouletteCountServiceTests
 	public async Task Decrease_RouletteCount_With_Two_Events_Returns()
 	{
 		var fakeRedisDatabase = Substitute.For<IDatabase>();
-		var fakeEventQueryService =
-			Substitute.For<IQueryService<GetDepositAccumulateEventsQuery, DepositAccumulateRouletteEventInfo>>();
+		var fakeEventRepository = Substitute.For<IDepositAccumulateRouletteEventRepository>();
 		var fakeUsedCountQueryService = Substitute.For<IGetService<RouletteUsedCountQuery, int>>();
-		var fakeSystemClock = Substitute.For<ISystemClock>();
 
 		var promotionId = Guid.NewGuid();
 		var playerCode = "player1";
@@ -214,13 +191,9 @@ internal class RouletteCountServiceTests
 
 		var expected = new RouletteCountInfo(events[0], 3, 2, 7, 6);
 
-		_ = fakeSystemClock.UtcNow.Returns(new DateTimeOffset(2022, 08, 11, 6, 0, 0, TimeSpan.FromHours(8)));
-
-		_ = fakeEventQueryService.QueryAsync(
-				Arg.Is(new GetDepositAccumulateEventsQuery(
-					promotionId,
-					playerCode,
-					DateOnly.Parse("2022-08-10"))),
+		_ = fakeEventRepository.GetDepositAccumulateRouletteEventInfosAsync(
+				Arg.Is(promotionId),
+				Arg.Is(playerCode),
 				Arg.Any<CancellationToken>())
 			.Returns(events.ToAsyncEnumerable());
 
@@ -239,8 +212,7 @@ internal class RouletteCountServiceTests
 				Arg.Is<RedisKey>($"{countKeyPrefix}:{events[0].Date:O}"))
 			.Returns(2);
 
-		var sut = new RouletteCountService(fakeRedisDatabase, fakeEventQueryService, fakeUsedCountQueryService,
-			fakeSystemClock);
+		var sut = new RouletteCountService(fakeRedisDatabase, fakeEventRepository, fakeUsedCountQueryService);
 
 		var actual = await sut.DecreaseRouletteCountAsync(promotionId, playerCode).ConfigureAwait(false);
 
@@ -251,10 +223,8 @@ internal class RouletteCountServiceTests
 	public async Task Decrease_RouletteCount_With_Two_Events_Returns_And_First_Event_Has_Run_Out_Of_Roulette_Count()
 	{
 		var fakeRedisDatabase = Substitute.For<IDatabase>();
-		var fakeEventQueryService =
-			Substitute.For<IQueryService<GetDepositAccumulateEventsQuery, DepositAccumulateRouletteEventInfo>>();
+		var fakeEventRepository = Substitute.For<IDepositAccumulateRouletteEventRepository>();
 		var fakeUsedCountQueryService = Substitute.For<IGetService<RouletteUsedCountQuery, int>>();
-		var fakeSystemClock = Substitute.For<ISystemClock>();
 
 		var promotionId = Guid.NewGuid();
 		var playerCode = "player1";
@@ -282,13 +252,9 @@ internal class RouletteCountServiceTests
 
 		var expected = new RouletteCountInfo(events[1], 4, 3, 4, 3);
 
-		_ = fakeSystemClock.UtcNow.Returns(new DateTimeOffset(2022, 08, 11, 6, 0, 0, TimeSpan.FromHours(8)));
-
-		_ = fakeEventQueryService.QueryAsync(
-				Arg.Is(new GetDepositAccumulateEventsQuery(
-					promotionId,
-					playerCode,
-					DateOnly.Parse("2022-08-10"))),
+		_ = fakeEventRepository.GetDepositAccumulateRouletteEventInfosAsync(
+				Arg.Is(promotionId),
+				Arg.Is(playerCode),
 				Arg.Any<CancellationToken>())
 			.Returns(events.ToAsyncEnumerable());
 
@@ -307,8 +273,7 @@ internal class RouletteCountServiceTests
 				Arg.Is<RedisKey>($"{countKeyPrefix}:{events[1].Date:O}"))
 			.Returns(3);
 
-		var sut = new RouletteCountService(fakeRedisDatabase, fakeEventQueryService, fakeUsedCountQueryService,
-			fakeSystemClock);
+		var sut = new RouletteCountService(fakeRedisDatabase, fakeEventRepository, fakeUsedCountQueryService);
 
 		var actual = await sut.DecreaseRouletteCountAsync(promotionId, playerCode).ConfigureAwait(false);
 
@@ -324,17 +289,14 @@ internal class RouletteCountServiceTests
 	public async Task Increase_RouletteCount()
 	{
 		var fakeRedisDatabase = Substitute.For<IDatabase>();
-		var fakeEventQueryService =
-			Substitute.For<IQueryService<GetDepositAccumulateEventsQuery, DepositAccumulateRouletteEventInfo>>();
+		var fakeEventRepository = Substitute.For<IDepositAccumulateRouletteEventRepository>();
 		var fakeUsedCountQueryService = Substitute.For<IGetService<RouletteUsedCountQuery, int>>();
-		var fakeSystemClock = Substitute.For<ISystemClock>();
 
 		var promotionId = Guid.NewGuid();
 		var playerCode = "player1";
 		var date = DateOnly.Parse("2022-08-11");
 
-		var sut = new RouletteCountService(fakeRedisDatabase, fakeEventQueryService, fakeUsedCountQueryService,
-			fakeSystemClock);
+		var sut = new RouletteCountService(fakeRedisDatabase, fakeEventRepository, fakeUsedCountQueryService);
 
 		await sut.IncreaseRouletteCountAsync(promotionId, playerCode, date).ConfigureAwait(false);
 
