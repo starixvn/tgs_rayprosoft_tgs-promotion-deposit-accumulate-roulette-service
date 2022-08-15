@@ -15,5 +15,7 @@ namespace Tgs.Promotion.DepositAccumulateRoulette.Repositories.Entities
         public int ItemIndex { get; set; }
         public string PlayerCode { get; set; } = null!;
         public Guid PromotionId { get; set; }
+
+        public virtual Promotion Promotion { get; set; } = null!;
     }
 }

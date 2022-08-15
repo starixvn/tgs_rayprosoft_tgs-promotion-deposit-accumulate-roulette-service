@@ -23,4 +23,9 @@ public interface ITgsRepository
 		decimal bonus,
 		int itemIndex,
 		CancellationToken cancellationToken = default);
+
+	IAsyncEnumerable<Guid> GetAvailablePromotionIdsAsync(
+		Guid brandId,
+		string playerCode,
+		CancellationToken cancellationToken);
 }

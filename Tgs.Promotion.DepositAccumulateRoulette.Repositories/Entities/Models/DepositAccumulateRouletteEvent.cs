@@ -14,5 +14,7 @@ namespace Tgs.Promotion.DepositAccumulateRoulette.Repositories.Entities
         public Guid PromotionId { get; set; }
         public int RouletteCount { get; set; }
         public decimal TotalDepositAmount { get; set; }
+
+        public virtual Promotion Promotion { get; set; } = null!;
     }
 }

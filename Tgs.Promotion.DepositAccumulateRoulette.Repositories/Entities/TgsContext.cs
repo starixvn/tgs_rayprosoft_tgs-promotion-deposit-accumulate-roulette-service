@@ -21,14 +21,17 @@ namespace Tgs.Promotion.DepositAccumulateRoulette.Repositories.Entities
 
         public virtual DbSet<DepositAccumulateRouletteEvent> DepositAccumulateRouletteEvents { get; set; } = null!;
         public virtual DbSet<DepositAccumulateRouletteGameEvent> DepositAccumulateRouletteGameEvents { get; set; } = null!;
+        public virtual DbSet<Promotion> Promotions { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasPostgresExtension("ltree")
+            modelBuilder.HasPostgresExtension("dbo", "uuid-ossp")
+                .HasPostgresExtension("ltree")
                 .HasPostgresExtension("pg_trgm");
 
             modelBuilder.ApplyConfiguration(new Configurations.DepositAccumulateRouletteEventConfiguration());
             modelBuilder.ApplyConfiguration(new Configurations.DepositAccumulateRouletteGameEventConfiguration());
+            modelBuilder.ApplyConfiguration(new Configurations.PromotionConfiguration());
             OnModelCreatingPartial(modelBuilder);
         }
 

@@ -42,6 +42,11 @@ namespace Tgs.Promotion.DepositAccumulateRoulette.Repositories.Entities.Configur
                 .HasPrecision(18, 6)
                 .HasColumnName("total_deposit_amount");
 
+            entity.HasOne(d => d.Promotion)
+                .WithMany(p => p.DepositAccumulateRouletteEvents)
+                .HasForeignKey(d => d.PromotionId)
+                .HasConstraintName("fk_deposit_accumulate_roulette_events_promotions_promotion_id");
+
             OnConfigurePartial(entity);
         }
 

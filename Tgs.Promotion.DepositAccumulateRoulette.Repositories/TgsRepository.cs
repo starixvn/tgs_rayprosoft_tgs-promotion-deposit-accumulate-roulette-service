@@ -84,4 +84,25 @@ internal class TgsRepository : ITgsRepository
 
 		return recordId;
 	}
+
+	public IAsyncEnumerable<Guid> GetAvailablePromotionIdsAsync(
+		Guid brandId,
+		string playerCode,
+		CancellationToken cancellationToken)
+	{
+		var date = DateOnly.FromDateTime(DateTimeOffset.UtcNow.ToOffset(TimeSpan.FromHours(8D - 8D)).DateTime);
+
+		return (from eventInfo in _context.DepositAccumulateRouletteEvents.Where(evt =>
+					evt.BrandId == brandId &&
+					evt.PlayerCode == playerCode &&
+					evt.Date == date)
+				join promotion in _context.Promotions.Where(p =>
+						p.BrandId == brandId &&
+						p.PromotionType == "DepositAccumulateRoulette" &&
+						p.Status == 0 &&
+						p.From <= DateTime.UtcNow)
+					on eventInfo.PromotionId equals promotion.Id
+				select promotion.Id)
+			.ToAsyncEnumerable();
+	}
 }

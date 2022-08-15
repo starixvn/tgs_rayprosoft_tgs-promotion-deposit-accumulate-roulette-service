@@ -24,6 +24,10 @@
       {
          "Name": "dbo.deposit_accumulate_roulette_game_events",
          "ObjectType": 0
+      },
+      {
+         "Name": "dbo.promotions",
+         "ObjectType": 0
       }
    ],
    "UiHint": "Tgs",
