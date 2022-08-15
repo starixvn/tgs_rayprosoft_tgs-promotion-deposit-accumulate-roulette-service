@@ -1,5 +1,4 @@
-﻿using StackExchange.Redis;
-using Tgs.Promotion.DepositAccumulateRoulette.Common;
+﻿using Tgs.Promotion.DepositAccumulateRoulette.Common;
 using Tgs.Promotion.DepositAccumulateRoulette.Core.ApplicationServices;
 using Tgs.ServiceUtility;
 
@@ -7,18 +6,45 @@ namespace Tgs.Promotion.DepositAccumulateRoulette.Core;
 
 internal class RouletteCountService : IRouletteCountService
 {
-	private readonly IDatabase _redisDatabase;
 	private readonly IDepositAccumulateRouletteEventRepository _eventRepository;
+	private readonly IRouletteCountRepository _countRepository;
 	private readonly IGetService<RouletteUsedCountQuery, int> _usedCountQueryService;
 
 	public RouletteCountService(
-		IDatabase redisDatabase,
 		IDepositAccumulateRouletteEventRepository eventRepository,
+		IRouletteCountRepository countRepository,
 		IGetService<RouletteUsedCountQuery, int> usedCountQueryService)
 	{
-		_redisDatabase = redisDatabase ?? throw new ArgumentNullException(nameof(redisDatabase));
 		_eventRepository = eventRepository ?? throw new ArgumentNullException(nameof(eventRepository));
+		_countRepository = countRepository ?? throw new ArgumentNullException(nameof(countRepository));
 		_usedCountQueryService = usedCountQueryService ?? throw new ArgumentNullException(nameof(usedCountQueryService));
+	}
+
+	public async ValueTask<int> GetAvailableRouletteCountAsync(
+		Guid promotionId,
+		string playerCode,
+		CancellationToken cancellationToken = default)
+	{
+		var events = await _eventRepository
+			.GetDepositAccumulateRouletteEventInfosAsync(promotionId, playerCode, cancellationToken)
+			.ToArrayAsync(cancellationToken).ConfigureAwait(false);
+
+		var totalCount = 0;
+
+		foreach (var info in events)
+		{
+			var cachedCount = await _countRepository
+				.GetRouletteCountAsync(promotionId, playerCode, info.Date)
+				.ConfigureAwait(false);
+
+			var count = cachedCount ??
+						 await SetRouletteCountAsync(promotionId, playerCode, info, cancellationToken)
+							 .ConfigureAwait(false);
+
+			totalCount += count;
+		}
+
+		return totalCount;
 	}
 
 	public async ValueTask<RouletteCountInfo> DecreaseRouletteCountAsync(
@@ -35,7 +61,8 @@ internal class RouletteCountService : IRouletteCountService
 
 		foreach (var info in events)
 		{
-			var cachedCount = await GetRouletteCountAsync(promotionId, playerCode, info.Date)
+			var cachedCount = await _countRepository
+				.GetRouletteCountAsync(promotionId, playerCode, info.Date)
 				.ConfigureAwait(false);
 
 			var before = cachedCount ??
@@ -45,7 +72,9 @@ internal class RouletteCountService : IRouletteCountService
 			var after = before;
 			if (before > 0 && useEvent is null)
 			{
-				after = await DecreaseRouletteCountAsync(promotionId, playerCode, info.Date).ConfigureAwait(false);
+				after = await _countRepository
+					.DecreaseRouletteCountAsync(promotionId, playerCode, info.Date)
+					.ConfigureAwait(false);
 
 				if (after >= 0)
 					useEvent = info;
@@ -80,15 +109,9 @@ internal class RouletteCountService : IRouletteCountService
 		DateOnly countDistributeDate,
 		CancellationToken cancellationToken = default)
 	{
-		var key = GetCountKey(promotionId, playerCode, countDistributeDate);
-
-		_ = await _redisDatabase.StringIncrementAsync(key).ConfigureAwait(false);
-	}
-
-	private static string GetCountKey(Guid promotionId, string playerCode, DateOnly date)
-	{
-		var key = $"Promotion.DepositAccumulateRoulette:RouletteCount:{promotionId}:{playerCode}:{date:O}";
-		return key;
+		_ = await _countRepository
+				.IncreaseRouletteCountAsync(promotionId, playerCode, countDistributeDate)
+				.ConfigureAwait(false);
 	}
 
 	private async ValueTask<int> SetRouletteCountAsync(Guid promotionId,
@@ -102,27 +125,11 @@ internal class RouletteCountService : IRouletteCountService
 
 		var count = eventInfo.RouletteCount >= usedCount ? eventInfo.RouletteCount - usedCount : 0;
 
-		var key = GetCountKey(promotionId, playerCode, eventInfo.Date);
-
-		_ = await _redisDatabase.StringSetAsync(key, count, TimeSpan.FromDays(2)).ConfigureAwait(false);
+		_ = await _countRepository
+			.SetRouletteCountAsync(promotionId, playerCode, eventInfo.Date, count)
+			.ConfigureAwait(false);
 
 		return count;
-	}
-
-	private async ValueTask<int?> GetRouletteCountAsync(Guid promotionId, string playerCode, DateOnly date)
-	{
-		var key = GetCountKey(promotionId, playerCode, date);
-
-		var value = await _redisDatabase.StringGetAsync(key).ConfigureAwait(false);
-
-		return value.HasValue ? (int)value! : null;
-	}
-
-	private async ValueTask<int> DecreaseRouletteCountAsync(Guid promotionId, string playerCode, DateOnly date)
-	{
-		var key = GetCountKey(promotionId, playerCode, date);
-
-		return (int)await _redisDatabase.StringDecrementAsync(key).ConfigureAwait(false);
 	}
 
 	private class CountInfo

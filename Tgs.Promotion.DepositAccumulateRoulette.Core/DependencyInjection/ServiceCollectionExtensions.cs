@@ -1,5 +1,4 @@
 ﻿using System.Reflection;
-using StackExchange.Redis;
 using Tgs.Promotion.DepositAccumulateRoulette.Core;
 
 namespace Microsoft.Extensions.DependencyInjection;
@@ -7,8 +6,7 @@ namespace Microsoft.Extensions.DependencyInjection;
 public static class ServiceCollectionExtensions
 {
 	public static IServiceCollection AddDepositAccumulateRouletteCore(
-		this IServiceCollection services,
-		Func<IServiceProvider, IDatabase> resolveRedisDatabase)
+		this IServiceCollection services)
 	{
 		_ = services
 			.RegisterAllServiceUtilityTypes(Assembly.GetExecutingAssembly(), ServiceLifetime.Transient);
@@ -19,12 +17,7 @@ public static class ServiceCollectionExtensions
 			.AddSingleton<IShuffleService, ShuffleService>();
 
 		_ = services
-			.AddTransient<IRouletteCountService>(sp =>
-			{
-				var database = resolveRedisDatabase(sp);
-
-				return ActivatorUtilities.CreateInstance<RouletteCountService>(sp, database);
-			});
+			.AddTransient<IRouletteCountService, RouletteCountService>();
 
 		return services;
 	}

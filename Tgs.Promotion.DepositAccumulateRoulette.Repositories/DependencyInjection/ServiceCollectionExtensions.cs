@@ -34,5 +34,11 @@ public static class ServiceCollectionExtensions
 
 				return ActivatorUtilities.CreateInstance<DepositAccumulateRouletteEventRepository>(sp, redisDatabase);
 			})
+			.AddTransient<IRouletteCountRepository>(sp =>
+			{
+				var redisDatabase = resolveRedisDatabase(sp);
+
+				return ActivatorUtilities.CreateInstance<RouletteCountRepository>(sp, redisDatabase);
+			})
 			.AddSerialNumberGenerator();
 }

@@ -61,9 +61,4 @@ internal class DepositAccumulateRouletteClient : IDepositAccumulateRouletteClien
 			response.ItemIndex,
 			response.RemainingCount);
 	}
-
-	public IAsyncEnumerable<RouletteEvent> QueryPlayerRouletteEventsAsync(
-		string playerCode,
-		CancellationToken cancellationToken = default)
-		=> throw new NotImplementedException();
 }

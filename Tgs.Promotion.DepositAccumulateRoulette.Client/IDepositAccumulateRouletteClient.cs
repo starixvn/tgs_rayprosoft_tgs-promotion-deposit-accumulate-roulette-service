@@ -10,8 +10,4 @@ public interface IDepositAccumulateRouletteClient
 		Guid promotionId,
 		string playerCode,
 		CancellationToken cancellationToken = default);
-
-	IAsyncEnumerable<RouletteEvent> QueryPlayerRouletteEventsAsync(
-		string playerCode,
-		CancellationToken cancellationToken = default);
 }

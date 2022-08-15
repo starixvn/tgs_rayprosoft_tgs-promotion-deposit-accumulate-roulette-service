@@ -2,6 +2,11 @@
 
 internal interface IRouletteCountService
 {
+	ValueTask<int> GetAvailableRouletteCountAsync(
+		Guid promotionId,
+		string playerCode,
+		CancellationToken cancellationToken = default);
+
 	ValueTask<RouletteCountInfo> DecreaseRouletteCountAsync(
 		Guid promotionId,
 		string playerCode,
