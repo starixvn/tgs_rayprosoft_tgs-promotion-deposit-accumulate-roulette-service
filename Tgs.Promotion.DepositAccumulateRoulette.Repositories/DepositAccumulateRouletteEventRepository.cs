@@ -71,7 +71,8 @@ internal class DepositAccumulateRouletteEventRepository :
 			{
 				var data = JsonSerializer.Serialize(evt, _JsonSerializerOptions);
 				var expired = currentDate == queryDate
-					? evt.Date.AddDays(1).ToDateTime(new TimeOnly(8, 0)).Ticks
+					? new DateTimeOffset(evt.Date.Year, evt.Date.Month, evt.Date.Day + 1, 8, 0, 0,
+						TimeSpan.FromHours(8D)).Ticks
 					: now.AddMinutes(5D).Ticks;
 
 				_ = await _redisDatabase.SortedSetAddAsync(redisKey, data, expired)

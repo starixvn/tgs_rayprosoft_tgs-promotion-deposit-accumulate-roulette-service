@@ -136,7 +136,7 @@ public class DepositAccumulateRouletteEventRepositoryTests
 			.SortedSetAddAsync(
 				Arg.Is<RedisKey>(redisKey),
 				Arg.Any<RedisValue>(),
-				Arg.Is<double>(x => (long)x == new DateTime(2022, 8, 13, 8, 0, 0).Ticks));
+				Arg.Is<double>(x => (long)x == new DateTimeOffset(2022, 8, 13, 8, 0, 0, TimeSpan.FromHours(8D)).Ticks));
 	}
 
 	[Test]
