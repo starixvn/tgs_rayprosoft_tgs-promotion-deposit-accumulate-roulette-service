@@ -6,9 +6,9 @@ using Tgs.PlayerService.Client;
 using Tgs.Promotion.Clients;
 using Tgs.Promotion.DepositAccumulateRoulette.Client;
 using Tgs.Promotion.DepositAccumulateRoulette.Common;
-using Tgs.Promotion.DepositAccumulateRoulette.Core;
 using Tgs.Promotion.DepositAccumulateRouletteService.MessageQueue;
-using static Tgs.Promotion.DepositAccumulateRoulette.Core.ApplicationServices.GetDepositAccumulateRoulettePromotionQueryService;
+using Tgs.Promotion.DepositAccumulateRouletteServices;
+using static Tgs.Promotion.DepositAccumulateRouletteServices.ApplicationServices.GetDepositAccumulateRoulettePromotionQueryService;
 
 namespace Tgs.Promotion.DepositAccumulateRouletteService.IntegrationTests;
 

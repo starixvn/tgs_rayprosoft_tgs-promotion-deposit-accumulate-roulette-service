@@ -2,7 +2,7 @@
 using Tgs.Promotion.DepositAccumulateRoulette.Common;
 using Tgs.ServiceUtility;
 
-namespace Tgs.Promotion.DepositAccumulateRoulette.Core.ApplicationServices;
+namespace Tgs.Promotion.DepositAccumulateRouletteServices.ApplicationServices;
 
 internal class GetDepositAccumulateRoulettePromotionQueryService
 	: IGetService<GetDepositAccumulateRoulettePromotionQuery, DepositAccumulateRoulettePromotion?>

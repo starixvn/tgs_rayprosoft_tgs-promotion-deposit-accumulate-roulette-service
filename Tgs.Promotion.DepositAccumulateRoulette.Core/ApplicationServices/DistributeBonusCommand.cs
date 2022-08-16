@@ -1,4 +1,4 @@
-﻿namespace Tgs.Promotion.DepositAccumulateRoulette.Core.ApplicationServices;
+﻿namespace Tgs.Promotion.DepositAccumulateRouletteServices.ApplicationServices;
 
 internal record DistributeBonusCommand(
 	Guid PromotionId,

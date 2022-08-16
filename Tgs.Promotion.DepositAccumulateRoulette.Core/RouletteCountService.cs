@@ -1,8 +1,7 @@
-﻿using Tgs.Promotion.DepositAccumulateRoulette.Common;
-using Tgs.Promotion.DepositAccumulateRoulette.Core.ApplicationServices;
+﻿using Tgs.Promotion.DepositAccumulateRouletteServices.ApplicationServices;
 using Tgs.ServiceUtility;
 
-namespace Tgs.Promotion.DepositAccumulateRoulette.Core;
+namespace Tgs.Promotion.DepositAccumulateRouletteServices;
 
 internal class RouletteCountService : IRouletteCountService
 {
@@ -38,8 +37,8 @@ internal class RouletteCountService : IRouletteCountService
 				.ConfigureAwait(false);
 
 			var count = cachedCount ??
-						 await SetRouletteCountAsync(promotionId, playerCode, info, cancellationToken)
-							 .ConfigureAwait(false);
+						await SetRouletteCountAsync(promotionId, playerCode, info, cancellationToken)
+							.ConfigureAwait(false);
 
 			totalCount += count;
 		}
@@ -110,8 +109,8 @@ internal class RouletteCountService : IRouletteCountService
 		CancellationToken cancellationToken = default)
 	{
 		_ = await _countRepository
-				.IncreaseRouletteCountAsync(promotionId, playerCode, countDistributeDate)
-				.ConfigureAwait(false);
+			.IncreaseRouletteCountAsync(promotionId, playerCode, countDistributeDate)
+			.ConfigureAwait(false);
 	}
 
 	private async ValueTask<int> SetRouletteCountAsync(Guid promotionId,

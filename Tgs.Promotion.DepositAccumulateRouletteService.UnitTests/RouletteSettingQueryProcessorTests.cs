@@ -1,10 +1,10 @@
 ﻿using Google.Protobuf;
 using NSubstitute;
 using Tgs.Promotion.DepositAccumulateRoulette.Common;
-using Tgs.Promotion.DepositAccumulateRoulette.Core;
-using Tgs.Promotion.DepositAccumulateRoulette.Core.ApplicationServices;
 using Tgs.Promotion.DepositAccumulateRouletteService.MessageQueue;
 using Tgs.Promotion.DepositAccumulateRouletteService.Protos;
+using Tgs.Promotion.DepositAccumulateRouletteServices;
+using Tgs.Promotion.DepositAccumulateRouletteServices.ApplicationServices;
 using Tgs.ServiceUtility;
 
 using Common = Tgs.Promotion.DepositAccumulateRoulette.Common;

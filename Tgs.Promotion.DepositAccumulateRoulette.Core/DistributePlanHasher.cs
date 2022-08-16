@@ -1,7 +1,7 @@
 ﻿using System.Text;
 using Murmur;
 
-namespace Tgs.Promotion.DepositAccumulateRoulette.Core;
+namespace Tgs.Promotion.DepositAccumulateRouletteServices;
 
 internal class DistributePlanHasher : IDistributePlanHasher
 {

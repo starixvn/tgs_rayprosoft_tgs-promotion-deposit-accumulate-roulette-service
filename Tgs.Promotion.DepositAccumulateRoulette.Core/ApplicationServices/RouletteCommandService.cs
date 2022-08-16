@@ -4,7 +4,7 @@ using Tgs.Promotion.Clients;
 using Tgs.Promotion.DepositAccumulateRoulette.Common;
 using Tgs.ServiceUtility;
 
-namespace Tgs.Promotion.DepositAccumulateRoulette.Core.ApplicationServices;
+namespace Tgs.Promotion.DepositAccumulateRouletteServices.ApplicationServices;
 
 internal class RouletteCommandService : IGetService<RouletteCommand, RouletteResult>
 {
@@ -84,12 +84,12 @@ internal class RouletteCommandService : IGetService<RouletteCommand, RouletteRes
 				default).ConfigureAwait(false);
 
 			await _distributeService.ExecuteAsync(new DistributeBonusCommand(
-				command.PromotionId,
-				command.PlayerCode,
-				countInfo.UseEvent.EventId,
-				countInfo.BeforeEventCount,
-				rouletteResult.Bonus,
-				rouletteResult.Bucket),
+					command.PromotionId,
+					command.PlayerCode,
+					countInfo.UseEvent.EventId,
+					countInfo.BeforeEventCount,
+					rouletteResult.Bonus,
+					rouletteResult.Bucket),
 				default).ConfigureAwait(false);
 		});
 
@@ -151,13 +151,13 @@ internal class RouletteCommandService : IGetService<RouletteCommand, RouletteRes
 			.ConfigureAwait(false);
 
 		var recordId = await _tgsRepository.AddRouletteRecordAsync(
-			command.PromotionId,
-			command.PlayerCode,
-			brandId,
-			depositAccumulateRouletteEventId,
-			distributeAmount,
-			itemIndex,
-			cancellationToken)
+				command.PromotionId,
+				command.PlayerCode,
+				brandId,
+				depositAccumulateRouletteEventId,
+				distributeAmount,
+				itemIndex,
+				cancellationToken)
 			.ConfigureAwait(false);
 
 		var bucket = rouletteItem.Bonus * rouletteItem.TurnoverRate;

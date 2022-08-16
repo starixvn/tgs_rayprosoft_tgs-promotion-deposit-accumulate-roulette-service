@@ -6,8 +6,7 @@ using StackExchange.Redis;
 using Tgs.Promotion.Clients;
 using Tgs.Promotion.DepositAccumulateRoulette.Cache;
 using Tgs.Promotion.DepositAccumulateRoulette.Common;
-using Tgs.Promotion.DepositAccumulateRoulette.Core;
-using Tgs.Promotion.DepositAccumulateRoulette.Core.ApplicationServices;
+using Tgs.Promotion.DepositAccumulateRouletteServices.ApplicationServices;
 using Tgs.ServiceUtility;
 
 namespace Microsoft.Extensions.DependencyInjection;

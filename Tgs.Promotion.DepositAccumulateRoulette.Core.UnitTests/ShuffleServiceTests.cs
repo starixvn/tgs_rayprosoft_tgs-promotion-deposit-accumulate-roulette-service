@@ -1,4 +1,5 @@
 ﻿using Tgs.Promotion.DepositAccumulateRoulette.Common;
+using Tgs.Promotion.DepositAccumulateRouletteServices;
 
 namespace Tgs.Promotion.DepositAccumulateRoulette.Core.UnitTests;
 

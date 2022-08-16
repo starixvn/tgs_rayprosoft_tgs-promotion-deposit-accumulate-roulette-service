@@ -1,3 +1,3 @@
-﻿namespace Tgs.Promotion.DepositAccumulateRoulette.Core.ApplicationServices;
+﻿namespace Tgs.Promotion.DepositAccumulateRouletteServices.ApplicationServices;
 
 public record GetPlayerAvailableRoulettePromotionsQuery(string PlayerCode);

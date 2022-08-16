@@ -1,6 +1,4 @@
-﻿using Tgs.Promotion.DepositAccumulateRoulette.Common;
-
-namespace Tgs.Promotion.DepositAccumulateRoulette.Core;
+﻿namespace Tgs.Promotion.DepositAccumulateRouletteServices;
 
 public interface IDepositAccumulateRouletteEventRepository
 {

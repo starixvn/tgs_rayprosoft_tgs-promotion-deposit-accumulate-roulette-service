@@ -1,4 +1,6 @@
-﻿namespace Tgs.Promotion.DepositAccumulateRoulette.Core.UnitTests;
+﻿using Tgs.Promotion.DepositAccumulateRouletteServices;
+
+namespace Tgs.Promotion.DepositAccumulateRoulette.Core.UnitTests;
 
 internal class DistributePlanHasherTests
 {

@@ -1,4 +1,5 @@
 ﻿using NSubstitute;
+using Tgs.Promotion.DepositAccumulateRouletteServices;
 
 namespace Tgs.Promotion.DepositAccumulateRoulette.Core.UnitTests;
 

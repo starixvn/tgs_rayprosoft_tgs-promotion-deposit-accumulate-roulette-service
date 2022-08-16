@@ -3,7 +3,7 @@ using DateOnlyTimeOnly.AspNet.Converters;
 using NSubstitute;
 using StackExchange.Redis;
 using Tgs.Promotion.DepositAccumulateRoulette.Common;
-using Tgs.Promotion.DepositAccumulateRoulette.Core;
+using Tgs.Promotion.DepositAccumulateRouletteServices;
 
 namespace Tgs.Promotion.DepositAccumulateRoulette.Repositories.UnitTests;
 

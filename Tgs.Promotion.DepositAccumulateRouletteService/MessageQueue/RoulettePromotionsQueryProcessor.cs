@@ -2,8 +2,8 @@
 using Google.Protobuf;
 using Tgs.MessageQueue;
 using Tgs.Promotion.Clients.Protos;
-using Tgs.Promotion.DepositAccumulateRoulette.Core;
-using Tgs.Promotion.DepositAccumulateRoulette.Core.ApplicationServices;
+using Tgs.Promotion.DepositAccumulateRouletteServices;
+using Tgs.Promotion.DepositAccumulateRouletteServices.ApplicationServices;
 using Tgs.ServiceUtility;
 
 namespace Tgs.Promotion.DepositAccumulateRouletteService.MessageQueue;

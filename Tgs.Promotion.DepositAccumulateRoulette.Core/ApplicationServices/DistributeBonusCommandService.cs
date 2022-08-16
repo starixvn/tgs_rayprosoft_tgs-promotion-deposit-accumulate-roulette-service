@@ -1,7 +1,7 @@
 ﻿using Tgs.Promotion.Clients;
 using Tgs.ServiceUtility;
 
-namespace Tgs.Promotion.DepositAccumulateRoulette.Core.ApplicationServices;
+namespace Tgs.Promotion.DepositAccumulateRouletteServices.ApplicationServices;
 
 internal class DistributeBonusCommandService : ICommandService<DistributeBonusCommand>
 {

@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
 using Tgs.Promotion.Clients;
-using Tgs.Promotion.DepositAccumulateRoulette.Core.ApplicationServices;
+using Tgs.Promotion.DepositAccumulateRouletteServices.ApplicationServices;
 using Tgs.ServiceUtility;
 
 namespace Tgs.Promotion.DepositAccumulateRoulette.Cache;

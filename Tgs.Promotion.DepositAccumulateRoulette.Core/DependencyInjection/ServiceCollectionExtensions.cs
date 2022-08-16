@@ -1,5 +1,5 @@
 ﻿using System.Reflection;
-using Tgs.Promotion.DepositAccumulateRoulette.Core;
+using Tgs.Promotion.DepositAccumulateRouletteServices;
 
 namespace Microsoft.Extensions.DependencyInjection;
 

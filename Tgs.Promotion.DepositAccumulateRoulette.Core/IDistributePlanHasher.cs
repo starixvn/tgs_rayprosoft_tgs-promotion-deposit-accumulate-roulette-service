@@ -1,4 +1,4 @@
-﻿namespace Tgs.Promotion.DepositAccumulateRoulette.Core;
+﻿namespace Tgs.Promotion.DepositAccumulateRouletteServices;
 
 internal interface IDistributePlanHasher
 {

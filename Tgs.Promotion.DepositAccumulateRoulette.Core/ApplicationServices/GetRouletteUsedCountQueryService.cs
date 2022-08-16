@@ -1,6 +1,6 @@
 ﻿using Tgs.ServiceUtility;
 
-namespace Tgs.Promotion.DepositAccumulateRoulette.Core.ApplicationServices;
+namespace Tgs.Promotion.DepositAccumulateRouletteServices.ApplicationServices;
 
 internal class GetRouletteUsedCountQueryService : IGetService<RouletteUsedCountQuery, int>
 {

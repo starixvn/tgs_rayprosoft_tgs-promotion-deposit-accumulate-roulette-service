@@ -3,7 +3,8 @@ using NSubstitute;
 using Tgs.PlayerService.Client;
 using Tgs.Promotion.Clients;
 using Tgs.Promotion.DepositAccumulateRoulette.Common;
-using Tgs.Promotion.DepositAccumulateRoulette.Core.ApplicationServices;
+using Tgs.Promotion.DepositAccumulateRouletteServices;
+using Tgs.Promotion.DepositAccumulateRouletteServices.ApplicationServices;
 
 namespace Tgs.Promotion.DepositAccumulateRoulette.Core.UnitTests;
 

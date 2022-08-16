@@ -2,7 +2,7 @@
 using Tgs.PlayerService.Client;
 using Tgs.ServiceUtility;
 
-namespace Tgs.Promotion.DepositAccumulateRoulette.Core.ApplicationServices;
+namespace Tgs.Promotion.DepositAccumulateRouletteServices.ApplicationServices;
 
 internal class GetPlayerAvailableRoulettePromotionsQueryService
 	: IQueryService<GetPlayerAvailableRoulettePromotionsQuery, RoulettePromotionInfo>

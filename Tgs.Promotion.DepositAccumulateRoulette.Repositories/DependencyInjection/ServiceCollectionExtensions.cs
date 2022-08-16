@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using StackExchange.Redis;
-using Tgs.Promotion.DepositAccumulateRoulette.Core;
 using Tgs.Promotion.DepositAccumulateRoulette.Repositories;
 using Tgs.Promotion.DepositAccumulateRoulette.Repositories.Entities;
+using Tgs.Promotion.DepositAccumulateRouletteServices;
 
 namespace Microsoft.Extensions.DependencyInjection;
 

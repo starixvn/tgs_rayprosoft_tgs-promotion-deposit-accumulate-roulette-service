@@ -1,6 +1,7 @@
 ﻿using NSubstitute;
 using Tgs.Promotion.DepositAccumulateRoulette.Common;
-using Tgs.Promotion.DepositAccumulateRoulette.Core.ApplicationServices;
+using Tgs.Promotion.DepositAccumulateRouletteServices;
+using Tgs.Promotion.DepositAccumulateRouletteServices.ApplicationServices;
 using Tgs.ServiceUtility;
 
 namespace Tgs.Promotion.DepositAccumulateRoulette.Core.UnitTests;
