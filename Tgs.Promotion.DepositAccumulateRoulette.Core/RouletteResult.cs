@@ -1,4 +1,4 @@
-﻿namespace Tgs.Promotion.DepositAccumulateRoulette.Common;
+﻿namespace Tgs.Promotion.DepositAccumulateRoulette.Core;
 
 public record RouletteResult(
 	Guid? Id,

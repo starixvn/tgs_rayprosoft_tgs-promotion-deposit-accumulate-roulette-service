@@ -16,8 +16,4 @@
     <PackageReference Include="PhoenixToolkits.Protobuf.ExtendTypes" Version="0.0.6" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Protobuf Include="Protos\roulette.proto" GrpcServices="Client" />
-  </ItemGroup>
-
 </Project>
