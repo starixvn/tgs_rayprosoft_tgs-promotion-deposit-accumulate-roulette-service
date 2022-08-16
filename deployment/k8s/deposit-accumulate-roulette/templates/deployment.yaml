@@ -119,7 +119,7 @@ spec:
       volumes:
         - name: appsettings
           configMap:
-            name: configmap-{{ include "deposit-accumulate-roulette.fullname" }}
+            name: configmap-{{ include "deposit-accumulate-roulette.fullname" . }}
         - name: diagvol
           emptyDir: {}
         - name: dumpsvol
