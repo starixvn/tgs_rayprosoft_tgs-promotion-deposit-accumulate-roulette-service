@@ -1,10 +1,10 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 using StackExchange.Redis;
+using Tgs.DepositAccumulateRoulette.Clients;
 using Tgs.MessageQueue;
 using Tgs.PlayerService.Client;
 using Tgs.Promotion.Clients;
-using Tgs.Promotion.DepositAccumulateRoulette.Client;
 using Tgs.Promotion.DepositAccumulateRoulette.Common;
 using Tgs.Promotion.DepositAccumulateRouletteService.MessageQueue;
 using Tgs.Promotion.DepositAccumulateRouletteServices;

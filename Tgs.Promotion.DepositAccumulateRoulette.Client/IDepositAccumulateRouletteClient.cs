@@ -1,4 +1,4 @@
-﻿namespace Tgs.Promotion.DepositAccumulateRoulette.Client;
+﻿namespace Tgs.DepositAccumulateRoulette.Clients;
 
 public interface IDepositAccumulateRouletteClient
 {

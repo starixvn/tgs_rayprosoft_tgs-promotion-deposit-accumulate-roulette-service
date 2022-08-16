@@ -1,3 +1,3 @@
-﻿namespace Tgs.Promotion.DepositAccumulateRoulette.Client;
+﻿namespace Tgs.DepositAccumulateRoulette.Clients;
 
 public record RouletteItem(Guid Id, string Title);

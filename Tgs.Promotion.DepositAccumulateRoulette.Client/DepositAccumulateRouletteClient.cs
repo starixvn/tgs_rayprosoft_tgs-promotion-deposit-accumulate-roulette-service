@@ -2,7 +2,7 @@
 using Tgs.MessageQueue;
 using Tgs.Promotion.DepositAccumulateRouletteService.Protos;
 
-namespace Tgs.Promotion.DepositAccumulateRoulette.Client;
+namespace Tgs.DepositAccumulateRoulette.Clients;
 
 internal class DepositAccumulateRouletteClient : IDepositAccumulateRouletteClient
 {
