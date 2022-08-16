@@ -55,9 +55,12 @@ internal class DepositAccumulateRouletteEventRepository :
 		{
 			foreach (var value in values)
 			{
-				yield return JsonSerializer.Deserialize<DepositAccumulateRouletteEventInfo>(
+				var eventInfo = JsonSerializer.Deserialize<DepositAccumulateRouletteEventInfo?>(
 					value!,
-					_JsonSerializerOptions)!;
+					_JsonSerializerOptions);
+
+				if (eventInfo is not null)
+					yield return eventInfo;
 			}
 		}
 		else
@@ -66,6 +69,19 @@ internal class DepositAccumulateRouletteEventRepository :
 				.GetDepositAccumulateRouletteEventInfosAsync(promotionId, playerCode, queryDate)
 				.ToArrayAsync(cancellationToken)
 				.ConfigureAwait(false);
+
+			if (events.Length == 0)
+			{
+				var expired = currentDate == queryDate
+					? new DateTimeOffset(currentDate.Year, currentDate.Month, currentDate.Day + 1, 8, 0, 0,
+						TimeSpan.FromHours(8D)).Ticks
+					: now.AddMinutes(5D).Ticks;
+				
+				_ = await _redisDatabase.SortedSetAddAsync(redisKey, "{}", expired)
+					.ConfigureAwait(false);
+
+				yield break;
+			}
 
 			foreach (var evt in events)
 			{
