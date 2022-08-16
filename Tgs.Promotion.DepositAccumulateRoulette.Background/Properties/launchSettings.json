@@ -8,7 +8,7 @@
       "launchUrl": "swagger",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "OTEL_SERVICE_NAME": "DepositAccumulateRoulette-Background(local)",
+        "OTEL_SERVICE_NAME": "Promotion-Deposit-Accumulate-Roulette-Background(local)",
         "NODE_IP": "otel.rpgp.cc"
       }
     }
