@@ -87,7 +87,7 @@ internal class DepositAccumulateRouletteTests
 		var fakeStatisticsRepository = Substitute.For<IStatisticsRepository>();
 		var fakeEventRepository = Substitute.For<IDepositAccumulateRouletteEventRepository>();
 		var fakePlayerServiceClient = Substitute.For<IPlayerServiceClient>();
-		var fakeRedisDatabase = Substitute.For<IDatabase>();
+		var fakeRedisConnectionManager = Substitute.For<IRedisConnectionManager>();
 
 		await using var web = new TestDepositAccumulateRouletteServiceApplication(builder => builder
 			.ConfigureServices(services => services
@@ -95,7 +95,7 @@ internal class DepositAccumulateRouletteTests
 				.AddSingleton(fakeStatisticsRepository)
 				.AddSingleton(fakePlayerServiceClient)
 				.AddSingleton(fakeEventRepository)
-				.AddSingleton<IRedisConnectionManager>(_ => new StubRedisConnectionManager(fakeRedisDatabase))));
+				.AddSingleton(fakeRedisConnectionManager)));
 
 		var serviceScope = web.Services.CreateAsyncScope();
 
@@ -164,7 +164,8 @@ internal class DepositAccumulateRouletteTests
 			.Returns(new PromotionRule { CompaignDetail = settings });
 
 		var key = $"Promotion.DepositAccumulateRoulette:RouletteCount:{promotionId}:{playerCode}:{eventInfo.Date:O}";
-		_ = fakeRedisDatabase
+		_ = fakeRedisConnectionManager
+			.Database
 			.StringDecrementAsync(Arg.Is<RedisKey>(key))
 			.Returns(3);
 

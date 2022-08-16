@@ -1,12 +1,13 @@
 ﻿using ExpectedObjects;
 using NSubstitute;
+using Tgs.PlayerService.Client;
 using Tgs.Promotion.Clients;
 using Tgs.Promotion.DepositAccumulateRoulette.Common;
 using Tgs.Promotion.DepositAccumulateRoulette.Core.ApplicationServices;
 
 namespace Tgs.Promotion.DepositAccumulateRoulette.Core.UnitTests;
 
-internal class GetDepositAccumulateRoulettePromotionQueryServiceTests
+internal class PromotionQueryTests
 {
 	[Test]
 	public async Task Get_RoulettePromotion_Info()
@@ -69,5 +70,60 @@ internal class GetDepositAccumulateRoulettePromotionQueryServiceTests
 		var actual = await sut.GetAsync(query);
 
 		expected.ShouldEqual(actual);
+	}
+
+	[Test]
+	public async Task Can_Get_Player_Roulette_PromotionsAsync()
+	{
+		var fakePlayerServiceClient = Substitute.For<IPlayerServiceClient>();
+		var fakeTgsRepository = Substitute.For<ITgsRepository>();
+		var fakeRouletteService = Substitute.For<IRouletteCountService>();
+
+		var sut = new GetPlayerAvailableRoulettePromotionsQueryService(
+			fakePlayerServiceClient,
+			fakeTgsRepository,
+			fakeRouletteService);
+
+		var playerInfo = new PlayerInfo
+		{
+			PlayerCode = "player1",
+			BrandId = Guid.NewGuid(),
+			UserName = "player1"
+		};
+
+		var expected = new RoulettePromotionInfo[]
+		{
+			new RoulettePromotionInfo(Guid.NewGuid(), 4),
+			new RoulettePromotionInfo(Guid.NewGuid(), 2)
+		};
+
+		var promotionIds = expected.Select(rp => rp.PromotionId).ToArray();
+
+		var query = new GetPlayerAvailableRoulettePromotionsQuery(playerInfo.PlayerCode);
+
+		_ = fakePlayerServiceClient.GetPlayerInfoAsync(Arg.Is(query.PlayerCode))
+			.Returns(playerInfo);
+
+		_ = fakeTgsRepository.GetAvailablePromotionIdsAsync(
+				Arg.Is(playerInfo.BrandId),
+				Arg.Is(playerInfo.PlayerCode),
+				Arg.Any<CancellationToken>())
+			.Returns(promotionIds.ToAsyncEnumerable());
+
+		_ = fakeRouletteService.GetAvailableRouletteCountAsync(
+				Arg.Is(promotionIds[0]),
+				Arg.Is(playerInfo.PlayerCode),
+				Arg.Any<CancellationToken>())
+			.Returns(4);
+
+		_ = fakeRouletteService.GetAvailableRouletteCountAsync(
+				Arg.Is(promotionIds[1]),
+				Arg.Is(playerInfo.PlayerCode),
+				Arg.Any<CancellationToken>())
+			.Returns(2);
+
+		var actual = await sut.QueryAsync(query).ToArrayAsync();
+
+		CollectionAssert.AreEqual(expected, actual);
 	}
 }
