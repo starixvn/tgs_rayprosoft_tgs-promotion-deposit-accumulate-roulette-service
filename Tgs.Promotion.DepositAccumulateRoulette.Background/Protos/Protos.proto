@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+option csharp_namespace = "Tgs.Promotion.DepositAccumulateRoulette.Background.Protos";
+
+import "phoenix/protobuf/date.proto";
+
+message ProcessRequest {
+	phoenix.protobuf.DateValue process_date = 1;
+}
