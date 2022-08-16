@@ -1,8 +1,8 @@
-﻿namespace Tgs.Promotion.DepositAccumulateRoulette.Background.Core;
+﻿namespace Tgs.Promotion.DepositAccumulateRoulette.Background;
 
 public record DepositAccumulateRouletteEventAddInfo(
-    string PlayerCode,
-    Guid BrandId,
-    Guid PromotionId,
-    int RouletteCount,
-    decimal TotalDepositAmount);
+	string PlayerCode,
+	Guid BrandId,
+	Guid PromotionId,
+	int RouletteCount,
+	decimal TotalDepositAmount);

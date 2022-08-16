@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Tgs.Promotion.DepositAccumulateRoulette.Background.Core;
+using Tgs.Promotion.DepositAccumulateRoulette.Background;
 using Tgs.Promotion.DepositAccumulateRoulette.Background.Repositories;
 using Tgs.Promotion.DepositAccumulateRoulette.Background.Repositories.Entities;
 

@@ -1,4 +1,4 @@
-﻿namespace Tgs.Promotion.DepositAccumulateRoulette.Background.Core;
+﻿namespace Tgs.Promotion.DepositAccumulateRoulette.Background;
 
 public record DepositFormInfo(
 	Guid FormId,
