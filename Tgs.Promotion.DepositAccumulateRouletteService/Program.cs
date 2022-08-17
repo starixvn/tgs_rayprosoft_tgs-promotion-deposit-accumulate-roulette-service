@@ -43,9 +43,9 @@ builder.Services
 			.AddProcessor<RouletteSettingQueryProcessor>(
 				"tgs.promotion.depositaccumulateroulette.roulettesetting.query",
 				"tgs.promotion.depositaccumulateroulette.roulettesetting.query")
-			.AddProcessor<RoulettePromotionsQueryProcessor>(
-				"tgs.promotion.depositaccumulateroulette.roulettepromotions.query",
-				"tgs.promotion.depositaccumulateroulette.roulettepromotions.query")
+			.AddProcessor<RouletteCountPromotionsQueryProcessor>(
+				"tgs.promotion.depositaccumulateroulette.roulettecountpromotions.query",
+				"tgs.promotion.depositaccumulateroulette.roulettecountpromotions.query")
 			.AddProcessor<RouletteProcessor>(
 				"tgs.promotion.depositaccumulateroulette.roulette.play",
 				"tgs.promotion.depositaccumulateroulette.roulette.play")

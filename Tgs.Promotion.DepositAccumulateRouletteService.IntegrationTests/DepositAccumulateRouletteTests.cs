@@ -123,7 +123,6 @@ internal class DepositAccumulateRouletteTests
 		var eventInfo = new DepositAccumulateRouletteEventInfo(
 			Guid.NewGuid(),
 			playerCode,
-			brandId,
 			promotionId,
 			DateOnly.FromDateTime(DateTime.Now),
 			4,

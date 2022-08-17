@@ -6,7 +6,7 @@
     <Nullable>enable</Nullable>
     <RootNamespace>Tgs.DepositAccumulateRoulette.Clients</RootNamespace>
     <PackageId>Tgs.DepositAccumulateRoulette.Client</PackageId>
-    <Version>0.0.1-alpha</Version>
+    <Version>0.0.2-alpha</Version>
     <Authors>Raypro</Authors>
     <Product>Tgs.DepositAccumulateRouletteClient</Product>
     <PackageProjectUrl>https://gitlab.com/rayprosoft/tgs-promotion-deposit-accumulate-roulette-service</PackageProjectUrl>

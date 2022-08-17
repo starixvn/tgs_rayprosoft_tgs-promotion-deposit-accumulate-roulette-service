@@ -8,12 +8,12 @@ using Tgs.ServiceUtility;
 
 namespace Tgs.Promotion.DepositAccumulateRouletteService.MessageQueue;
 
-public class RoulettePromotionsQueryProcessor : IMessageProcessor
+public class RouletteCountPromotionsQueryProcessor : IMessageProcessor
 {
-	private readonly IQueryService<GetPlayerAvailableRoulettePromotionsQuery, RoulettePromotionInfo> _queryService;
+	private readonly IQueryService<GetPlayerRouletteCountPromotionsQuery, RouletteCountPromotionInfo> _queryService;
 
-	public RoulettePromotionsQueryProcessor(
-		IQueryService<GetPlayerAvailableRoulettePromotionsQuery, RoulettePromotionInfo> queryService)
+	public RouletteCountPromotionsQueryProcessor(
+		IQueryService<GetPlayerRouletteCountPromotionsQuery, RouletteCountPromotionInfo> queryService)
 	{
 		_queryService = queryService ?? throw new ArgumentNullException(nameof(queryService));
 	}
@@ -24,7 +24,7 @@ public class RoulettePromotionsQueryProcessor : IMessageProcessor
 		var request = RoulettePromotionsReqest.Parser.ParseFrom(data.Span);
 
 		var promotionInfos = await _queryService
-			.QueryAsync(new GetPlayerAvailableRoulettePromotionsQuery(request.PlayerCode), cancellationToken)
+			.QueryAsync(new GetPlayerRouletteCountPromotionsQuery(request.PlayerCode), cancellationToken)
 			.ToArrayAsync(cancellationToken)
 			.ConfigureAwait(false);
 

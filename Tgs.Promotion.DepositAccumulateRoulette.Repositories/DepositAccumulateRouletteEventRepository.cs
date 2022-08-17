@@ -2,7 +2,6 @@
 using System.Text.Json;
 using DateOnlyTimeOnly.AspNet.Converters;
 using StackExchange.Redis;
-using Tgs.Promotion.DepositAccumulateRoulette.Common;
 using Tgs.Promotion.DepositAccumulateRouletteServices;
 
 namespace Tgs.Promotion.DepositAccumulateRoulette.Repositories;
@@ -55,9 +54,12 @@ internal class DepositAccumulateRouletteEventRepository :
 		{
 			foreach (var value in values)
 			{
-				yield return JsonSerializer.Deserialize<DepositAccumulateRouletteEventInfo>(
-					value!,
-					_JsonSerializerOptions)!;
+				var eventInfo = value.HasValue
+					? JsonSerializer.Deserialize<DepositAccumulateRouletteEventInfo>(value!, _JsonSerializerOptions)
+					: null;
+
+				if (eventInfo is not null && eventInfo.EventId != Guid.Empty)
+					yield return eventInfo;
 			}
 		}
 		else
@@ -66,6 +68,24 @@ internal class DepositAccumulateRouletteEventRepository :
 				.GetDepositAccumulateRouletteEventInfosAsync(promotionId, playerCode, queryDate)
 				.ToArrayAsync(cancellationToken)
 				.ConfigureAwait(false);
+
+			if (events.Length == 0)
+			{
+				var expired = currentDate == queryDate
+					? new DateTimeOffset(currentDate.Year, currentDate.Month, currentDate.Day + 1, 8, 0, 0,
+						TimeSpan.FromHours(8D)).Ticks
+					: now.AddMinutes(5D).Ticks;
+
+				var info = new DepositAccumulateRouletteEventInfo(
+					Guid.Empty, playerCode, promotionId, currentDate, 0, 0);
+
+				var data = JsonSerializer.Serialize(info, _JsonSerializerOptions);
+
+				_ = await _redisDatabase.SortedSetAddAsync(redisKey, data, expired)
+					.ConfigureAwait(false);
+
+				yield break;
+			}
 
 			foreach (var evt in events)
 			{

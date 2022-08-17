@@ -22,7 +22,7 @@ internal class MemoryCachedGetPromotionDistributePlanQueryService : IGetService<
 		GetPromotionDistributePlanQuery query,
 		CancellationToken cancellationToken = default)
 	{
-		var cacheKey = $"{query.PromotionId}:{query.ConditionHash}";
+		var cacheKey = $"DistributePlan:{query.PromotionId}:{query.ConditionHash}";
 
 		var plan = await _memoryCache.GetOrCreateAsync(cacheKey, async entry =>
 		{

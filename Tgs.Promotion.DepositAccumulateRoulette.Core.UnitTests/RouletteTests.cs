@@ -54,7 +54,6 @@ internal class RouletteTests
 		var eventInfo = new DepositAccumulateRouletteEventInfo(
 			Guid.NewGuid(),
 			playerCode,
-			brandId,
 			promotionId,
 			DateOnly.Parse("2022-08-11"),
 			4,
@@ -287,7 +286,6 @@ internal class RouletteTests
 		var eventInfo = new DepositAccumulateRouletteEventInfo(
 			Guid.NewGuid(),
 			playerCode,
-			brandId,
 			promotionId,
 			DateOnly.Parse("2022-08-11"),
 			4,
