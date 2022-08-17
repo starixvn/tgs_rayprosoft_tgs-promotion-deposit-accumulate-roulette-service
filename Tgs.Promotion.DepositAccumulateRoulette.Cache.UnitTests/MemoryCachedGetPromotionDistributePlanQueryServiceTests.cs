@@ -27,7 +27,7 @@ internal class MemoryCachedGetPromotionDistributePlanQueryServiceTests
 				query.PromotionId,
 				query.ConditionHash);
 
-		_ = fakeMemoryCache.Set($"{query.PromotionId}:{query.ConditionHash}", expected);
+		_ = fakeMemoryCache.Set($"DistributePlan:{query.PromotionId}:{query.ConditionHash}", expected);
 
 		var actual = await sut.GetAsync(query);
 
