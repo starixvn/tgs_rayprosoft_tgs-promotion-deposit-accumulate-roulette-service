@@ -80,7 +80,7 @@ internal class PromotionQueryTests
 		var fakeTgsRepository = Substitute.For<ITgsRepository>();
 		var fakeRouletteService = Substitute.For<IRouletteCountService>();
 
-		var sut = new GetPlayerAvailableRoulettePromotionsQueryService(
+		var sut = new GetPlayerRouletteCountPromotionsQueryService(
 			fakePlayerServiceClient,
 			fakeTgsRepository,
 			fakeRouletteService);
@@ -92,15 +92,15 @@ internal class PromotionQueryTests
 			UserName = "player1"
 		};
 
-		var expected = new RoulettePromotionInfo[]
+		var expected = new RouletteCountPromotionInfo[]
 		{
-			new RoulettePromotionInfo(Guid.NewGuid(), 4),
-			new RoulettePromotionInfo(Guid.NewGuid(), 2)
+			new RouletteCountPromotionInfo(Guid.NewGuid(), 4),
+			new RouletteCountPromotionInfo(Guid.NewGuid(), 2)
 		};
 
 		var promotionIds = expected.Select(rp => rp.PromotionId).ToArray();
 
-		var query = new GetPlayerAvailableRoulettePromotionsQuery(playerInfo.PlayerCode);
+		var query = new GetPlayerRouletteCountPromotionsQuery(playerInfo.PlayerCode);
 
 		_ = fakePlayerServiceClient.GetPlayerInfoAsync(Arg.Is(query.PlayerCode))
 			.Returns(playerInfo);
