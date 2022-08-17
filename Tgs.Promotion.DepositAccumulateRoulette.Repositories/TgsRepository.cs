@@ -31,7 +31,6 @@ internal class TgsRepository : ITgsRepository
 				new DepositAccumulateRouletteEventInfo(
 					evt.Id,
 					evt.PlayerCode,
-					evt.BrandId,
 					evt.PromotionId,
 					evt.Date,
 					evt.RouletteCount,
@@ -95,7 +94,7 @@ internal class TgsRepository : ITgsRepository
 		return (from eventInfo in _context.DepositAccumulateRouletteEvents.Where(evt =>
 					evt.BrandId == brandId &&
 					evt.PlayerCode == playerCode &&
-					evt.Date == date)
+					evt.Date >= date)
 				join promotion in _context.Promotions.Where(p =>
 						p.BrandId == brandId &&
 						p.PromotionType == "DepositAccumulateRoulette" &&

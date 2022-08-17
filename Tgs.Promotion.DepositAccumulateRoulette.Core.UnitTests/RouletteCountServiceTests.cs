@@ -24,7 +24,6 @@ internal class RouletteCountServiceTests
 			new DepositAccumulateRouletteEventInfo(
 				Guid.NewGuid(),
 				playerCode,
-				brandId,
 				promotionId,
 				DateOnly.Parse("2022-08-10"),
 				5,
@@ -74,7 +73,6 @@ internal class RouletteCountServiceTests
 			new DepositAccumulateRouletteEventInfo(
 				Guid.NewGuid(),
 				playerCode,
-				brandId,
 				promotionId,
 				DateOnly.Parse("2022-08-11"),
 				5,
@@ -181,7 +179,6 @@ internal class RouletteCountServiceTests
 			new DepositAccumulateRouletteEventInfo(
 				Guid.NewGuid(),
 				playerCode,
-				brandId,
 				promotionId,
 				DateOnly.Parse("2022-08-10"),
 				5,
@@ -189,7 +186,6 @@ internal class RouletteCountServiceTests
 			new DepositAccumulateRouletteEventInfo(
 				Guid.NewGuid(),
 				playerCode,
-				brandId,
 				promotionId,
 				DateOnly.Parse("2022-08-11"),
 				4,
@@ -248,7 +244,6 @@ internal class RouletteCountServiceTests
 			new DepositAccumulateRouletteEventInfo(
 				Guid.NewGuid(),
 				playerCode,
-				brandId,
 				promotionId,
 				DateOnly.Parse("2022-08-10"),
 				5,
@@ -256,7 +251,6 @@ internal class RouletteCountServiceTests
 			new DepositAccumulateRouletteEventInfo(
 				Guid.NewGuid(),
 				playerCode,
-				brandId,
 				promotionId,
 				DateOnly.Parse("2022-08-11"),
 				4,

@@ -31,7 +31,6 @@ public class DepositAccumulateRouletteEventRepositoryTests
 			new DepositAccumulateRouletteEventInfo(
 				Guid.NewGuid(),
 				playerCode,
-				brandId,
 				promotionId,
 				DateOnly.Parse("2022-08-12"),
 				3,
@@ -88,7 +87,6 @@ public class DepositAccumulateRouletteEventRepositoryTests
 			new DepositAccumulateRouletteEventInfo(
 				Guid.NewGuid(),
 				playerCode,
-				brandId,
 				promotionId,
 				DateOnly.Parse("2022-08-12"),
 				4,
@@ -160,7 +158,6 @@ public class DepositAccumulateRouletteEventRepositoryTests
 			new DepositAccumulateRouletteEventInfo(
 				Guid.NewGuid(),
 				playerCode,
-				brandId,
 				promotionId,
 				DateOnly.Parse("2022-08-11"),
 				4,
@@ -168,7 +165,6 @@ public class DepositAccumulateRouletteEventRepositoryTests
 			new DepositAccumulateRouletteEventInfo(
 				Guid.NewGuid(),
 				playerCode,
-				brandId,
 				promotionId,
 				DateOnly.Parse("2022-08-12"),
 				3,
@@ -225,7 +221,6 @@ public class DepositAccumulateRouletteEventRepositoryTests
 			new DepositAccumulateRouletteEventInfo(
 				Guid.NewGuid(),
 				playerCode,
-				brandId,
 				promotionId,
 				DateOnly.Parse("2022-08-11"),
 				4,
@@ -233,7 +228,6 @@ public class DepositAccumulateRouletteEventRepositoryTests
 			new DepositAccumulateRouletteEventInfo(
 				Guid.NewGuid(),
 				playerCode,
-				brandId,
 				promotionId,
 				DateOnly.Parse("2022-08-12"),
 				3,
