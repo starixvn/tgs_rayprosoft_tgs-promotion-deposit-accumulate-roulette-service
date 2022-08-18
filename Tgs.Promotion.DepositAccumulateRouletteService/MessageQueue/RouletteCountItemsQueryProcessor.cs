@@ -1,5 +1,4 @@
-﻿using System.Data;
-using Google.Protobuf;
+﻿using Google.Protobuf;
 using Tgs.MessageQueue;
 using Tgs.Promotion.Clients.Protos;
 using Tgs.Promotion.DepositAccumulateRouletteServices;
@@ -8,12 +7,12 @@ using Tgs.ServiceUtility;
 
 namespace Tgs.Promotion.DepositAccumulateRouletteService.MessageQueue;
 
-public class RouletteCountPromotionsQueryProcessor : IMessageProcessor
+public class RouletteCountItemsQueryProcessor : IMessageProcessor
 {
-	private readonly IQueryService<GetPlayerRouletteCountPromotionsQuery, RouletteCountPromotionInfo> _queryService;
+	private readonly IQueryService<GetPlayerRouletteCountItemsQuery, RouletteCountItemInfo> _queryService;
 
-	public RouletteCountPromotionsQueryProcessor(
-		IQueryService<GetPlayerRouletteCountPromotionsQuery, RouletteCountPromotionInfo> queryService)
+	public RouletteCountItemsQueryProcessor(
+		IQueryService<GetPlayerRouletteCountItemsQuery, RouletteCountItemInfo> queryService)
 	{
 		_queryService = queryService ?? throw new ArgumentNullException(nameof(queryService));
 	}
@@ -21,21 +20,21 @@ public class RouletteCountPromotionsQueryProcessor : IMessageProcessor
 	public async ValueTask<ReadOnlyMemory<byte>> HandleAsync(
 		ReadOnlyMemory<byte> data, CancellationToken cancellationToken = default)
 	{
-		var request = RouletteCountPromotionsReqest.Parser.ParseFrom(data.Span);
+		var request = RouletteCountRequest.Parser.ParseFrom(data.Span);
 
 		var promotionInfos = await _queryService
-			.QueryAsync(new GetPlayerRouletteCountPromotionsQuery(request.PlayerCode), cancellationToken)
+			.QueryAsync(new GetPlayerRouletteCountItemsQuery(request.PlayerCode), cancellationToken)
 			.ToArrayAsync(cancellationToken)
 			.ConfigureAwait(false);
 
-		var promotions = promotionInfos.Select(p => new RouletteCountPromotion
+		var promotions = promotionInfos.Select(p => new RouletteCountItem
 		{
 			PromotionId = p.PromotionId,
 			RouletteCount = p.RouletteCount
 		});
 
-		var response = new RouletteCountPromotionsResponse();
-		response.Promotions.AddRange(promotions);
+		var response = new RouletteCountResponse();
+		response.Items.AddRange(promotions);
 
 		return response.ToByteArray();
 	}
