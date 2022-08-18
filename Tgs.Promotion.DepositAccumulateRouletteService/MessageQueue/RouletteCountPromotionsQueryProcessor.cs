@@ -21,20 +21,20 @@ public class RouletteCountPromotionsQueryProcessor : IMessageProcessor
 	public async ValueTask<ReadOnlyMemory<byte>> HandleAsync(
 		ReadOnlyMemory<byte> data, CancellationToken cancellationToken = default)
 	{
-		var request = RoulettePromotionsReqest.Parser.ParseFrom(data.Span);
+		var request = RouletteCountPromotionsReqest.Parser.ParseFrom(data.Span);
 
 		var promotionInfos = await _queryService
 			.QueryAsync(new GetPlayerRouletteCountPromotionsQuery(request.PlayerCode), cancellationToken)
 			.ToArrayAsync(cancellationToken)
 			.ConfigureAwait(false);
 
-		var promotions = promotionInfos.Select(p => new RoulettePromotion
+		var promotions = promotionInfos.Select(p => new RouletteCountPromotion
 		{
 			PromotionId = p.PromotionId,
 			RouletteCount = p.RouletteCount
 		});
 
-		var response = new RoulettePromotionsResponse();
+		var response = new RouletteCountPromotionsResponse();
 		response.Promotions.AddRange(promotions);
 
 		return response.ToByteArray();
