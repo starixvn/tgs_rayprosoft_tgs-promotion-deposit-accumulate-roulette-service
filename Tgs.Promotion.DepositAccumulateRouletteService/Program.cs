@@ -11,7 +11,7 @@ using Tgs.Promotion.DepositAccumulateRouletteService.MessageQueue;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Configuration
-	.AddJsonFile("/config/appsettigs.json", true)
+	.AddJsonFile("/config/appsettings.json", true)
 	.AddEnvironmentVariables();
 
 builder.Logging
