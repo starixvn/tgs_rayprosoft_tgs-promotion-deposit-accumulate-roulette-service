@@ -91,16 +91,13 @@ internal class TgsRepository : ITgsRepository
 	{
 		var date = DateOnly.FromDateTime(DateTimeOffset.UtcNow.ToOffset(TimeSpan.FromHours(8D - 8D)).DateTime);
 
-		return (from eventInfo in _context.DepositAccumulateRouletteEvents.Where(evt =>
+		return _context.DepositAccumulateRouletteEvents
+			.Where(evt =>
 					evt.BrandId == brandId &&
 					evt.PlayerCode == playerCode &&
 					evt.Date >= date)
-				from promotion in _context.Promotions.Where(p =>
-						p.Id == eventInfo.PromotionId &&
-						p.PromotionType == "DepositAccumulateRoulette" &&
-						p.Status == 0 &&
-						p.From <= DateTime.UtcNow)
-				select promotion.Id)
+			.Select(evt => evt.PromotionId)
+			.Distinct()
 			.ToAsyncEnumerable();
 	}
 }

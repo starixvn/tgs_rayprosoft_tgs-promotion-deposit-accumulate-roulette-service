@@ -43,13 +43,12 @@ builder.Services
 			.AddProcessor<RouletteSettingQueryProcessor>(
 				"tgs.promotion.depositaccumulateroulette.roulettesetting.query",
 				"tgs.promotion.depositaccumulateroulette.roulettesetting.query")
-			.AddProcessor<RouletteCountPromotionsQueryProcessor>(
-				"tgs.promotion.depositaccumulateroulette.roulettecountpromotions.query",
-				"tgs.promotion.depositaccumulateroulette.roulettecountpromotions.query")
+			.AddProcessor<RouletteCountItemsQueryProcessor>(
+				"tgs.promotion.depositaccumulateroulette.roulettecountitems.query",
+				"tgs.promotion.depositaccumulateroulette.roulettecountitems.query")
 			.AddProcessor<RouletteProcessor>(
 				"tgs.promotion.depositaccumulateroulette.roulette.play",
-				"tgs.promotion.depositaccumulateroulette.roulette.play")
-			.SetSessionReplySubject($"tgs.promotion.depositaccumulateroulette.worker.{Environment.MachineName}.reply");
+				"tgs.promotion.depositaccumulateroulette.roulette.play");
 	})
 	.AddNatsGlobPatternExchange("*");
 

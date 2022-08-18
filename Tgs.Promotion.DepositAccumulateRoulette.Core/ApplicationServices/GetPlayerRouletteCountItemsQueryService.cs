@@ -4,14 +4,14 @@ using Tgs.ServiceUtility;
 
 namespace Tgs.Promotion.DepositAccumulateRouletteServices.ApplicationServices;
 
-internal class GetPlayerRouletteCountPromotionsQueryService
-	: IQueryService<GetPlayerRouletteCountPromotionsQuery, RouletteCountPromotionInfo>
+internal class GetPlayerRouletteCountItemsQueryService
+	: IQueryService<GetPlayerRouletteCountItemsQuery, RouletteCountItemInfo>
 {
 	private readonly IPlayerServiceClient _playerServiceClient;
 	private readonly ITgsRepository _tgsRepository;
 	private readonly IRouletteCountService _rouletteCountService;
 
-	public GetPlayerRouletteCountPromotionsQueryService(
+	public GetPlayerRouletteCountItemsQueryService(
 		IPlayerServiceClient playerServiceClient,
 		ITgsRepository tgsRepository,
 		IRouletteCountService rouletteCountService)
@@ -21,8 +21,8 @@ internal class GetPlayerRouletteCountPromotionsQueryService
 		_rouletteCountService = rouletteCountService ?? throw new ArgumentNullException(nameof(rouletteCountService));
 	}
 
-	public async IAsyncEnumerable<RouletteCountPromotionInfo> QueryAsync(
-		GetPlayerRouletteCountPromotionsQuery query,
+	public async IAsyncEnumerable<RouletteCountItemInfo> QueryAsync(
+		GetPlayerRouletteCountItemsQuery query,
 		[EnumeratorCancellation] CancellationToken cancellationToken = default)
 	{
 		var player = await _playerServiceClient.GetPlayerInfoAsync(query.PlayerCode, cancellationToken)
@@ -42,7 +42,7 @@ internal class GetPlayerRouletteCountPromotionsQueryService
 				.ConfigureAwait(false);
 
 			if (count > 0)
-				yield return new RouletteCountPromotionInfo(id, count);
+				yield return new RouletteCountItemInfo(id, count);
 		}
 	}
 }
