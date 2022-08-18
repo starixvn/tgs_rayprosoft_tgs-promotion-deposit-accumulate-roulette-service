@@ -16,7 +16,7 @@
     <PackageReference Include="StackExchange.Redis" Version="2.6.48" />
     <PackageReference Include="System.Linq.Async" Version="6.0.1" />
     <PackageReference Include="Tgs.PlayerService.Client" Version="0.0.15" />
-    <PackageReference Include="Tgs.Promotion.Client" Version="1.0.22-alpha" />
+    <PackageReference Include="Tgs.Promotion.Client" Version="1.0.23-alpha" />
     <PackageReference Include="TGS.ServiceUtility" Version="0.1.0" />
   </ItemGroup>
 

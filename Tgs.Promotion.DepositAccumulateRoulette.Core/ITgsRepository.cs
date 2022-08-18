@@ -1,4 +1,6 @@
-﻿namespace Tgs.Promotion.DepositAccumulateRouletteServices;
+﻿using Tgs.Promotion.Clients;
+
+namespace Tgs.Promotion.DepositAccumulateRouletteServices;
 
 public interface ITgsRepository
 {

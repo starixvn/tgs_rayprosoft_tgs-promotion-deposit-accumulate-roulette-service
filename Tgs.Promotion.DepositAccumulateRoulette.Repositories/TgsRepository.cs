@@ -95,12 +95,11 @@ internal class TgsRepository : ITgsRepository
 					evt.BrandId == brandId &&
 					evt.PlayerCode == playerCode &&
 					evt.Date >= date)
-				join promotion in _context.Promotions.Where(p =>
-						p.BrandId == brandId &&
+				from promotion in _context.Promotions.Where(p =>
+						p.Id == eventInfo.PromotionId &&
 						p.PromotionType == "DepositAccumulateRoulette" &&
 						p.Status == 0 &&
 						p.From <= DateTime.UtcNow)
-					on eventInfo.PromotionId equals promotion.Id
 				select promotion.Id)
 			.ToAsyncEnumerable();
 	}
