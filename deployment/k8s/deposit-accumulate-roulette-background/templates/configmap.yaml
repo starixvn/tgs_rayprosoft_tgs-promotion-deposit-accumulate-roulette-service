@@ -3,7 +3,9 @@ kind: ConfigMap
 metadata: 
   name: configmap-{{ include "deposit-accumulate-roulette-background.fullname" . }}
 data:
-  appsettings.json: ""
+  appsettings.json: |
+    {        
+    }
   monitor.settings.json: | 
     {
       "Logging":{
