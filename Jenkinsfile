@@ -7,6 +7,7 @@ pipeline {
 	environment {
 		BuildConfiguration = 'Debug'
 		ServiceImageName = "pgtgs/promotion-deposit-accumulate-roulette"
+        BackgroundImageName = "pgtgs/promotion-deposit-accumulate-roulette-background"
 	}
 
 	stages {
@@ -64,12 +65,14 @@ pipeline {
 		stage('Build Docker Image') {
 			steps {
 				sh 'dotnet build "Tgs.Promotion.DepositAccumulateRouletteService/Tgs.Promotion.DepositAccumulateRouletteService.csproj" -c $BuildConfiguration -t:ContainerBuild -p:DockerfileTag="$ServiceImageName:$TAG" --no-restore '
+                sh 'dotnet build "Tgs.Promotion.DepositAccumulateRoulette.Background/Tgs.Promotion.DepositAccumulateRoulette.Background.csproj" -c $BuildConfiguration -t:ContainerBuild -p:DockerfileTag="$BackgroudImageName:$TAG" --no-restore '
 			}
 		}
 
 		stage('Push Docker Image') {
 			steps {
 				sh 'docker push $ServiceImageName:$TAG'
+                sh 'docker push $BackgroundImageName:$TAG'
 			}
 		}
 
@@ -93,7 +96,7 @@ pipeline {
 			steps {
                 script {
                     withKubeConfig([credentialsId: env.k8s_config]) {
-                        def resources = getResources(env.k8s_config, env.kube_ns, "sign-in")
+                        def resources = getResources(env.k8s_config, env.kube_ns, "deposit-accumulate-roulette-service")
                         def dedicated = getTgsSettings(env.k8s_config, env.kube_ns, "dedicated")
                         def node_selector = getTgsSettings(env.k8s_config, env.kube_ns, "node-selector")
                         
@@ -130,7 +133,49 @@ pipeline {
                 }
 			}
 		}
-		
+
+		stage('Deploy deposit-accumulate-roulette-background to k8s') {
+			steps {
+                script {
+                    withKubeConfig([credentialsId: env.k8s_config]) {
+                        def resources = getResources(env.k8s_config, env.kube_ns, "deposit-accumulate-roulette-background")
+                        def dedicated = getTgsSettings(env.k8s_config, env.kube_ns, "dedicated")
+                        def node_selector = getTgsSettings(env.k8s_config, env.kube_ns, "node-selector")
+                        
+                        println resources
+                        println dedicated
+                        println node_selector
+
+                        sh """
+                            cat << EOF | yq e -P | helm template deployment/k8s/deposit-accumulate-roulette-background \
+                                -n ${kube_ns} \
+                                --name-template tgs \
+                                --set image.tag=${TAG} \
+                                -f -
+                            {
+                                "nodeSelector": $node_selector,
+                                "tolerations": [$dedicated],
+                                "resources": $resources
+                            }
+                        """
+                        sh """
+                            cat << EOF | yq e -P | helm template deployment/k8s/deposit-accumulate-roulette-background \
+                                -n ${kube_ns} \
+                                --name-template tgs \
+                                --set image.tag=${TAG} \
+                                -f - \
+                                | kubectl -n ${kube_ns} apply -f -
+                            {
+                                "nodeSelector": $node_selector,
+                                "tolerations": [$dedicated],
+                                "resources": $resources
+                            }
+                        """
+                    }
+                }
+			}
+		}
+
 		stage('Add Tag on Prod') {
             when {
                 expression {
