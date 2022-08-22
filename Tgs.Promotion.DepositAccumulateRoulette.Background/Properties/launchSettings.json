@@ -16,6 +16,11 @@
       "commandName": "Docker",
       "launchBrowser": true,
       "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}/swagger",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "OTEL_SERVICE_NAME": "Promotion-Deposit-Accumulate-Roulette-Background(local)",
+        "NODE_IP": "otel.rpgp.cc"
+      },
       "publishAllPorts": true,
       "useSSL": true
     }
