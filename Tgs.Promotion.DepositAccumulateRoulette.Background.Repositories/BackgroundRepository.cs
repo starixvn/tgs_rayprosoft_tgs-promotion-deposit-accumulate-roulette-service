@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Tgs.Promotion.DepositAccumulateRoulette.Background.Repositories.Entities;
-using Tgs.Promotion.DepositAccumulateRoulette.Common;
 using Tgs.SerialNumberGenerator;
 
 namespace Tgs.Promotion.DepositAccumulateRoulette.Background.Repositories;
@@ -25,7 +24,7 @@ internal class BackgroundRepository : IBackgroundRepository
 
 		var promotions = _context.Promotions
 			.Where(p => p.From <= now
-						&& p.To >= now
+						&& p.To > now
 						&& p.Status == 0
 						&& p.PromotionType == "DepositAccumulateRoulette")
 			.Select(p => new PromotionInfo(p.Id, p.From, p.To, p.BrandId, p.CampaignDetail))
@@ -93,10 +92,10 @@ internal class BackgroundRepository : IBackgroundRepository
 				TotalDepositAmount = evt.TotalDepositAmount
 			};
 
-			await _context.DepositAccumulateRouletteEvents.AddAsync(eventData, cancellationToken)
+			_ = await _context.DepositAccumulateRouletteEvents.AddAsync(eventData, cancellationToken)
 				.ConfigureAwait(false);
 		}
 
-		await _context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+		_ = await _context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 	}
 }

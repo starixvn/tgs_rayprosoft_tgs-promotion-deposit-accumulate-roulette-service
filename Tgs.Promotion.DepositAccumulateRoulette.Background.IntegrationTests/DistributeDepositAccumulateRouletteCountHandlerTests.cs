@@ -7,14 +7,14 @@ using Tgs.ServiceUtility;
 
 namespace Tgs.Promotion.DepositAccumulateRoulette.Background.IntegrationTests;
 
-internal class DepositAccumulateCalculateHandlerTests
+internal class DistributeDepositAccumulateRouletteCountHandlerTests
 {
 	[Test]
 	public async Task Process_Request_By_Daily()
 	{
-		var fakeCommandService = Substitute.For<ICommandService<DepositAccumulatedCalculateCommand>>();
+		var fakeCommandService = Substitute.For<ICommandService<DistributeDepositAccumulateRouletteCountCommand>>();
 
-		var sut = new DepositAccumulateCalculateHandler(fakeCommandService);
+		var sut = new DistributeDepositAccumulateRouletteCountHandler(fakeCommandService);
 
 		var request = new ProcessRequest
 		{
@@ -24,6 +24,6 @@ internal class DepositAccumulateCalculateHandlerTests
 		await sut.HandleAsync(request.ToByteArray(), CancellationToken.None);
 
 		_ = fakeCommandService.Received(1)
-			.ExecuteAsync(Arg.Is<DepositAccumulatedCalculateCommand>(x => x.ProcessDate == (DateOnly)request.ProcessDate));
+			.ExecuteAsync(Arg.Is<DistributeDepositAccumulateRouletteCountCommand>(x => x.ProcessDate == (DateOnly)request.ProcessDate));
 	}
 }

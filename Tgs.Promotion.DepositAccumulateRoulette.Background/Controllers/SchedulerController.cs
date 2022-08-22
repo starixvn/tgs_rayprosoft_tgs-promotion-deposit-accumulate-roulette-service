@@ -1,4 +1,5 @@
 ﻿using Google.Protobuf;
+using Hangfire;
 using Microsoft.AspNetCore.Mvc;
 using Tgs.MessageQueue;
 using Tgs.Promotion.DepositAccumulateRoulette.Background.Protos;
@@ -10,43 +11,24 @@ namespace Tgs.Promotion.DepositAccumulateRoulette.Background.Controllers;
 [ApiController]
 public class SchedulerController : ControllerBase
 {
-    [HttpPost("calculate", Name = "QueueDepositAccumulateCalculationJob")]
-    [SuccessStatusCode(202)]
-    public void QueueDepositAccumulateCalculationJob(
-        [FromServices] IMessageSender messageSender)
-    {
-        var currentDate = DateOnly.FromDateTime(DateTimeOffset.Now
-            .ToOffset(TimeSpan.FromHours(8D))
-            .DateTime);
+	[HttpPost("distribute/roulette/count", Name = "QueueProcessDistributeDepositAccumulateRouletteCountJob")]
+	[SuccessStatusCode(202)]
+	public void QueueProcessDistributeDepositAccumulateRouletteCountCalculationJob()
+	{
+		var currentDate = DateOnly.FromDateTime(DateTimeOffset.Now
+			.ToOffset(TimeSpan.FromHours(8D))
+			.DateTime);
 
-        var request = new ProcessRequest
-        {
-            ProcessDate = currentDate
-        };
+		_ = BackgroundJob.Enqueue<ScheduleBackgroundJob>(job =>
+			job.ExecuteAsync(currentDate, "tgs.promotion.depositaccumulateroulette.background.roulettecount.distribute"));
+	}
 
-        _ = messageSender
-            .SendAsync(
-                "tgs.promotion.depositaccumulateroulette.background.calculate",
-                request.ToByteArray())
-            .AsTask();
-    }
-
-    [HttpPost("calculate/{processDate}", Name = "QueueDepositAccumulateCalculationJobWithProcessDate")]
-    [SuccessStatusCode(202)]
-    public void QueueDepositAccumulateCalculationJob(
-        [FromServices] IMessageSender messageSender,
-        DateOnly processDate)
-    {
-        var request = new ProcessRequest
-        {
-            ProcessDate = processDate
-
-        };
-
-        _ = messageSender
-            .SendAsync(
-                "tgs.promotion.depositaccumulateroulette.background.calculate",
-                request.ToByteArray())
-            .AsTask();
-    }
+	[HttpPost("distribute/roulette/count/{processDate}", Name = "QueueProcessDistributeDepositAccumulateRouletteCountWithProcessDate")]
+	[SuccessStatusCode(202)]
+	public void QueueProcessDistributeDepositAccumulateRouletteCountCalculationWithProcessDate(
+		DateOnly processDate)
+	{
+		_ = BackgroundJob.Enqueue<ScheduleBackgroundJob>(job =>
+			job.ExecuteAsync(processDate, "tgs.promotion.depositaccumulateroulette.background.roulettecount.distribute"));
+	}
 }

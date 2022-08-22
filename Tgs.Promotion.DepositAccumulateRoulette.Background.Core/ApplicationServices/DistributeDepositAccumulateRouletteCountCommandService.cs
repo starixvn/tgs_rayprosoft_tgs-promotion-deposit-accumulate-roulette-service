@@ -3,12 +3,12 @@ using Tgs.ServiceUtility;
 
 namespace Tgs.Promotion.DepositAccumulateRoulette.Background.ApplicationServices;
 
-internal class DepositAccumulatedCalculateCommandService : ICommandService<DepositAccumulatedCalculateCommand>
+internal class DistributeDepositAccumulateRouletteCountCommandService : ICommandService<DistributeDepositAccumulateRouletteCountCommand>
 {
 	private readonly IBackgroundRepository _backgroundRepository;
 	private readonly DepositAccumulateRouletteSerializer _serializer;
 
-	public DepositAccumulatedCalculateCommandService(
+	public DistributeDepositAccumulateRouletteCountCommandService(
 		IBackgroundRepository backgroundRepository,
 		DepositAccumulateRouletteSerializer serializer)
 	{
@@ -17,7 +17,7 @@ internal class DepositAccumulatedCalculateCommandService : ICommandService<Depos
 	}
 
 	public async ValueTask ExecuteAsync(
-		DepositAccumulatedCalculateCommand command,
+		DistributeDepositAccumulateRouletteCountCommand command,
 		CancellationToken cancellationToken = default)
 	{
 		var promotions = await _backgroundRepository

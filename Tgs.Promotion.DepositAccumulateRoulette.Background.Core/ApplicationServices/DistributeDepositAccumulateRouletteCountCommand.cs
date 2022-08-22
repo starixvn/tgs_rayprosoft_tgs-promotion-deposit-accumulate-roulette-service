@@ -1,4 +1,4 @@
 ﻿namespace Tgs.Promotion.DepositAccumulateRoulette.Background.ApplicationServices;
 
-public record DepositAccumulatedCalculateCommand(
+public record DistributeDepositAccumulateRouletteCountCommand(
 	DateOnly ProcessDate);

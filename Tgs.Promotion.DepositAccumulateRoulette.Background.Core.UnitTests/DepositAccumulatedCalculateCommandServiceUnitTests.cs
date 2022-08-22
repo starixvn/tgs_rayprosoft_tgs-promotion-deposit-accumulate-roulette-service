@@ -50,7 +50,7 @@ internal class DepositAccumulatedCalculateCommandServiceUnitTests
 				1300),
 		};
 
-		var command = new DepositAccumulatedCalculateCommand(DateOnly.Parse("2022-07-29"));
+		var command = new DistributeDepositAccumulateRouletteCountCommand(DateOnly.Parse("2022-07-29"));
 
 		_ = fakeBackgroundRepository
 			.GetValidDepositAccumulateRoulettePromotionsAsync(Arg.Any<CancellationToken>())
@@ -62,7 +62,7 @@ internal class DepositAccumulatedCalculateCommandServiceUnitTests
 				Arg.Any<CancellationToken>())
 			.Returns(depositForms.ToAsyncEnumerable());
 
-		var sut = new DepositAccumulatedCalculateCommandService(fakeBackgroundRepository, serializer);
+		var sut = new DistributeDepositAccumulateRouletteCountCommandService(fakeBackgroundRepository, serializer);
 
 		await sut.ExecuteAsync(command);
 
@@ -82,13 +82,13 @@ internal class DepositAccumulatedCalculateCommandServiceUnitTests
 
 		var promotions = Array.Empty<PromotionInfo>();
 
-		var command = new DepositAccumulatedCalculateCommand(DateOnly.Parse("2022-07-29"));
+		var command = new DistributeDepositAccumulateRouletteCountCommand(DateOnly.Parse("2022-07-29"));
 
 		_ = fakeBackgroundRepository
 			.GetValidDepositAccumulateRoulettePromotionsAsync(Arg.Any<CancellationToken>())
 			.Returns(promotions.ToAsyncEnumerable());
 
-		var sut = new DepositAccumulatedCalculateCommandService(fakeBackgroundRepository, serializer);
+		var sut = new DistributeDepositAccumulateRouletteCountCommandService(fakeBackgroundRepository, serializer);
 
 		await sut.ExecuteAsync(command);
 
@@ -137,7 +137,7 @@ internal class DepositAccumulatedCalculateCommandServiceUnitTests
 
 		var depositForms = Array.Empty<DepositFormInfo>();
 
-		var command = new DepositAccumulatedCalculateCommand(DateOnly.Parse("2022-07-29"));
+		var command = new DistributeDepositAccumulateRouletteCountCommand(DateOnly.Parse("2022-07-29"));
 
 		_ = fakeBackgroundRepository
 			.GetValidDepositAccumulateRoulettePromotionsAsync(Arg.Any<CancellationToken>())
@@ -149,7 +149,7 @@ internal class DepositAccumulatedCalculateCommandServiceUnitTests
 				Arg.Any<CancellationToken>())
 			.Returns(depositForms.ToAsyncEnumerable());
 
-		var sut = new DepositAccumulatedCalculateCommandService(fakeBackgroundRepository, serializer);
+		var sut = new DistributeDepositAccumulateRouletteCountCommandService(fakeBackgroundRepository, serializer);
 
 		await sut.ExecuteAsync(command);
 
@@ -195,7 +195,7 @@ internal class DepositAccumulatedCalculateCommandServiceUnitTests
 				1300),
 		};
 
-		var command = new DepositAccumulatedCalculateCommand(DateOnly.Parse("2022-07-29"));
+		var command = new DistributeDepositAccumulateRouletteCountCommand(DateOnly.Parse("2022-07-29"));
 
 		_ = fakeBackgroundRepository
 			.GetValidDepositAccumulateRoulettePromotionsAsync(Arg.Any<CancellationToken>())
@@ -207,7 +207,7 @@ internal class DepositAccumulatedCalculateCommandServiceUnitTests
 				Arg.Any<CancellationToken>())
 			.Returns(depositForms.ToAsyncEnumerable());
 
-		var sut = new DepositAccumulatedCalculateCommandService(fakeBackgroundRepository, serializer);
+		var sut = new DistributeDepositAccumulateRouletteCountCommandService(fakeBackgroundRepository, serializer);
 
 		await sut.ExecuteAsync(command);
 
@@ -257,7 +257,7 @@ internal class DepositAccumulatedCalculateCommandServiceUnitTests
 				500)
 		};
 
-		var command = new DepositAccumulatedCalculateCommand(DateOnly.Parse("2022-07-29"));
+		var command = new DistributeDepositAccumulateRouletteCountCommand(DateOnly.Parse("2022-07-29"));
 
 		_ = fakeBackgroundRepository
 			.GetValidDepositAccumulateRoulettePromotionsAsync(Arg.Any<CancellationToken>())
@@ -269,7 +269,7 @@ internal class DepositAccumulatedCalculateCommandServiceUnitTests
 				Arg.Any<CancellationToken>())
 			.Returns(depositForms.ToAsyncEnumerable());
 
-		var sut = new DepositAccumulatedCalculateCommandService(fakeBackgroundRepository, serializer);
+		var sut = new DistributeDepositAccumulateRouletteCountCommandService(fakeBackgroundRepository, serializer);
 
 		await sut.ExecuteAsync(command);
 

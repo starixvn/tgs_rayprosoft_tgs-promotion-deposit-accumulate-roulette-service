@@ -5,12 +5,12 @@ using Tgs.ServiceUtility;
 
 namespace Tgs.Promotion.DepositAccumulateRoulette.Background.MessageQueue;
 
-internal class DepositAccumulateCalculateHandler : IMessageHandler
+internal class DistributeDepositAccumulateRouletteCountHandler : IMessageHandler
 {
-	private readonly ICommandService<DepositAccumulatedCalculateCommand> _commandService;
+	private readonly ICommandService<DistributeDepositAccumulateRouletteCountCommand> _commandService;
 
-	public DepositAccumulateCalculateHandler(
-		ICommandService<DepositAccumulatedCalculateCommand> commandService)
+	public DistributeDepositAccumulateRouletteCountHandler(
+		ICommandService<DistributeDepositAccumulateRouletteCountCommand> commandService)
 	{
 		_commandService = commandService ?? throw new ArgumentNullException(nameof(commandService));
 	}
@@ -24,7 +24,7 @@ internal class DepositAccumulateCalculateHandler : IMessageHandler
 		if (requestDate is null)
 			return ValueTask.CompletedTask;
 
-		var command = new DepositAccumulatedCalculateCommand(requestDate.Value);
+		var command = new DistributeDepositAccumulateRouletteCountCommand(requestDate.Value);
 
 		return _commandService.ExecuteAsync(command, cancellationToken);
 	}
