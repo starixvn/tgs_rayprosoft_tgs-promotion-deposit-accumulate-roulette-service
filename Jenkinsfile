@@ -107,7 +107,6 @@ pipeline {
                         sh """
                             cat << EOF | yq e -P | helm template deployment/k8s/deposit-accumulate-roulette \
                                 -n ${kube_ns} \
-                                --name-template tgs \
                                 --set image.tag=${TAG} \
                                 -f -
                             {
@@ -119,7 +118,6 @@ pipeline {
                         sh """
                             cat << EOF | yq e -P | helm template deployment/k8s/deposit-accumulate-roulette \
                                 -n ${kube_ns} \
-                                --name-template tgs \
                                 --set image.tag=${TAG} \
                                 -f - \
                                 | kubectl -n ${kube_ns} apply -f -
@@ -149,7 +147,6 @@ pipeline {
                         sh """
                             cat << EOF | yq e -P | helm template deployment/k8s/deposit-accumulate-roulette-background \
                                 -n ${kube_ns} \
-                                --name-template tgs \
                                 --set image.tag=${TAG} \
                                 -f -
                             {
@@ -161,7 +158,6 @@ pipeline {
                         sh """
                             cat << EOF | yq e -P | helm template deployment/k8s/deposit-accumulate-roulette-background \
                                 -n ${kube_ns} \
-                                --name-template tgs \
                                 --set image.tag=${TAG} \
                                 -f - \
                                 | kubectl -n ${kube_ns} apply -f -
