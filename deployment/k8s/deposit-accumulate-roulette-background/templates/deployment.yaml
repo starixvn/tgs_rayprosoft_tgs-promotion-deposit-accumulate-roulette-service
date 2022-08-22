@@ -50,7 +50,7 @@ spec:
                 secretKeyRef:
                   name: tgs-connections
                   key: tgs
-              name: DOTNET_DiagnosticPorts
+            - name: DOTNET_DiagnosticPorts
               value: /diag/port
           ports:
             - name: http
