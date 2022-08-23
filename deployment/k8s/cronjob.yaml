@@ -3,7 +3,7 @@ kind: CronJob
 metadata:
   name: deposit-accumulate-roulette-background-scheduler
 spec:
-  schedule: "*%5 * * * *"
+  schedule: "*/5 * * * *"
   jobTemplate:
     spec:
       template:
