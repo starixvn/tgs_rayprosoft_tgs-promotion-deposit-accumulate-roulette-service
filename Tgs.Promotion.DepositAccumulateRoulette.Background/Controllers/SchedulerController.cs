@@ -4,7 +4,7 @@ using Tgs.WebApi.Toolkits;
 
 namespace Tgs.Promotion.DepositAccumulateRoulette.Background.Controllers;
 
-[Route("api/[controller]")]
+[Route("[controller]")]
 [ApiController]
 public class SchedulerController : ControllerBase
 {
