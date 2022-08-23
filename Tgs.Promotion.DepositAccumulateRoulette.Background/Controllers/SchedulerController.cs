@@ -1,8 +1,5 @@
-﻿using Google.Protobuf;
-using Hangfire;
+﻿using Hangfire;
 using Microsoft.AspNetCore.Mvc;
-using Tgs.MessageQueue;
-using Tgs.Promotion.DepositAccumulateRoulette.Background.Protos;
 using Tgs.WebApi.Toolkits;
 
 namespace Tgs.Promotion.DepositAccumulateRoulette.Background.Controllers;

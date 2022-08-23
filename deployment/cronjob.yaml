@@ -1,0 +1,20 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: deposit-accumulate-roulette-background-scheduler
+spec:
+  schedule: "*%5 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: deposit-accumulate-roulette-background-job
+            image: alpine/curl:3.14
+            imagePullPolicy: IfNotPresent
+            command:
+              - curl
+              - -X
+              - POST
+              - http://tgs-deposit-accumulate-roulette-background/scheduler/distribute/roulette/count    
+          restartPolicy: OnFailure

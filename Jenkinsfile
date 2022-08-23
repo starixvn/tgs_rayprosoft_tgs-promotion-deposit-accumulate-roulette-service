@@ -171,6 +171,9 @@ pipeline {
                                 "resources": $resources
                             }
                         """
+                        sh """
+                            kubectl -n ${kube_ns} apply -f deployment/k8s/cronjob.yaml
+                        """
                     }
                 }
 			}
