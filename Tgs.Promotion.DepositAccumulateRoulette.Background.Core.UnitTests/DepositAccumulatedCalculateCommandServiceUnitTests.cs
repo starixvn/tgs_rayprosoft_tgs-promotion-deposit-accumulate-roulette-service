@@ -53,7 +53,7 @@ internal class DepositAccumulatedCalculateCommandServiceUnitTests
 		var command = new DistributeDepositAccumulateRouletteCountCommand(DateOnly.Parse("2022-07-29"));
 
 		_ = fakeBackgroundRepository
-			.GetValidDepositAccumulateRoulettePromotionsAsync(Arg.Any<CancellationToken>())
+			.GetValidDepositAccumulateRoulettePromotionsAsync(Arg.Is(command.ProcessDate), Arg.Any<CancellationToken>())
 			.Returns(promotions.ToAsyncEnumerable());
 
 		_ = fakeBackgroundRepository.GetApprovedDepositFormsAsync(
@@ -85,7 +85,8 @@ internal class DepositAccumulatedCalculateCommandServiceUnitTests
 		var command = new DistributeDepositAccumulateRouletteCountCommand(DateOnly.Parse("2022-07-29"));
 
 		_ = fakeBackgroundRepository
-			.GetValidDepositAccumulateRoulettePromotionsAsync(Arg.Any<CancellationToken>())
+			.GetValidDepositAccumulateRoulettePromotionsAsync(
+				Arg.Is(command.ProcessDate), Arg.Any<CancellationToken>())
 			.Returns(promotions.ToAsyncEnumerable());
 
 		var sut = new DistributeDepositAccumulateRouletteCountCommandService(fakeBackgroundRepository, serializer);
@@ -140,7 +141,9 @@ internal class DepositAccumulatedCalculateCommandServiceUnitTests
 		var command = new DistributeDepositAccumulateRouletteCountCommand(DateOnly.Parse("2022-07-29"));
 
 		_ = fakeBackgroundRepository
-			.GetValidDepositAccumulateRoulettePromotionsAsync(Arg.Any<CancellationToken>())
+			.GetValidDepositAccumulateRoulettePromotionsAsync(
+				Arg.Is(command.ProcessDate),
+				Arg.Any<CancellationToken>())
 			.Returns(promotions.ToAsyncEnumerable());
 
 		_ = fakeBackgroundRepository.GetApprovedDepositFormsAsync(
@@ -198,7 +201,9 @@ internal class DepositAccumulatedCalculateCommandServiceUnitTests
 		var command = new DistributeDepositAccumulateRouletteCountCommand(DateOnly.Parse("2022-07-29"));
 
 		_ = fakeBackgroundRepository
-			.GetValidDepositAccumulateRoulettePromotionsAsync(Arg.Any<CancellationToken>())
+			.GetValidDepositAccumulateRoulettePromotionsAsync(
+				Arg.Is(command.ProcessDate),
+				Arg.Any<CancellationToken>())
 			.Returns(promotions.ToAsyncEnumerable());
 
 		_ = fakeBackgroundRepository.GetApprovedDepositFormsAsync(
@@ -260,7 +265,7 @@ internal class DepositAccumulatedCalculateCommandServiceUnitTests
 		var command = new DistributeDepositAccumulateRouletteCountCommand(DateOnly.Parse("2022-07-29"));
 
 		_ = fakeBackgroundRepository
-			.GetValidDepositAccumulateRoulettePromotionsAsync(Arg.Any<CancellationToken>())
+			.GetValidDepositAccumulateRoulettePromotionsAsync(Arg.Is(command.ProcessDate), Arg.Any<CancellationToken>())
 			.Returns(promotions.ToAsyncEnumerable());
 
 		_ = fakeBackgroundRepository.GetApprovedDepositFormsAsync(

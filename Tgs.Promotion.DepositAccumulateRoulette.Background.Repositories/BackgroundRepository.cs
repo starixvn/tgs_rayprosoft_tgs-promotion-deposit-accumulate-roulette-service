@@ -18,15 +18,17 @@ internal class BackgroundRepository : IBackgroundRepository
 	}
 
 	public IAsyncEnumerable<PromotionInfo> GetValidDepositAccumulateRoulettePromotionsAsync(
+		DateOnly processDate,
 		CancellationToken cancellationToken = default)
 	{
-		var now = DateTime.UtcNow;
+		var processTime = new DateTimeOffset(
+			processDate.Year, processDate.Month, processDate.Day, 0, 0, 0, TimeSpan.FromHours(8D)).UtcDateTime;
 
 		var promotions = _context.Promotions
-			.Where(p => p.From <= now
-						&& p.To > now
-						&& p.Status == 0
-						&& p.PromotionType == "DepositAccumulateRoulette")
+			.Where(p => p.Status == 0
+						&& p.PromotionType == "DepositAccumulateRoulette"
+						&& p.From <= processTime
+						&& (p.To > processTime || (processTime - p.To).Days <= 1))
 			.Select(p => new PromotionInfo(p.Id, p.From, p.To, p.BrandId, p.CampaignDetail))
 			.AsAsyncEnumerable();
 

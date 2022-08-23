@@ -21,7 +21,7 @@ internal class DistributeDepositAccumulateRouletteCountCommandService : ICommand
 		CancellationToken cancellationToken = default)
 	{
 		var promotions = await _backgroundRepository
-			.GetValidDepositAccumulateRoulettePromotionsAsync(cancellationToken)
+			.GetValidDepositAccumulateRoulettePromotionsAsync(command.ProcessDate, cancellationToken)
 			.ToArrayAsync(cancellationToken)
 			.ConfigureAwait(false);
 

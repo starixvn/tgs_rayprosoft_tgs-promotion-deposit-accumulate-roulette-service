@@ -2,7 +2,9 @@
 
 public interface IBackgroundRepository
 {
-	IAsyncEnumerable<PromotionInfo> GetValidDepositAccumulateRoulettePromotionsAsync(CancellationToken cancellationToken = default);
+	IAsyncEnumerable<PromotionInfo> GetValidDepositAccumulateRoulettePromotionsAsync(
+		DateOnly processDate,
+		CancellationToken cancellationToken = default);
 
 	IAsyncEnumerable<DepositFormInfo> GetApprovedDepositFormsAsync(
 		IEnumerable<Guid> brandIds,
