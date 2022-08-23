@@ -7,13 +7,16 @@ internal class DistributeDepositAccumulateRouletteCountCommandService : ICommand
 {
 	private readonly IBackgroundRepository _backgroundRepository;
 	private readonly DepositAccumulateRouletteSerializer _serializer;
+	private readonly ICommandService<ClearExpiredEventCacheCommand> _clearCacheCommandService;
 
 	public DistributeDepositAccumulateRouletteCountCommandService(
 		IBackgroundRepository backgroundRepository,
-		DepositAccumulateRouletteSerializer serializer)
+		DepositAccumulateRouletteSerializer serializer,
+		ICommandService<ClearExpiredEventCacheCommand> clearCacheCommandService)
 	{
 		_backgroundRepository = backgroundRepository ?? throw new ArgumentNullException(nameof(backgroundRepository));
 		_serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
+		_clearCacheCommandService = clearCacheCommandService ?? throw new ArgumentNullException(nameof(clearCacheCommandService));
 	}
 
 	public async ValueTask ExecuteAsync(
@@ -85,6 +88,15 @@ internal class DistributeDepositAccumulateRouletteCountCommandService : ICommand
 
 		await _backgroundRepository
 			.AddDepositAccumulateRouletteEventsAsync(command.ProcessDate, depositAccumulateEvents, cancellationToken)
+			.ConfigureAwait(false);
+
+		var infos = depositAccumulateEvents.Select(evt =>
+				new ClearCacheInfo(evt.PromotionId, evt.PlayerCode))
+			.Distinct();
+
+		await _clearCacheCommandService.ExecuteAsync(
+				new ClearExpiredEventCacheCommand(infos),
+				cancellationToken)
 			.ConfigureAwait(false);
 	}
 }

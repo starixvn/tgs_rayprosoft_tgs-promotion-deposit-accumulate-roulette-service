@@ -1,0 +1,10 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "Tgs.Promotion.DepositAccumulateRoulette.Common.Protos";
+
+import "phoenix/protobuf/guid.proto";
+
+message ClearEventCacheRequest {
+	phoenix.protobuf.GuidValue promotion_id = 1;
+	string player_code = 2;
+}
