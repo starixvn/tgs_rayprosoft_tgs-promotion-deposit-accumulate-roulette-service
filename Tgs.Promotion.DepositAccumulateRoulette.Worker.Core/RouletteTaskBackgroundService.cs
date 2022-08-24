@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Hosting;
 
-namespace Tgs.Promotion.DepositAccumulateRouletteServices;
+namespace Tgs.Promotion.DepositAccumulateRoulette.Worker;
 
 internal class RouletteTaskBackgroundService : BackgroundService
 {

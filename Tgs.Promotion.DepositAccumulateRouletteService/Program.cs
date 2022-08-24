@@ -51,8 +51,10 @@ builder.Services
 				"tgs.promotion.depositaccumulateroulette.roulette.play")
 			.AddHandler<ClearExpiredDepositAccumulateEventCacheHandler>(
 				"tgs.promotion.depositaccumulateroulette.event.expired.clear",
-				"tgs.promotion.depositaccumulateroulette.event.expired.clear");
+				"tgs.promotion.depositaccumulateroulette.event.expired.clear")
+			.SetSessionReplySubject($"tgs.promotion.depositaccumulateroulette.worker.{Environment.MachineName}.reply");
 	})
+	.ClearAllExchanges()
 	.AddNatsGlobPatternExchange("*");
 
 builder.Services

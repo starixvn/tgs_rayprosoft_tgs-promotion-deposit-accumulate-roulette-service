@@ -1,8 +1,10 @@
 ﻿using System.Collections.Concurrent;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Tgs.Promotion.DepositAccumulateRoulette.Common;
+using Tgs.Promotion.DepositAccumulateRoulette.Common.Protos;
 
-namespace Tgs.Promotion.DepositAccumulateRouletteServices;
+namespace Tgs.Promotion.DepositAccumulateRoulette.Worker;
 
 public class RouletteTaskProcessor
 {
@@ -10,7 +12,6 @@ public class RouletteTaskProcessor
 	private readonly ILogger<RouletteTaskProcessor> _logger;
 
 	private readonly ConcurrentDictionary<string, RouletteTaskQueue> _queuePool = new();
-
 	private readonly CancellationTokenSource _cancellationTokenSource = new();
 
 	public RouletteTaskProcessor(
@@ -21,7 +22,7 @@ public class RouletteTaskProcessor
 		_logger = logger ?? throw new ArgumentNullException(nameof(logger));
 	}
 
-	public Task<RouletteResult> RequestAsync(RouletteTaskRequest request)
+	public Task<RouletteResult> RequestAsync(RouletteSessionRequest request)
 	{
 		var queue = _queuePool.GetOrAdd(
 			request.PlayerCode,

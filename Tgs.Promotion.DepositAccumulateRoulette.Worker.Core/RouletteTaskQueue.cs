@@ -1,10 +1,9 @@
 ﻿using System.Collections.Concurrent;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Tgs.Promotion.DepositAccumulateRouletteServices.ApplicationServices;
-using Tgs.ServiceUtility;
+using Tgs.Promotion.DepositAccumulateRoulette.Common;
 
-namespace Tgs.Promotion.DepositAccumulateRouletteServices;
+namespace Tgs.Promotion.DepositAccumulateRoulette.Worker;
 
 internal class RouletteTaskQueue
 {
@@ -85,14 +84,16 @@ internal class RouletteTaskQueue
 
 			await using var scope = _serviceProvider.CreateAsyncScope();
 
-			var commandService =
-				scope.ServiceProvider.GetRequiredService<IGetService<RouletteCommand, RouletteResult>>();
+			//var commandService =
+			//	scope.ServiceProvider.GetRequiredService<IGetService<RouletteCommand, RouletteResult>>();
 
-			var command = new RouletteCommand(promotionId, playerCode);
+			//var command = new RouletteCommand(promotionId, playerCode);
 
-			var result = await commandService
-				.GetAsync(command, cancellationToken)
-				.ConfigureAwait(false);
+			//var result = await commandService
+			//	.GetAsync(command, cancellationToken)
+			//	.ConfigureAwait(false);
+
+			var result = new RouletteResult(null, -1, 0);
 
 			rouletteTask.Promise.SetResult(result);
 		}

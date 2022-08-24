@@ -1,5 +1,7 @@
 ﻿using Google.Protobuf;
 using Tgs.MessageQueue;
+using Tgs.Promotion.DepositAccumulateRoulette.Common;
+using Tgs.Promotion.DepositAccumulateRoulette.Common.Protos;
 using Tgs.Promotion.DepositAccumulateRouletteService.Protos;
 using Tgs.Promotion.DepositAccumulateRouletteServices;
 
@@ -7,21 +9,25 @@ namespace Tgs.Promotion.DepositAccumulateRouletteService.MessageQueue;
 
 public class RouletteProcessor : IMessageProcessor
 {
-	private readonly RouletteTaskProcessor _rouletteTaskProcessor;
+	private readonly IRouletteHandleService _handleService;
 
 	public RouletteProcessor(
-		RouletteTaskProcessor rouletteTaskProcessor)
+		IRouletteHandleService handleService)
 	{
-		_rouletteTaskProcessor = rouletteTaskProcessor ?? throw new ArgumentNullException(nameof(rouletteTaskProcessor));
+		_handleService = handleService ?? throw new ArgumentNullException(nameof(handleService));
 	}
 
 	public async ValueTask<ReadOnlyMemory<byte>> HandleAsync(ReadOnlyMemory<byte> data, CancellationToken cancellationToken = default)
 	{
 		var request = RouletteRequest.Parser.ParseFrom(data.Span);
 
-		var taskRequest = new RouletteTaskRequest(request.PromotionId, request.PlayerCode);
+		var sessionRequest = new RouletteSessionRequest
+		{
+			PromotionId = request.PromotionId,
+			PlayerCode = request.PlayerCode
+		};
 
-		var result = await _rouletteTaskProcessor.RequestAsync(taskRequest).ConfigureAwait(false);
+		var result = await _handleService.RequestAsync(sessionRequest, cancellationToken).ConfigureAwait(false);
 
 		return new RouletteResponse
 		{

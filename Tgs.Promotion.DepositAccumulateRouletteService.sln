@@ -43,6 +43,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		nuget.config = nuget.config
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tgs.Promotion.DepositAccumulateRoulette.Worker", "Tgs.Promotion.DepositAccumulateRoulette.Worker\Tgs.Promotion.DepositAccumulateRoulette.Worker.csproj", "{28A32211-9FCA-48B8-9BB1-831F6C5A5321}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tgs.Promotion.DepositAccumulateRoulette.Worker.Core", "Tgs.Promotion.DepositAccumulateRoulette.Worker.Core\Tgs.Promotion.DepositAccumulateRoulette.Worker.Core.csproj", "{E27D3ACE-2E7B-4255-A72A-26BC94111EF2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -117,6 +121,14 @@ Global
 		{17DBCEA4-5B5E-4450-A6B4-A5F2C974F2B6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{17DBCEA4-5B5E-4450-A6B4-A5F2C974F2B6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{17DBCEA4-5B5E-4450-A6B4-A5F2C974F2B6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{28A32211-9FCA-48B8-9BB1-831F6C5A5321}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{28A32211-9FCA-48B8-9BB1-831F6C5A5321}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{28A32211-9FCA-48B8-9BB1-831F6C5A5321}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{28A32211-9FCA-48B8-9BB1-831F6C5A5321}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E27D3ACE-2E7B-4255-A72A-26BC94111EF2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E27D3ACE-2E7B-4255-A72A-26BC94111EF2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E27D3ACE-2E7B-4255-A72A-26BC94111EF2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E27D3ACE-2E7B-4255-A72A-26BC94111EF2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
