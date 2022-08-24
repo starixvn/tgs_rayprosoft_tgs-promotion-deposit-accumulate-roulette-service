@@ -44,7 +44,7 @@ public class RouletteTaskProcessor
 		if (!_cancellationTokenSource.IsCancellationRequested)
 			_cancellationTokenSource.Cancel();
 
-		foreach (var queue in _queuePool.Values)
-			queue.StopProcess();
+		Task.WaitAll(_queuePool.Values
+			.Select(queue => Task.Run(queue.StopProcess)).ToArray());
 	}
 }

@@ -134,7 +134,9 @@ internal class DepositAccumulateRouletteTests
 				Arg.Any<CancellationToken>())
 			.Returns(new[] { eventInfo }.ToAsyncEnumerable());
 
-		_ = fakePlayerServiceClient.GetPlayerInfoAsync(Arg.Is(playerCode))
+		_ = fakePlayerServiceClient.GetPlayerInfoAsync(
+				Arg.Is(playerCode),
+				Arg.Any<CancellationToken>())
 			.Returns(new PlayerInfo
 			{
 				PlayerCode = playerCode,
@@ -148,7 +150,9 @@ internal class DepositAccumulateRouletteTests
 				RegisteredOn = DateTime.Now.AddDays(-10)
 			});
 
-		_ = fakePromotionServiceClient.GetPromotionMainInfoAsync(Arg.Is(promotionId))
+		_ = fakePromotionServiceClient.GetPromotionMainInfoAsync(
+				Arg.Is(promotionId),
+				Arg.Any<CancellationToken>())
 			.Returns(new PromotionMainInfo
 			{
 				Id = promotionId,
@@ -159,7 +163,9 @@ internal class DepositAccumulateRouletteTests
 				PromotionType = "DepositAccumulateRoulette"
 			});
 
-		_ = fakePromotionServiceClient.GetPromotionRuleAsync<PromotionRule>(Arg.Is(promotionId))
+		_ = fakePromotionServiceClient.GetPromotionRuleAsync<PromotionRule>(
+				Arg.Is(promotionId),
+				Arg.Any<CancellationToken>())
 			.Returns(new PromotionRule { CompaignDetail = settings });
 
 		var key = $"Promotion.DepositAccumulateRoulette:RouletteCount:{promotionId}:{playerCode}:{eventInfo.Date:O}";

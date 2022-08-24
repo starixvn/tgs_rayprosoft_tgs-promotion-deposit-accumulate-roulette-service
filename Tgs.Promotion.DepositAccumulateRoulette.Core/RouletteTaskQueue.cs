@@ -40,7 +40,6 @@ internal class RouletteTaskQueue
 		IsStartProcess = true;
 
 		_cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-
 		_cancellationTokenSource.Token.Register(() => _rouletteTasks.CompleteAdding());
 
 		_backgroundTask = Task.Run(async () =>
@@ -54,7 +53,21 @@ internal class RouletteTaskQueue
 
 	public void StopProcess()
 	{
-		_backgroundTask?.Wait();
+		if (_cancellationTokenSource?.IsCancellationRequested == false)
+			_cancellationTokenSource?.Cancel();
+
+		try
+		{
+			if (_rouletteTasks.TryGetNonEnumeratedCount(out var count)
+				&& count > 0
+				&& _backgroundTask?.IsCompleted == false)
+			{
+				_backgroundTask?.Wait();
+			}
+		}
+		catch (AggregateException ex) when (ex.InnerException is TaskCanceledException)
+		{
+		}
 	}
 
 	private async Task HandleRouletteTaskAsync(RouletteTask rouletteTask, CancellationToken cancellationToken)
