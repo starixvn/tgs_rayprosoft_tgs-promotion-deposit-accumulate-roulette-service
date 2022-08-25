@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Caching.Memory;
-using Tgs.Promotion.DepositAccumulateRouletteServices;
-using Tgs.Promotion.DepositAccumulateRouletteServices.ApplicationServices;
+﻿using Microsoft.Extensions.Caching.Memory;
+using Tgs.Promotion.DepositAccumulateRoulette.Worker;
+using Tgs.Promotion.DepositAccumulateRoulette.Worker.ApplicationServices;
 using Tgs.ServiceUtility;
 
 namespace Tgs.Promotion.DepositAccumulateRoulette.Cache;

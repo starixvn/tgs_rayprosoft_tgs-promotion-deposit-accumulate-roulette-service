@@ -11,6 +11,14 @@ public static class ServiceCollectionExtensions
 		_ = services
 			.RegisterAllServiceUtilityTypes(Assembly.GetExecutingAssembly(), ServiceLifetime.Transient);
 
+		_ = services
+			.AddSingleton<IDistributePlanHasher, DistributePlanHasher>()
+			.AddSingleton<IStatisticsService, StatisticsService>()
+			.AddSingleton<IShuffleService, ShuffleService>();
+
+		_ = services
+			.AddTransient<IRouletteCountService, RouletteCountService>();
+
 		_ = services.AddSingleton<RouletteTaskProcessor>()
 			.AddHostedService<RouletteTaskBackgroundService>();
 

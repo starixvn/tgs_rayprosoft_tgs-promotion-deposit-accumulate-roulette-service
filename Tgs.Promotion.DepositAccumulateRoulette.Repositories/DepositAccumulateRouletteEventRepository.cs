@@ -2,7 +2,7 @@
 using System.Text.Json;
 using DateOnlyTimeOnly.AspNet.Converters;
 using StackExchange.Redis;
-using Tgs.Promotion.DepositAccumulateRouletteServices;
+using Tgs.Promotion.DepositAccumulateRoulette.Worker;
 
 namespace Tgs.Promotion.DepositAccumulateRoulette.Repositories;
 

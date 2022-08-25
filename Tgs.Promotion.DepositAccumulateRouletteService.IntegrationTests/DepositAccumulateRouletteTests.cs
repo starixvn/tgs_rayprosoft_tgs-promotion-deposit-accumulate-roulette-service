@@ -6,9 +6,9 @@ using Tgs.MessageQueue;
 using Tgs.PlayerService.Client;
 using Tgs.Promotion.Clients;
 using Tgs.Promotion.DepositAccumulateRoulette.Common;
+using Tgs.Promotion.DepositAccumulateRoulette.Worker;
+using Tgs.Promotion.DepositAccumulateRoulette.Worker.ApplicationServices;
 using Tgs.Promotion.DepositAccumulateRouletteService.MessageQueue;
-using Tgs.Promotion.DepositAccumulateRouletteServices;
-using static Tgs.Promotion.DepositAccumulateRouletteServices.ApplicationServices.GetDepositAccumulateRoulettePromotionQueryService;
 
 namespace Tgs.Promotion.DepositAccumulateRouletteService.IntegrationTests;
 
@@ -98,10 +98,10 @@ internal class DepositAccumulateRouletteTests
 				PromotionType = "DepositAccumulateRoulette"
 			});
 
-		_ = fakePromotionServiceClient.GetPromotionRuleAsync<PromotionRule>(
+		_ = fakePromotionServiceClient.GetPromotionRuleAsync<GetDepositAccumulateRoulettePromotionQueryService.PromotionRule>(
 				Arg.Is(promotionId),
 				Arg.Any<CancellationToken>())
-			.Returns(new PromotionRule { CompaignDetail = settings });
+			.Returns(new GetDepositAccumulateRoulettePromotionQueryService.PromotionRule { CompaignDetail = settings });
 
 		var key = $"Promotion.DepositAccumulateRoulette:RouletteCount:{promotionId}:{playerCode}:{eventInfo.Date:O}";
 		_ = fakeRedisConnectionManager

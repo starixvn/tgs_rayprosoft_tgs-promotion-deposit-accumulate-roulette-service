@@ -1,5 +1,5 @@
 ﻿using StackExchange.Redis;
-using Tgs.Promotion.DepositAccumulateRouletteServices;
+using Tgs.Promotion.DepositAccumulateRoulette.Worker;
 
 namespace Tgs.Promotion.DepositAccumulateRoulette.Repositories;
 

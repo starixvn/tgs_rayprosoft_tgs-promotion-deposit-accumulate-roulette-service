@@ -2,7 +2,7 @@
 using StackExchange.Redis;
 using Tgs.Promotion.DepositAccumulateRoulette.Repositories;
 using Tgs.Promotion.DepositAccumulateRoulette.Repositories.Entities;
-using Tgs.Promotion.DepositAccumulateRouletteServices;
+using Tgs.Promotion.DepositAccumulateRoulette.Worker;
 
 namespace Microsoft.Extensions.DependencyInjection;
 

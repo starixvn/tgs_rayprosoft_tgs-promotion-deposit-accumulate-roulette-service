@@ -2,8 +2,7 @@ using System.Text.Json;
 using DateOnlyTimeOnly.AspNet.Converters;
 using NSubstitute;
 using StackExchange.Redis;
-using Tgs.Promotion.DepositAccumulateRoulette.Common;
-using Tgs.Promotion.DepositAccumulateRouletteServices;
+using Tgs.Promotion.DepositAccumulateRoulette.Worker;
 
 namespace Tgs.Promotion.DepositAccumulateRoulette.Repositories.UnitTests;
 
