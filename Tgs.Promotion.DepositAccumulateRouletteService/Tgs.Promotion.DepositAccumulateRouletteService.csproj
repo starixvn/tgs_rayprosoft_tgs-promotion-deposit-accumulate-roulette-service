@@ -31,9 +31,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Tgs.Promotion.DepositAccumulateRoulette.Cache\Tgs.Promotion.DepositAccumulateRoulette.Cache.csproj" />
     <ProjectReference Include="..\Tgs.Promotion.DepositAccumulateRoulette.Core\Tgs.Promotion.DepositAccumulateRoulette.Core.csproj" />
-    <ProjectReference Include="..\Tgs.Promotion.DepositAccumulateRoulette.Repositories\Tgs.Promotion.DepositAccumulateRoulette.Repositories.csproj" />
   </ItemGroup>
 
   <ItemGroup>

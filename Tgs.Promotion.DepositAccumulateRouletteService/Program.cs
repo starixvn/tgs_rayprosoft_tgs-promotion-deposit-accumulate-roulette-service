@@ -1,4 +1,3 @@
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Npgsql;
 using OpenTelemetry.Exporter;
@@ -55,26 +54,8 @@ builder.Services
 	.AddNatsGlobPatternExchange("*");
 
 builder.Services
-	.AddSingleton<IRedisConnectionManager>(sp =>
-	{
-		var config = sp.GetRequiredService<IConfiguration>();
-		return new RedisConnectionManager(config.GetConnectionString("Redis"));
-	})
-	.AddMemoryCache()
 	.AddDepositAccumulateRouletteCommon()
 	.AddDepositAccumulateRouletteCore()
-	.AddDepositAccumulateRouletteCache()
-	.AddDepositAccumulateRouletteRepositories(
-		dbOptionsConfigure: (sp, dbOptions) =>
-		{
-			var config = sp.GetRequiredService<IConfiguration>();
-			_ = dbOptions.UseNpgsql(config.GetConnectionString("Tgs"));
-		},
-		resolveRedisDatabase: sp =>
-		{
-			var redisConnectionManager = sp.GetRequiredService<IRedisConnectionManager>();
-			return redisConnectionManager.Database;
-		})
 	.AddPromotionClientServices((options, sp) =>
 	{
 		var config = sp.GetRequiredService<IConfiguration>();

@@ -1,6 +1,6 @@
 ﻿using StackExchange.Redis;
 
-namespace Tgs.Promotion.DepositAccumulateRouletteService;
+namespace Tgs.Promotion.DepositAccumulateRoulette.Worker;
 
 public class RedisConnectionManager : IRedisConnectionManager, IDisposable
 {

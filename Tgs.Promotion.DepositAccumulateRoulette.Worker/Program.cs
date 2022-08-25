@@ -1,9 +1,11 @@
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Npgsql;
 using OpenTelemetry.Exporter;
 using OpenTelemetry.Instrumentation.AspNetCore;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
+using Tgs.Promotion.DepositAccumulateRoulette.Worker;
 using Tgs.Promotion.DepositAccumulateRoulette.Worker.MessageQueue;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -42,8 +44,36 @@ builder.Services
 	.AddNatsGlobPatternExchange("*");
 
 builder.Services
+	.AddSingleton<IRedisConnectionManager>(sp =>
+	{
+		var config = sp.GetRequiredService<IConfiguration>();
+		return new RedisConnectionManager(config.GetConnectionString("Redis"));
+	})
+	.AddMemoryCache()
 	.AddDepositAccumulateRouletteCommon()
-	.AddDepositAccumulateRouletteWorkerCore();
+	.AddDepositAccumulateRouletteWorkerCore()
+	.AddDepositAccumulateRouletteCache()
+	.AddDepositAccumulateRouletteRepositories(
+		dbOptionsConfigure: (sp, dbOptions) =>
+		{
+			var config = sp.GetRequiredService<IConfiguration>();
+			_ = dbOptions.UseNpgsql(config.GetConnectionString("Tgs"));
+		},
+		resolveRedisDatabase: sp =>
+		{
+			var redisConnectionManager = sp.GetRequiredService<IRedisConnectionManager>();
+			return redisConnectionManager.Database;
+		})
+	.AddPromotionClientServices((options, sp) =>
+	{
+		var config = sp.GetRequiredService<IConfiguration>();
+		options.Url = config.GetValue<Uri>("DepositAccumulateRouletteWorker:PromotionBaseUrl");
+	})
+	.AddPlayerServiceClient((options, sp) =>
+	{
+		var config = sp.GetRequiredService<IConfiguration>();
+		options.BaseUrl = config.GetValue<Uri>("DepositAccumulateRouletteWorker:PlayerBaseUrl");
+	});
 
 builder.Services
 	.AddSingleton<IConfigureOptions<OtlpExporterOptions>>(
