@@ -40,9 +40,6 @@ builder.Services
 			.AddProcessor<DepositAccumulateRouletteSettingProcessor>(
 				"tgs.promotion.depositaccumulateroulette.setting",
 				"tgs.promotion.depositaccumulateroulette.setting")
-			.AddProcessor<RouletteSettingQueryProcessor>(
-				"tgs.promotion.depositaccumulateroulette.roulettesetting.query",
-				"tgs.promotion.depositaccumulateroulette.roulettesetting.query")
 			.AddProcessor<RouletteCountItemsQueryProcessor>(
 				"tgs.promotion.depositaccumulateroulette.roulettecountitems.query",
 				"tgs.promotion.depositaccumulateroulette.roulettecountitems.query")
