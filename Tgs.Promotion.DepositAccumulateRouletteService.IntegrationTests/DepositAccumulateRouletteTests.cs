@@ -1,14 +1,16 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
-using StackExchange.Redis;
 using Tgs.DepositAccumulateRoulette.Clients;
 using Tgs.MessageQueue;
 using Tgs.PlayerService.Client;
 using Tgs.Promotion.Clients;
 using Tgs.Promotion.DepositAccumulateRoulette.Common;
+using Tgs.Promotion.DepositAccumulateRoulette.Common.Protos;
 using Tgs.Promotion.DepositAccumulateRoulette.Worker;
 using Tgs.Promotion.DepositAccumulateRoulette.Worker.ApplicationServices;
 using Tgs.Promotion.DepositAccumulateRouletteService.MessageQueue;
+using Tgs.ServiceUtility;
+using RouletteResult = Tgs.Promotion.DepositAccumulateRoulette.Common.RouletteResult;
 
 namespace Tgs.Promotion.DepositAccumulateRouletteService.IntegrationTests;
 
@@ -19,18 +21,67 @@ internal class DepositAccumulateRouletteTests
 	{
 		var fakeMessageSender = Substitute.For<IMessageSender>();
 		var fakePromotionServiceClient = Substitute.For<IPromotionServiceClient>();
-		var fakeStatisticsRepository = Substitute.For<IStatisticsRepository>();
-		var fakeEventRepository = Substitute.For<IDepositAccumulateRouletteEventRepository>();
 		var fakePlayerServiceClient = Substitute.For<IPlayerServiceClient>();
 		var fakeRedisConnectionManager = Substitute.For<IRedisConnectionManager>();
 
+		var fakeTgsRepository = Substitute.For<ITgsRepository>();
+		var fakePromotionService = Substitute
+			.For<IGetService<GetDepositAccumulateRoulettePromotionQuery, DepositAccumulateRoulettePromotion?>>();
+		var fakeRouletteCountService = Substitute.For<IRouletteCountService>();
+		var fakeStatisticsService = Substitute.For<IStatisticsService>();
+		var fakeDistributeService = Substitute.For<ICommandService<DistributeBonusCommand>>();
+
 		await using var web = new TestDepositAccumulateRouletteServiceApplication(builder => builder
-			.ConfigureServices(services => services
-				.AddSingleton(fakePromotionServiceClient)
-				.AddSingleton(fakeStatisticsRepository)
-				.AddSingleton(fakePlayerServiceClient)
-				.AddSingleton(fakeEventRepository)
-				.AddSingleton(fakeRedisConnectionManager)));
+			.ConfigureServices(services =>
+			{
+				_ = services
+					.AddSingleton(fakePromotionServiceClient)
+					.AddSingleton(fakeStatisticsService)
+					.AddSingleton(fakePlayerServiceClient)
+					.AddSingleton(fakePromotionService)
+					.AddSingleton(fakeTgsRepository)
+					.AddSingleton(fakeRouletteCountService)
+					.AddSingleton(fakeDistributeService)
+					.AddSingleton(fakeRedisConnectionManager);
+
+				_ = services
+					.AddSingleton<IShuffleService, ShuffleService>();
+
+				_ = services
+					.AddSingleton<IGetService<RouletteCommand, RouletteResult>>(sp =>
+					{
+						var shuffleService = sp.GetRequiredService<IShuffleService>();
+
+						return new RouletteCommandService(
+							fakeTgsRepository,
+							fakePromotionService,
+							fakeRouletteCountService,
+							shuffleService,
+							fakeStatisticsService,
+							fakeDistributeService,
+							fakePromotionServiceClient,
+							fakePlayerServiceClient);
+					});
+
+				_ = services
+					.AddSingleton<RouletteTaskQueueManager>()
+					.AddSingleton(sp =>
+					{
+						var manager = sp.GetRequiredService<RouletteTaskQueueManager>();
+						var fakeRouletteHandleService = Substitute.For<IRouletteHandleService>();
+						_ = fakeRouletteHandleService.RequestAsync(
+								Arg.Any<RouletteTaskRequest>(),
+								Arg.Any<CancellationToken>())
+							.Returns(callInfo =>
+							{
+								var request = callInfo.Arg<RouletteTaskRequest>();
+
+								return manager.RequestAsync(request).Result;
+							});
+
+						return fakeRouletteHandleService;
+					});
+			}));
 
 		var serviceScope = web.Services.CreateAsyncScope();
 
@@ -55,6 +106,11 @@ internal class DepositAccumulateRouletteTests
 
 		var settings = new DepositAccumulateRouletteSettings(depositItems, rouletteItems);
 
+		_ = fakePromotionService.GetAsync(
+				Arg.Is(new GetDepositAccumulateRoulettePromotionQuery(promotionId)),
+				Arg.Any<CancellationToken>())
+			.Returns(new DepositAccumulateRoulettePromotion(promotionId, null, settings));
+
 		var eventInfo = new DepositAccumulateRouletteEventInfo(
 			Guid.NewGuid(),
 			playerCode,
@@ -63,11 +119,16 @@ internal class DepositAccumulateRouletteTests
 			4,
 			2000);
 
-		_ = fakeEventRepository.GetDepositAccumulateRouletteEventInfosAsync(
+		_ = fakeRouletteCountService.DecreaseRouletteCountAsync(
 				Arg.Is(promotionId),
 				Arg.Is(playerCode),
 				Arg.Any<CancellationToken>())
-			.Returns(new[] { eventInfo }.ToAsyncEnumerable());
+			.Returns(new RouletteCountInfo(
+				eventInfo,
+				4,
+				3,
+				4,
+				3));
 
 		_ = fakePlayerServiceClient.GetPlayerInfoAsync(
 				Arg.Is(playerCode),
@@ -98,16 +159,10 @@ internal class DepositAccumulateRouletteTests
 				PromotionType = "DepositAccumulateRoulette"
 			});
 
-		_ = fakePromotionServiceClient.GetPromotionRuleAsync<GetDepositAccumulateRoulettePromotionQueryService.PromotionRule>(
+		_ = fakePromotionServiceClient.GetPromotionRuleAsync<RouletteProcessor.PromotionRule>(
 				Arg.Is(promotionId),
 				Arg.Any<CancellationToken>())
-			.Returns(new GetDepositAccumulateRoulettePromotionQueryService.PromotionRule { CompaignDetail = settings });
-
-		var key = $"Promotion.DepositAccumulateRoulette:RouletteCount:{promotionId}:{playerCode}:{eventInfo.Date:O}";
-		_ = fakeRedisConnectionManager
-			.Database
-			.StringDecrementAsync(Arg.Is<RedisKey>(key))
-			.Returns(3);
+			.Returns(new RouletteProcessor.PromotionRule { CompaignDetail = settings });
 
 		_ = fakeMessageSender.RequestAsync(
 				Arg.Is("tgs.promotion.depositaccumulateroulette.roulette.play"),

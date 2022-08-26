@@ -3,6 +3,7 @@ using Tgs.MessageQueue;
 using Tgs.PlayerService.Client;
 using Tgs.Promotion.Clients;
 using Tgs.Promotion.DepositAccumulateRoulette.Common;
+using Tgs.Promotion.DepositAccumulateRoulette.Common.Protos;
 using Tgs.Promotion.DepositAccumulateRouletteService.Protos;
 
 namespace Tgs.Promotion.DepositAccumulateRouletteService.MessageQueue;
@@ -53,7 +54,13 @@ public class RouletteProcessor : IMessageProcessor
 		if (!rule.CompaignDetail.RouletteItems.Any())
 			throw new InvalidOperationException($"Promotion {request.PromotionId} does not have any roulette items.");
 
-		var result = await _handleService.RequestAsync(request, cancellationToken).ConfigureAwait(false);
+		var taskRequest = new RouletteTaskRequest
+		{
+			PromotionId = request.PromotionId,
+			PlayerCode = request.PlayerCode
+		};
+
+		var result = await _handleService.RequestAsync(taskRequest, cancellationToken).ConfigureAwait(false);
 
 		return new RouletteResponse
 		{

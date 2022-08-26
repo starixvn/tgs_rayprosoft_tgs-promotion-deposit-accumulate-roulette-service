@@ -1,9 +1,9 @@
 ﻿using Tgs.Promotion.DepositAccumulateRoulette.Common;
-using Tgs.Promotion.DepositAccumulateRouletteService.Protos;
+using Tgs.Promotion.DepositAccumulateRoulette.Common.Protos;
 
 namespace Tgs.Promotion.DepositAccumulateRouletteService;
 
 public interface IRouletteHandleService
 {
-	ValueTask<RouletteResult> RequestAsync(RouletteRequest request, CancellationToken cancellationToken);
+	ValueTask<RouletteResult> RequestAsync(RouletteTaskRequest request, CancellationToken cancellationToken);
 }

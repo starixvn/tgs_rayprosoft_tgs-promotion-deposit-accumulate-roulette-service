@@ -9,17 +9,13 @@ namespace Tgs.Promotion.DepositAccumulateRoulette.Worker;
 public class RouletteTaskQueueManager
 {
 	private readonly IServiceProvider _serviceProvider;
-	private readonly ILogger<RouletteTaskQueueManager> _logger;
 
 	private readonly ConcurrentDictionary<string, RouletteTaskQueue> _queuePool = new();
 	private readonly CancellationTokenSource _cancellationTokenSource = new();
 
-	public RouletteTaskQueueManager(
-		IServiceProvider serviceProvider,
-		ILogger<RouletteTaskQueueManager> logger)
+	public RouletteTaskQueueManager(IServiceProvider serviceProvider)
 	{
 		_serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
-		_logger = logger ?? throw new ArgumentNullException(nameof(logger));
 	}
 
 	public Task<RouletteResult> RequestAsync(RouletteTaskRequest request)

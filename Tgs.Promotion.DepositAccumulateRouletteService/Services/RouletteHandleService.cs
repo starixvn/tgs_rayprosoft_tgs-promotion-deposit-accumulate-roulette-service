@@ -24,20 +24,14 @@ internal class RouletteHandleService : IRouletteHandleService
 	}
 
 	public async ValueTask<RouletteResult> RequestAsync(
-		RouletteRequest request,
+		RouletteTaskRequest request,
 		CancellationToken cancellationToken)
 	{
 		var machineName = await GetProcessSubjectAsync(request.PlayerCode, cancellationToken).ConfigureAwait(false);
 
-		var taskRequest = new RouletteTaskRequest
-		{
-			PromotionId = request.PromotionId,
-			PlayerCode = request.PlayerCode
-		};
-
 		var data = await _messageSender.RequestAsync(
 			$"tgs.promotion.depositaccumulateroulette.worker.{machineName}.roulette",
-			taskRequest.ToByteArray(),
+			request.ToByteArray(),
 			cancellationToken)
 			.ConfigureAwait(false);
 
