@@ -40,7 +40,10 @@ builder.Services
 			.AddProcessor<RouletteTaskProcessor>("tgs.promotion.depositaccumulateroulette.worker.roulette")
 			.AddProcessor<RouletteCountItemsQueryProcessor>(
 				"tgs.promotion.depositaccumulateroulette.worker.roulettecountitems",
-				"tgs.promotion.depositaccumulateroulette.worker.roulettecountitems");
+				"tgs.promotion.depositaccumulateroulette.worker.roulettecountitems")
+			.AddHandler<ClearExpiredDepositAccumulateEventCacheHandler>(
+				"tgs.promotion.depositaccumulateroulette.worker.event.expired.clear",
+				"tgs.promotion.depositaccumulateroulette.worker.event.expired.clear");
 	})
 	.ClearAllExchanges()
 	.AddNatsGlobPatternExchange("*");

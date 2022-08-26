@@ -24,7 +24,7 @@ internal class ClearExpiredEventCacheCommandService : ICommandService<ClearExpir
 		ClearExpiredEventCacheCommand command,
 		CancellationToken cancellationToken = default)
 	{
-		var subject = "tgs.promotion.depositaccumulateroulette.event.expired.clear";
+		var subject = "tgs.promotion.depositaccumulateroulette.worker.event.expired.clear";
 
 		foreach (var info in command.Infos)
 		{
