@@ -43,20 +43,11 @@ internal class RouletteCommandService : IGetService<RouletteCommand, RouletteRes
 		var player = await _playerServiceClient.GetPlayerInfoAsync(command.PlayerCode, cancellationToken)
 			.ConfigureAwait(false);
 
-		if (player is null)
-			throw new InvalidOperationException($"Can't find player with code {command.PlayerCode}");
-
 		var promotionSetting = await _getPromotionService.GetAsync(
 			new GetDepositAccumulateRoulettePromotionQuery(command.PromotionId),
 			cancellationToken).ConfigureAwait(false);
 
-		if (promotionSetting is null)
-			throw new InvalidOperationException($"Promotion {command.PromotionId} does not exist.");
-
-		var rouletteItems = promotionSetting.CampaignDetail.RouletteItems?.ToArray() ?? Array.Empty<RouletteItem>();
-
-		if (rouletteItems.Length == 0)
-			throw new InvalidOperationException($"Promotion {command.PromotionId} does not have any roulette items.");
+		var rouletteItems = promotionSetting!.CampaignDetail.RouletteItems.ToArray();
 
 		var countInfo = await _rouletteCountService.DecreaseRouletteCountAsync(
 			command.PromotionId,
@@ -71,7 +62,7 @@ internal class RouletteCommandService : IGetService<RouletteCommand, RouletteRes
 		var rouletteResult = await ProcessRouletteAsync(
 			command,
 			rouletteItems,
-			player.BrandId,
+			player!.BrandId,
 			countInfo,
 			cancellationToken).ConfigureAwait(false);
 
