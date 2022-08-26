@@ -32,3 +32,11 @@ message RouletteCountItemInfo {
 	phoenix.protobuf.GuidValue promotion_id = 1;
 	int32 roulette_count = 2;
 }
+
+message BidRequest {
+	string player_code = 1;
+}
+
+message BidResponse {
+	string subject = 1;
+}

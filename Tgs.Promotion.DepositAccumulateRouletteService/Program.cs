@@ -4,6 +4,7 @@ using OpenTelemetry.Exporter;
 using OpenTelemetry.Instrumentation.AspNetCore;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
+using Tgs.Promotion.DepositAccumulateRouletteService;
 using Tgs.Promotion.DepositAccumulateRouletteService.MessageQueue;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -49,8 +50,17 @@ builder.Services
 	.AddNatsGlobPatternExchange("*");
 
 builder.Services
+	.AddSingleton<IRedisConnectionManager>(sp =>
+	{
+		var config = sp.GetRequiredService<IConfiguration>();
+		return new RedisConnectionManager(config.GetConnectionString("Redis"));
+	})
 	.AddDepositAccumulateRouletteCommon()
-	.AddDepositAccumulateRouletteService()
+	.AddDepositAccumulateRouletteService(sp =>
+	{
+		var redisConnectionManager = sp.GetRequiredService<IRedisConnectionManager>();
+		return redisConnectionManager.Database;
+	})
 	.AddPromotionClientServices((options, sp) =>
 	{
 		var config = sp.GetRequiredService<IConfiguration>();
