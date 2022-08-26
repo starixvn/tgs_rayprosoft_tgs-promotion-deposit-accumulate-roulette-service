@@ -79,7 +79,7 @@ internal class PromotionQueryTests
 		var fakeTgsRepository = Substitute.For<ITgsRepository>();
 		var fakeRouletteService = Substitute.For<IRouletteCountService>();
 
-		var sut = new GetPlayerRouletteCountItemsQueryService(
+		var sut = new GetRouletteCountItemsQueryService(
 			fakePlayerServiceClient,
 			fakeTgsRepository,
 			fakeRouletteService);
@@ -99,7 +99,7 @@ internal class PromotionQueryTests
 
 		var promotionIds = expected.Select(rp => rp.PromotionId).ToArray();
 
-		var query = new GetPlayerRouletteCountItemsQuery(playerInfo.PlayerCode);
+		var query = new GetRouletteCountItemsQuery(playerInfo.PlayerCode);
 
 		_ = fakePlayerServiceClient.GetPlayerInfoAsync(Arg.Is(query.PlayerCode))
 			.Returns(playerInfo);

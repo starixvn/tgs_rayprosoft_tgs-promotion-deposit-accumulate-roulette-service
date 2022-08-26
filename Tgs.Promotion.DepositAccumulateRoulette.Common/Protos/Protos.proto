@@ -19,3 +19,16 @@ message RouletteTaskResponse {
 	int32 item_index = 2;
 	int32 remaining_count = 3;
 }
+
+message RouletteCountItemsQueryRequest {
+	string player_code = 1;
+}
+
+message RouletteCountItemsQueryResponse {
+	repeated RouletteCountItemInfo items = 1;
+}
+
+message RouletteCountItemInfo {
+	phoenix.protobuf.GuidValue promotion_id = 1;
+	int32 roulette_count = 2;
+}

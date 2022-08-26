@@ -161,8 +161,7 @@ internal class RouletteTests
 				BrandId = Guid.NewGuid()
 			});
 
-		_ = Assert.ThrowsAsync<InvalidOperationException>(
-			async () => await sut.GetAsync(command));
+		_ = Assert.CatchAsync(async () => await sut.GetAsync(command));
 	}
 
 	[Test]
@@ -191,8 +190,7 @@ internal class RouletteTests
 			Guid.NewGuid(),
 			"player1");
 
-		_ = Assert.ThrowsAsync<InvalidOperationException>(
-			async () => await sut.GetAsync(command));
+		_ = Assert.CatchAsync(async () => await sut.GetAsync(command));
 	}
 
 	[Test]
@@ -237,7 +235,7 @@ internal class RouletteTests
 				null,
 				settings));
 
-		_ = Assert.ThrowsAsync<InvalidOperationException>(async () => await sut.GetAsync(command));
+		_ = Assert.CatchAsync(async () => await sut.GetAsync(command));
 	}
 
 	[Test]

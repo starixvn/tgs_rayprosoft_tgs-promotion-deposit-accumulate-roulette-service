@@ -37,7 +37,10 @@ builder.Services
 				var config = sp.GetRequiredService<IConfiguration>();
 				options.Url = config.GetConnectionString("Nats");
 			})
-			.AddProcessor<RouletteTaskProcessor>("tgs.promotion.depositaccumulateroulette.worker.roulette");
+			.AddProcessor<RouletteTaskProcessor>("tgs.promotion.depositaccumulateroulette.worker.roulette")
+			.AddProcessor<RouletteCountItemsQueryProcessor>(
+				"tgs.promotion.depositaccumulateroulette.worker.roulettecountitems",
+				"tgs.promotion.depositaccumulateroulette.worker.roulettecountitems");
 	})
 	.ClearAllExchanges()
 	.AddNatsGlobPatternExchange("*");
