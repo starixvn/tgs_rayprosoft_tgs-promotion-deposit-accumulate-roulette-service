@@ -5,8 +5,6 @@ VisualStudioVersion = 17.2.32519.379
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tgs.Promotion.DepositAccumulateRouletteService", "Tgs.Promotion.DepositAccumulateRouletteService\Tgs.Promotion.DepositAccumulateRouletteService.csproj", "{E9AB04E5-B94D-433E-AED0-B30CC0DA70D9}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tgs.Promotion.DepositAccumulateRoulette.Core", "Tgs.Promotion.DepositAccumulateRoulette.Core\Tgs.Promotion.DepositAccumulateRoulette.Core.csproj", "{1E084E52-A65A-4A5C-82B1-67724705F945}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tgs.Promotion.DepositAccumulateRoulette.Client", "Tgs.Promotion.DepositAccumulateRoulette.Client\Tgs.Promotion.DepositAccumulateRoulette.Client.csproj", "{0AB60702-69CA-4ABF-8BEE-8F40F92E0A80}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tgs.Promotion.DepositAccumulateRoulette.Background", "Tgs.Promotion.DepositAccumulateRoulette.Background\Tgs.Promotion.DepositAccumulateRoulette.Background.csproj", "{03979C39-4C19-4463-B4D9-C20DD4AF9743}"
@@ -45,7 +43,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tgs.Promotion.DepositAccumu
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tgs.Promotion.DepositAccumulateRoulette.Worker.Core", "Tgs.Promotion.DepositAccumulateRoulette.Worker.Core\Tgs.Promotion.DepositAccumulateRoulette.Worker.Core.csproj", "{E27D3ACE-2E7B-4255-A72A-26BC94111EF2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tgs.Promotion.DepositAccumulateRoulette.Worker.Core.UnitTests", "Tgs.Promotion.DepositAccumulateRoulette.Worker.Core.UnitTests\Tgs.Promotion.DepositAccumulateRoulette.Worker.Core.UnitTests.csproj", "{65F102E6-163F-4E57-89F1-F4AB2246AF42}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tgs.Promotion.DepositAccumulateRoulette.Worker.Core.UnitTests", "Tgs.Promotion.DepositAccumulateRoulette.Worker.Core.UnitTests\Tgs.Promotion.DepositAccumulateRoulette.Worker.Core.UnitTests.csproj", "{65F102E6-163F-4E57-89F1-F4AB2246AF42}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -57,10 +55,6 @@ Global
 		{E9AB04E5-B94D-433E-AED0-B30CC0DA70D9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E9AB04E5-B94D-433E-AED0-B30CC0DA70D9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E9AB04E5-B94D-433E-AED0-B30CC0DA70D9}.Release|Any CPU.Build.0 = Release|Any CPU
-		{1E084E52-A65A-4A5C-82B1-67724705F945}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1E084E52-A65A-4A5C-82B1-67724705F945}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1E084E52-A65A-4A5C-82B1-67724705F945}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1E084E52-A65A-4A5C-82B1-67724705F945}.Release|Any CPU.Build.0 = Release|Any CPU
 		{0AB60702-69CA-4ABF-8BEE-8F40F92E0A80}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{0AB60702-69CA-4ABF-8BEE-8F40F92E0A80}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0AB60702-69CA-4ABF-8BEE-8F40F92E0A80}.Release|Any CPU.ActiveCfg = Release|Any CPU

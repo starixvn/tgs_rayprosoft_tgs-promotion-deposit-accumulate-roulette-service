@@ -28,10 +28,13 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
     <PackageReference Include="Tgs.Interceptors" Version="0.2.1" />
     <PackageReference Include="Tgs.MessageQueue.Nats" Version="2.1.6" />
+    <PackageReference Include="Tgs.PlayerService.Client" Version="0.0.15" />
+    <PackageReference Include="Tgs.Promotion.Client" Version="1.0.24-alpha" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Tgs.Promotion.DepositAccumulateRoulette.Core\Tgs.Promotion.DepositAccumulateRoulette.Core.csproj" />
+    <ProjectReference Include="..\Tgs.Promotion.DepositAccumulateRoulette.Client\Tgs.Promotion.DepositAccumulateRoulette.Client.csproj" />
+    <ProjectReference Include="..\Tgs.Promotion.DepositAccumulateRoulette.Common\Tgs.Promotion.DepositAccumulateRoulette.Common.csproj" />
   </ItemGroup>
 
   <ItemGroup>

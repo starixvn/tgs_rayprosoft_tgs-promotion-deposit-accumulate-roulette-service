@@ -4,5 +4,5 @@ using Tgs.Promotion.DepositAccumulateRoulette.Common.Protos;
 namespace Tgs.Promotion.DepositAccumulateRoulette.Worker;
 
 internal record RouletteTask(
-	RouletteSessionRequest Request,
+	RouletteTaskRequest Request,
 	TaskCompletionSource<RouletteResult> Promise);

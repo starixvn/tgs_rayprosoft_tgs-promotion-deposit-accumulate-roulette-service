@@ -4,7 +4,6 @@ using OpenTelemetry.Exporter;
 using OpenTelemetry.Instrumentation.AspNetCore;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
-using Tgs.Promotion.DepositAccumulateRouletteService;
 using Tgs.Promotion.DepositAccumulateRouletteService.MessageQueue;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -47,15 +46,14 @@ builder.Services
 				"tgs.promotion.depositaccumulateroulette.roulette.play")
 			.AddHandler<ClearExpiredDepositAccumulateEventCacheHandler>(
 				"tgs.promotion.depositaccumulateroulette.event.expired.clear",
-				"tgs.promotion.depositaccumulateroulette.event.expired.clear")
-			.SetSessionReplySubject($"tgs.promotion.depositaccumulateroulette.worker.{Environment.MachineName}.reply");
+				"tgs.promotion.depositaccumulateroulette.event.expired.clear");
 	})
 	.ClearAllExchanges()
 	.AddNatsGlobPatternExchange("*");
 
 builder.Services
 	.AddDepositAccumulateRouletteCommon()
-	.AddDepositAccumulateRouletteCore()
+	.AddDepositAccumulateRouletteService()
 	.AddPromotionClientServices((options, sp) =>
 	{
 		var config = sp.GetRequiredService<IConfiguration>();

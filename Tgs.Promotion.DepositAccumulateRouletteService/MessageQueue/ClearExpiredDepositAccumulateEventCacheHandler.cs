@@ -1,6 +1,5 @@
 ﻿using Tgs.MessageQueue;
 using Tgs.Promotion.DepositAccumulateRoulette.Common.Protos;
-using Tgs.Promotion.DepositAccumulateRouletteServices;
 
 namespace Tgs.Promotion.DepositAccumulateRouletteService.MessageQueue;
 

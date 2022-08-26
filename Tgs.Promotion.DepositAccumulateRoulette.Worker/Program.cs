@@ -33,12 +33,11 @@ builder.Services
 	.AddNatsMessageQueue(natsConfig =>
 	{
 		natsConfig.ConfigQueueOptions((options, sp) =>
-		{
-			var config = sp.GetRequiredService<IConfiguration>();
-			options.Url = config.GetConnectionString("Nats");
-		})
-		.AddSession<RouletteTaskSession>("tgs.promotion.depositaccumulateroulette.worker")
-		.SetSessionReplySubject($"tgs.promotion.depositaccumulateroulette.worker.{Environment.MachineName}.reply");
+			{
+				var config = sp.GetRequiredService<IConfiguration>();
+				options.Url = config.GetConnectionString("Nats");
+			})
+			.AddProcessor<RouletteTaskProcessor>("tgs.promotion.depositaccumulateroulette.worker.roulette");
 	})
 	.ClearAllExchanges()
 	.AddNatsGlobPatternExchange("*");

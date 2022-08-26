@@ -19,7 +19,7 @@ public static class ServiceCollectionExtensions
 		_ = services
 			.AddTransient<IRouletteCountService, RouletteCountService>();
 
-		_ = services.AddSingleton<RouletteTaskProcessor>()
+		_ = services.AddSingleton<RouletteTaskQueueManager>()
 			.AddHostedService<RouletteTaskBackgroundService>();
 
 		return services;

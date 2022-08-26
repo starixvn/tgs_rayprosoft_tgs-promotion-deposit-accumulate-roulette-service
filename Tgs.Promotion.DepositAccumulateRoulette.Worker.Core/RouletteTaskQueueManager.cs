@@ -6,23 +6,23 @@ using Tgs.Promotion.DepositAccumulateRoulette.Common.Protos;
 
 namespace Tgs.Promotion.DepositAccumulateRoulette.Worker;
 
-public class RouletteTaskProcessor
+public class RouletteTaskQueueManager
 {
 	private readonly IServiceProvider _serviceProvider;
-	private readonly ILogger<RouletteTaskProcessor> _logger;
+	private readonly ILogger<RouletteTaskQueueManager> _logger;
 
 	private readonly ConcurrentDictionary<string, RouletteTaskQueue> _queuePool = new();
 	private readonly CancellationTokenSource _cancellationTokenSource = new();
 
-	public RouletteTaskProcessor(
+	public RouletteTaskQueueManager(
 		IServiceProvider serviceProvider,
-		ILogger<RouletteTaskProcessor> logger)
+		ILogger<RouletteTaskQueueManager> logger)
 	{
 		_serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
 		_logger = logger ?? throw new ArgumentNullException(nameof(logger));
 	}
 
-	public Task<RouletteResult> RequestAsync(RouletteSessionRequest request)
+	public Task<RouletteResult> RequestAsync(RouletteTaskRequest request)
 	{
 		var queue = _queuePool.GetOrAdd(
 			request.PlayerCode,

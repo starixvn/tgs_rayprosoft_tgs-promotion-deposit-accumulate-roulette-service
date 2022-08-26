@@ -2,8 +2,9 @@
 using Tgs.MessageQueue;
 using Tgs.Promotion.DepositAccumulateRoulette.Common;
 using Tgs.Promotion.DepositAccumulateRoulette.Common.Protos;
+using Tgs.Promotion.DepositAccumulateRouletteService.Protos;
 
-namespace Tgs.Promotion.DepositAccumulateRouletteServices;
+namespace Tgs.Promotion.DepositAccumulateRouletteService.Services;
 
 internal class RouletteHandleService : IRouletteHandleService
 {
@@ -16,20 +17,22 @@ internal class RouletteHandleService : IRouletteHandleService
 	}
 
 	public async ValueTask<RouletteResult> RequestAsync(
-		RouletteSessionRequest request,
+		RouletteRequest request,
 		CancellationToken cancellationToken)
 	{
-		var answer = await _messageSender.AskAsync(
-			"tgs.promotion.depositaccumulateroulette.worker",
-			request.ToByteArray(),
+		var taskRequest = new RouletteTaskRequest
+		{
+			PromotionId = request.PromotionId,
+			PlayerCode = request.PlayerCode
+		};
+
+		var data = await _messageSender.RequestAsync(
+			"tgs.promotion.depositaccumulateroulette.worker.roulette",
+			taskRequest.ToByteArray(),
 			cancellationToken)
 			.ConfigureAwait(false);
 
-		var response = RouletteSessionResponse.Parser.ParseFrom(answer.Result.Span);
-
-		await answer
-			.CompleteAsync(Array.Empty<byte>(), cancellationToken)
-			.ConfigureAwait(false);
+		var response = RouletteTaskResponse.Parser.ParseFrom(data.Span);
 
 		return new RouletteResult(response.Id, response.ItemIndex, response.RemainingCount);
 	}
