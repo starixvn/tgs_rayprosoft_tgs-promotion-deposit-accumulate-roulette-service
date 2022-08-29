@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: ConfigMap
+metadaata:
+  name: configmap-{{ include "deposit-accumulate-roulette-worker.fullname" . }}
+data:
+  appsettings.json: |
+    {
+      "DepositAccumulateRouletteWorker": {
+        "PromotionBaseUrl": "http://promotion-api",
+        "PlayerBaseUrl": "http://player-api"
+      }
+    }
+  monitor.settings.json: | 
+    {
+      "Logging":{
+        "Console": {
+          "FormatterName": "json",
+          "FormatterOptions": {
+            "IncludeScopes": "True",
+            "TimestampFormat": "HH:mm:ss "
+          }
+        },
+        "LogLevel": {
+          "Default": "Warning",
+          "Microsoft": "Warning",
+          "Microsoft.Diagnostics": "Warning",
+          "Microsoft.Hosting.Lifetime": "Information"
+        }
+      }
+    }
