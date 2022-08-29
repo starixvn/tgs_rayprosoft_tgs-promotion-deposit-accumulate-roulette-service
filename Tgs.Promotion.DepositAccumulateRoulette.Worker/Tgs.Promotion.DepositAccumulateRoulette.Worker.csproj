@@ -4,6 +4,10 @@
     <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>e7ef8328-a199-4f5b-8b54-571e18959fa0</UserSecretsId>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <DockerfileBuildArguments>--build-arg "BuildConfiguration=$(Configuration)"</DockerfileBuildArguments>
+    <DockerfileTag Condition="$(DockerfileTag) == ''">deposit-accumulate-roulette-worker</DockerfileTag>
   </PropertyGroup>
 
   <ItemGroup>
