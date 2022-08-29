@@ -7,7 +7,7 @@ using Tgs.ServiceUtility;
 
 namespace Tgs.Promotion.DepositAccumulateRoulette.Worker;
 
-internal class RouletteTaskQueue
+internal class RouletteTaskQueue : IDisposable
 {
 	private readonly IServiceProvider _serviceProvider;
 	private readonly ILogger<RouletteTaskQueue> _logger;
@@ -15,6 +15,9 @@ internal class RouletteTaskQueue
 
 	private CancellationTokenSource? _cancellationTokenSource;
 	private Task? _backgroundTask;
+	private bool _disposedValue;
+
+	public DateTime Expired { get; private set; } = DateTime.Now.AddMinutes(1).AddSeconds(20);
 
 	public string PlayerCode { get; }
 
@@ -47,7 +50,10 @@ internal class RouletteTaskQueue
 		{
 			foreach (var task in _rouletteTasks.GetConsumingEnumerable(_cancellationTokenSource.Token))
 			{
-				await HandleRouletteTaskAsync(task, _cancellationTokenSource.Token);
+				Expired = DateTime.Now.AddMinutes(1).AddSeconds(20);
+
+				await HandleRouletteTaskAsync(task, _cancellationTokenSource.Token)
+					.ConfigureAwait(false);
 			}
 		}, cancellationToken);
 	}
@@ -59,6 +65,8 @@ internal class RouletteTaskQueue
 
 		try
 		{
+			_rouletteTasks.CompleteAdding();
+
 			if (_rouletteTasks.TryGetNonEnumeratedCount(out var count)
 				&& count > 0
 				&& _backgroundTask?.IsCompleted == false)
@@ -68,6 +76,31 @@ internal class RouletteTaskQueue
 		}
 		catch (AggregateException ex) when (ex.InnerException is TaskCanceledException)
 		{
+		}
+	}
+
+	public void Dispose()
+	{
+		// Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+		Dispose(disposing: true);
+		GC.SuppressFinalize(this);
+	}
+
+	protected virtual void Dispose(bool disposing)
+	{
+		if (!_disposedValue)
+		{
+			if (disposing)
+			{
+				if (_cancellationTokenSource?.IsCancellationRequested == false)
+					_cancellationTokenSource?.Cancel();
+
+				_rouletteTasks.CompleteAdding();
+			}
+
+			// TODO: free unmanaged resources (unmanaged objects) and override finalizer
+			// TODO: set large fields to null
+			_disposedValue = true;
 		}
 	}
 

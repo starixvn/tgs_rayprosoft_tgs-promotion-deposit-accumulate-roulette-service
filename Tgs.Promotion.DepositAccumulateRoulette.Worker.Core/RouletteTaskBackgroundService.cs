@@ -15,6 +15,14 @@ internal class RouletteTaskBackgroundService : BackgroundService
 	{
 		_ = stoppingToken.Register(() => _rouletteTaskQueueManager.StopReceive());
 
-		return Task.CompletedTask;
+		return Task.Run(async () =>
+		{
+			while (!stoppingToken.IsCancellationRequested)
+			{
+				_rouletteTaskQueueManager.ClearExpiredQueues();
+
+				await Task.Delay(10000, stoppingToken).ConfigureAwait(false);
+			}
+		}, stoppingToken);
 	}
 }

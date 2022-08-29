@@ -44,4 +44,22 @@ public class RouletteTaskQueueManager
 		Task.WaitAll(_queuePool.Values
 			.Select(queue => Task.Run(queue.StopProcess)).ToArray());
 	}
+
+	public void ClearExpiredQueues()
+	{
+		var currentTime = DateTime.Now;
+
+		var removeTasks = _queuePool.Values
+			.Where(queue => currentTime > queue.Expired)
+			.Select(queue => Task.Run(() =>
+			{
+				if (!_queuePool.TryRemove(queue.PlayerCode, out _))
+					return;
+
+				queue.StopProcess();
+				queue.Dispose();
+			})).ToArray();
+
+		Task.WaitAll(removeTasks);
+	}
 }
