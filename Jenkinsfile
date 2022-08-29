@@ -8,6 +8,7 @@ pipeline {
 		BuildConfiguration = 'Debug'
 		ServiceImageName = "pgtgs/promotion-deposit-accumulate-roulette"
         BackgroundImageName = "pgtgs/promotion-deposit-accumulate-roulette-background"
+        WorkerImageName = "pgtgs/promotion-deposit-accumulate-roulette-worker"
 	}
 
 	stages {
@@ -65,6 +66,7 @@ pipeline {
 		stage('Build Docker Image') {
 			steps {
 				sh 'dotnet build "Tgs.Promotion.DepositAccumulateRouletteService/Tgs.Promotion.DepositAccumulateRouletteService.csproj" -c $BuildConfiguration -t:ContainerBuild -p:DockerfileTag="$ServiceImageName:$TAG" --no-restore '
+                sh 'dotnet build "Tgs.Promotion.DepositAccumulateRoulette.Worker/Tgs.Promotion.DepositAccumulateRoulette.Worker.csproj" -c $BuildConfiguration -t:ContainerBuild -p:DockerfileTag="$WorkerImageName:$TAG" --no-restore '
                 sh 'dotnet build "Tgs.Promotion.DepositAccumulateRoulette.Background/Tgs.Promotion.DepositAccumulateRoulette.Background.csproj" -c $BuildConfiguration -t:ContainerBuild -p:DockerfileTag="$BackgroundImageName:$TAG" --no-restore '
 			}
 		}
@@ -72,6 +74,7 @@ pipeline {
 		stage('Push Docker Image') {
 			steps {
 				sh 'docker push $ServiceImageName:$TAG'
+                sh 'docker push $WorkerImageName:$TAG'
                 sh 'docker push $BackgroundImageName:$TAG'
 			}
 		}
@@ -96,7 +99,7 @@ pipeline {
 			steps {
                 script {
                     withKubeConfig([credentialsId: env.k8s_config]) {
-                        def resources = getResources(env.k8s_config, env.kube_ns, "deposit-accumulate-roulette-service")
+                        def resources = getResources(env.k8s_config, env.kube_ns, "deposit-accumulate-roulette")
                         def dedicated = getTgsSettings(env.k8s_config, env.kube_ns, "dedicated")
                         def node_selector = getTgsSettings(env.k8s_config, env.kube_ns, "node-selector")
                         
@@ -118,6 +121,48 @@ pipeline {
                         """
                         sh """
                             cat << EOF | yq e -P | helm template deployment/k8s/deposit-accumulate-roulette \
+                                -n ${kube_ns} \
+                                --name-template tgs \
+                                --set image.tag=${TAG} \
+                                -f - \
+                                | kubectl -n ${kube_ns} apply -f -
+                            {
+                                "nodeSelector": $node_selector,
+                                "tolerations": [$dedicated],
+                                "resources": $resources
+                            }
+                        """
+                    }
+                }
+			}
+		}
+
+        stage('Deploy deposit-accumulate-roulette-worker to k8s') {
+			steps {
+                script {
+                    withKubeConfig([credentialsId: env.k8s_config]) {
+                        def resources = getResources(env.k8s_config, env.kube_ns, "deposit-accumulate-roulette-worker")
+                        def dedicated = getTgsSettings(env.k8s_config, env.kube_ns, "dedicated")
+                        def node_selector = getTgsSettings(env.k8s_config, env.kube_ns, "node-selector")
+                        
+                        println resources
+                        println dedicated
+                        println node_selector
+
+                        sh """
+                            cat << EOF | yq e -P | helm template deployment/k8s/deposit-accumulate-roulette-worker \
+                                -n ${kube_ns} \
+                                --name-template tgs \
+                                --set image.tag=${TAG} \
+                                -f -
+                            {
+                                "nodeSelector": $node_selector,
+                                "tolerations": [$dedicated],
+                                "resources": $resources
+                            }
+                        """
+                        sh """
+                            cat << EOF | yq e -P | helm template deployment/k8s/deposit-accumulate-roulette-worker \
                                 -n ${kube_ns} \
                                 --name-template tgs \
                                 --set image.tag=${TAG} \
