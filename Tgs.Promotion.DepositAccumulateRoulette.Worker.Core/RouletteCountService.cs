@@ -32,13 +32,7 @@ internal class RouletteCountService : IRouletteCountService
 
 		foreach (var info in events)
 		{
-			var cachedCount = await _countRepository
-				.GetRouletteCountAsync(promotionId, playerCode, info.Date)
-				.ConfigureAwait(false);
-
-			var count = cachedCount ??
-						await SetRouletteCountAsync(promotionId, playerCode, info, cancellationToken)
-							.ConfigureAwait(false);
+			var count = await GetOrSetRouletteCountAsync(promotionId, playerCode, info, cancellationToken);
 
 			totalCount += count;
 		}
@@ -60,13 +54,7 @@ internal class RouletteCountService : IRouletteCountService
 
 		foreach (var info in events)
 		{
-			var cachedCount = await _countRepository
-				.GetRouletteCountAsync(promotionId, playerCode, info.Date)
-				.ConfigureAwait(false);
-
-			var before = cachedCount ??
-						 await SetRouletteCountAsync(promotionId, playerCode, info, cancellationToken)
-							 .ConfigureAwait(false);
+			var before = await GetOrSetRouletteCountAsync(promotionId, playerCode, info, cancellationToken);
 
 			var after = before;
 			if (before > 0 && useEvent is null)
@@ -113,19 +101,27 @@ internal class RouletteCountService : IRouletteCountService
 			.ConfigureAwait(false);
 	}
 
-	private async ValueTask<int> SetRouletteCountAsync(Guid promotionId,
+	private async ValueTask<int> GetOrSetRouletteCountAsync(
+		Guid promotionId,
 		string playerCode,
-		DepositAccumulateRouletteEventInfo eventInfo,
+		DepositAccumulateRouletteEventInfo info,
 		CancellationToken cancellationToken)
 	{
+		var cachedCount = await _countRepository
+			.GetRouletteCountAsync(promotionId, playerCode, info.Date)
+			.ConfigureAwait(false);
+
+		if (cachedCount.HasValue)
+			return (int)cachedCount;
+
 		var usedCount = await _usedCountQueryService.GetAsync(
-			new RouletteUsedCountQuery(promotionId, playerCode, eventInfo.EventId),
+			new RouletteUsedCountQuery(promotionId, playerCode, info.EventId),
 			cancellationToken).ConfigureAwait(false);
 
-		var count = eventInfo.RouletteCount >= usedCount ? eventInfo.RouletteCount - usedCount : 0;
+		var count = info.RouletteCount >= usedCount ? info.RouletteCount - usedCount : 0;
 
 		_ = await _countRepository
-			.SetRouletteCountAsync(promotionId, playerCode, eventInfo.Date, count)
+			.SetRouletteCountAsync(promotionId, playerCode, info.Date, count)
 			.ConfigureAwait(false);
 
 		return count;
