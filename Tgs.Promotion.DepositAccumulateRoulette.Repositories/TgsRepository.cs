@@ -44,8 +44,8 @@ internal class TgsRepository : ITgsRepository
 		CancellationToken cancellationToken = default)
 	{
 		var count = await _context.DepositAccumulateRouletteGameEvents
-			.Where(evt => evt.PromotionId == promotionId
-						  && evt.PlayerCode == playerCode
+			.Where(evt => evt.PlayerCode == playerCode
+						  && evt.PromotionId == promotionId
 						  && evt.Date == eventDate)
 			.CountAsync(cancellationToken)
 			.ConfigureAwait(false);
