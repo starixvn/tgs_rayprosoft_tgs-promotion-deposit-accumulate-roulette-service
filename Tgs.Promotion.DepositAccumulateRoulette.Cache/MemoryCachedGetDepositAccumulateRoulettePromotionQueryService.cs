@@ -27,7 +27,7 @@ internal class MemoryCachedGetDepositAccumulateRoulettePromotionQueryService
 
 		var promotion = await _memoryCache.GetOrCreateAsync(cacheKey, async entry =>
 		{
-			_ = entry.SetAbsoluteExpiration(TimeSpan.FromHours(1D));
+			_ = entry.SetAbsoluteExpiration(TimeSpan.FromDays(1D));
 
 			return await _sourceService.GetAsync(query, cancellationToken).ConfigureAwait(false);
 		}).ConfigureAwait(false);
