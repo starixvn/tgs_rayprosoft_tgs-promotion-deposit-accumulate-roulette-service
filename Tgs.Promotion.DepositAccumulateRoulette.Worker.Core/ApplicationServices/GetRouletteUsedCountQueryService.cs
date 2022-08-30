@@ -19,6 +19,6 @@ internal class GetRouletteUsedCountQueryService : IGetService<RouletteUsedCountQ
 			.GetRouletteUsedCountAsync(
 				query.PromotionId,
 				query.PlayerCode,
-				query.DepositAccumulateRouletteEventId,
+				query.EventDate,
 				cancellationToken);
 }

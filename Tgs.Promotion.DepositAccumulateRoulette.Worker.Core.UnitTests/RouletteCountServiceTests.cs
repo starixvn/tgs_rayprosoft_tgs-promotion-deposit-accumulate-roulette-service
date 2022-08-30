@@ -20,7 +20,6 @@ internal class RouletteCountServiceTests
 		var events = new DepositAccumulateRouletteEventInfo[]
 		{
 			new DepositAccumulateRouletteEventInfo(
-				Guid.NewGuid(),
 				playerCode,
 				promotionId,
 				DateOnly.Parse("2022-08-10"),
@@ -69,7 +68,6 @@ internal class RouletteCountServiceTests
 		var events = new DepositAccumulateRouletteEventInfo[]
 		{
 			new DepositAccumulateRouletteEventInfo(
-				Guid.NewGuid(),
 				playerCode,
 				promotionId,
 				DateOnly.Parse("2022-08-11"),
@@ -95,7 +93,7 @@ internal class RouletteCountServiceTests
 				Arg.Is(new RouletteUsedCountQuery(
 					promotionId,
 					playerCode,
-					events[0].EventId)))
+					events[0].Date)))
 			.Returns(2);
 
 		_ = fakeCountRepository
@@ -172,17 +170,15 @@ internal class RouletteCountServiceTests
 		var playerCode = "player1";
 		var brandId = Guid.NewGuid();
 
-		var events = new DepositAccumulateRouletteEventInfo[]
+		var events = new[]
 		{
 			new DepositAccumulateRouletteEventInfo(
-				Guid.NewGuid(),
 				playerCode,
 				promotionId,
 				DateOnly.Parse("2022-08-10"),
 				5,
 				2400),
 			new DepositAccumulateRouletteEventInfo(
-				Guid.NewGuid(),
 				playerCode,
 				promotionId,
 				DateOnly.Parse("2022-08-11"),
@@ -240,14 +236,12 @@ internal class RouletteCountServiceTests
 		var events = new DepositAccumulateRouletteEventInfo[]
 		{
 			new DepositAccumulateRouletteEventInfo(
-				Guid.NewGuid(),
 				playerCode,
 				promotionId,
 				DateOnly.Parse("2022-08-10"),
 				5,
 				2400),
 			new DepositAccumulateRouletteEventInfo(
-				Guid.NewGuid(),
 				playerCode,
 				promotionId,
 				DateOnly.Parse("2022-08-11"),

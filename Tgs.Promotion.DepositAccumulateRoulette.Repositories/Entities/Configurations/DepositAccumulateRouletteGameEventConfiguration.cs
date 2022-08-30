@@ -36,7 +36,9 @@ namespace Tgs.Promotion.DepositAccumulateRoulette.Repositories.Entities.Configur
                 .HasColumnName("created_on")
                 .HasDefaultValueSql("now()");
 
-            entity.Property(e => e.DepositAccumulateRouletteEventId).HasColumnName("deposit_accumulate_roulette_event_id");
+            entity.Property(e => e.Date)
+                .HasColumnName("date")
+                .HasDefaultValueSql("'-infinity'::date");
 
             entity.Property(e => e.ItemIndex).HasColumnName("item_index");
 

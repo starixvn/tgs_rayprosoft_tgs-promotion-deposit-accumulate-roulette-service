@@ -5,9 +5,9 @@ namespace Tgs.Promotion.DepositAccumulateRoulette.Worker;
 
 internal class DistributePlanHasher : IDistributePlanHasher
 {
-	public int GetHashCode(Guid depositAccumulateRouletteId, int currentRouletteCount)
+	public int GetHashCode(DateOnly eventDate, int currentRouletteCount)
 	{
-		var value = $"{depositAccumulateRouletteId:D},{currentRouletteCount}";
+		var value = $"{eventDate:O},{currentRouletteCount}";
 
 		var bytes = Encoding.UTF8.GetBytes(value);
 

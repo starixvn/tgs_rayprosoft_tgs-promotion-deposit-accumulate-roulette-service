@@ -77,7 +77,7 @@ internal class RouletteCommandService : IGetService<RouletteCommand, RouletteRes
 			await _distributeService.ExecuteAsync(new DistributeBonusCommand(
 					command.PromotionId,
 					command.PlayerCode,
-					countInfo.UseEvent.EventId,
+					countInfo.UseEvent.Date,
 					countInfo.BeforeEventCount,
 					rouletteResult.Bonus,
 					rouletteResult.Bucket),
@@ -106,7 +106,7 @@ internal class RouletteCommandService : IGetService<RouletteCommand, RouletteRes
 				rouletteItems,
 				brandId,
 				itemIndex,
-				countInfo.UseEvent!.EventId,
+				countInfo.UseEvent!.Date,
 				cancellationToken).ConfigureAwait(false);
 
 			return result;
@@ -128,7 +128,7 @@ internal class RouletteCommandService : IGetService<RouletteCommand, RouletteRes
 		RouletteItem[] rouletteItems,
 		Guid brandId,
 		int itemIndex,
-		Guid depositAccumulateRouletteEventId,
+		DateOnly eventDate,
 		CancellationToken cancellationToken)
 	{
 		var rouletteItem = rouletteItems[itemIndex];
@@ -145,7 +145,7 @@ internal class RouletteCommandService : IGetService<RouletteCommand, RouletteRes
 				command.PromotionId,
 				command.PlayerCode,
 				brandId,
-				depositAccumulateRouletteEventId,
+				eventDate,
 				distributeAmount,
 				itemIndex,
 				cancellationToken)

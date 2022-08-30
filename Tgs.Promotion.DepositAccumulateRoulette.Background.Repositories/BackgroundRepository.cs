@@ -7,14 +7,11 @@ namespace Tgs.Promotion.DepositAccumulateRoulette.Background.Repositories;
 internal class BackgroundRepository : IBackgroundRepository
 {
 	private readonly TgsContext _context;
-	private readonly ISerialNumberGenerator _serialNumberGenerator;
 
 	public BackgroundRepository(
-		TgsContext context,
-		ISerialNumberGenerator serialNumberGenerator)
+		TgsContext context)
 	{
 		_context = context ?? throw new ArgumentNullException(nameof(context));
-		_serialNumberGenerator = serialNumberGenerator ?? throw new ArgumentNullException(nameof(serialNumberGenerator));
 	}
 
 	public IAsyncEnumerable<PromotionInfo> GetValidDepositAccumulateRoulettePromotionsAsync(
@@ -68,8 +65,11 @@ internal class BackgroundRepository : IBackgroundRepository
 		IEnumerable<DepositAccumulateRouletteEventAddInfo> events,
 		CancellationToken cancellationToken = default)
 	{
+		var playerCodes = events.Select(e => e.PlayerCode).Distinct().ToArray();
+
 		var existData = await _context.DepositAccumulateRouletteEvents
-			.Where(evt => evt.Date == processDate)
+			.Where(evt => playerCodes.Contains(evt.PlayerCode)
+						  && evt.Date == processDate)
 			.ToArrayAsync(cancellationToken)
 			.ConfigureAwait(false);
 
@@ -81,11 +81,8 @@ internal class BackgroundRepository : IBackgroundRepository
 			if (exist)
 				continue;
 
-			var eventId = await _serialNumberGenerator.GenerateAsync(cancellationToken).ConfigureAwait(false);
-
 			var eventData = new DepositAccumulateRouletteEvent
 			{
-				Id = eventId,
 				PlayerCode = evt.PlayerCode,
 				BrandId = evt.BrandId,
 				Date = processDate,

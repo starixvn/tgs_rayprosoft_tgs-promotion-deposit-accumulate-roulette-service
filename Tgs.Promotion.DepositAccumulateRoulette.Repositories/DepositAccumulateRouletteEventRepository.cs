@@ -58,7 +58,7 @@ internal class DepositAccumulateRouletteEventRepository :
 					? JsonSerializer.Deserialize<DepositAccumulateRouletteEventInfo>(value!, _JsonSerializerOptions)
 					: null;
 
-				if (eventInfo is not null && eventInfo.EventId != Guid.Empty)
+				if (eventInfo is not null)
 					yield return eventInfo;
 			}
 		}
@@ -77,7 +77,7 @@ internal class DepositAccumulateRouletteEventRepository :
 					: now.AddMinutes(5D).Ticks;
 
 				var info = new DepositAccumulateRouletteEventInfo(
-					Guid.Empty, playerCode, promotionId, currentDate, 0, 0);
+					playerCode, promotionId, currentDate, 0, 0);
 
 				var data = JsonSerializer.Serialize(info, _JsonSerializerOptions);
 

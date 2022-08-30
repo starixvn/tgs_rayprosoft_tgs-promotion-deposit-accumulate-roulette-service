@@ -51,7 +51,6 @@ internal class RouletteTests
 		var settings = new DepositAccumulateRouletteSettings(depositItems, rouletteItems);
 
 		var eventInfo = new DepositAccumulateRouletteEventInfo(
-			Guid.NewGuid(),
 			playerCode,
 			promotionId,
 			DateOnly.Parse("2022-08-11"),
@@ -108,7 +107,7 @@ internal class RouletteTests
 				Arg.Is(command.PromotionId),
 				Arg.Is(command.PlayerCode),
 				Arg.Any<Guid>(),
-				Arg.Is(rouletteCountInfo.UseEvent!.EventId),
+				Arg.Is(rouletteCountInfo.UseEvent!.Date),
 				Arg.Any<decimal>(),
 				Arg.Any<int>());
 
@@ -281,7 +280,6 @@ internal class RouletteTests
 		var playerCode = "player1";
 
 		var eventInfo = new DepositAccumulateRouletteEventInfo(
-			Guid.NewGuid(),
 			playerCode,
 			promotionId,
 			DateOnly.Parse("2022-08-11"),
@@ -338,7 +336,7 @@ internal class RouletteTests
 				Arg.Is(command.PromotionId),
 				Arg.Is(command.PlayerCode),
 				Arg.Any<Guid>(),
-				Arg.Any<Guid>(),
+				Arg.Any<DateOnly>(),
 				Arg.Any<decimal>(),
 				Arg.Any<int>());
 

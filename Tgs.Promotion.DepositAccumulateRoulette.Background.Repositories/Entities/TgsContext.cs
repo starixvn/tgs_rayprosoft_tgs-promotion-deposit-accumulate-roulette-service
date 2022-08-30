@@ -25,7 +25,8 @@ namespace Tgs.Promotion.DepositAccumulateRoulette.Background.Repositories.Entiti
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasPostgresExtension("ltree")
+            modelBuilder.HasPostgresExtension("dbo", "uuid-ossp")
+                .HasPostgresExtension("ltree")
                 .HasPostgresExtension("pg_trgm");
 
             modelBuilder.ApplyConfiguration(new Configurations.DepositAccumulateRouletteEventConfiguration());

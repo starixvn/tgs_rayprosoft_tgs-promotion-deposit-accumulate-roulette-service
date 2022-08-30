@@ -10,14 +10,14 @@ public interface ITgsRepository
 	ValueTask<int> GetRouletteUsedCountAsync(
 		Guid promotionId,
 		string playerCode,
-		Guid depositAccumulateRouletteEventId,
+		DateOnly eventDate,
 		CancellationToken cancellationToken = default);
 
 	ValueTask<Guid> AddRouletteRecordAsync(
 		Guid promotionId,
 		string playerCode,
 		Guid brandId,
-		Guid depositAccumulateRouletteEventId,
+		DateOnly eventDate,
 		decimal bonus,
 		int itemIndex,
 		CancellationToken cancellationToken = default);

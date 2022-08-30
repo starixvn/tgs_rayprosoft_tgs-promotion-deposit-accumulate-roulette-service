@@ -3,4 +3,4 @@
 internal record RouletteUsedCountQuery(
 	Guid PromotionId,
 	string PlayerCode,
-	Guid DepositAccumulateRouletteEventId);
+	DateOnly EventDate);

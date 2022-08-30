@@ -23,7 +23,7 @@ internal class DistributeBonusCommandService : ICommandService<DistributeBonusCo
 		DistributeBonusCommand command,
 		CancellationToken cancellationToken = default)
 	{
-		var hash = _hasher.GetHashCode(command.DepositAccumulateRouletteEventId, command.CurrentRouletteCount);
+		var hash = _hasher.GetHashCode(command.EventDate, command.CurrentRouletteCount);
 
 		var plan = await _getDistributePlanService.GetAsync(
 			new GetPromotionDistributePlanQuery(

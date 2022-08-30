@@ -2,5 +2,5 @@
 
 internal interface IDistributePlanHasher
 {
-	int GetHashCode(Guid depositAccumulateRouletteId, int currentRouletteCount);
+	int GetHashCode(DateOnly eventDate, int currentRouletteCount);
 }

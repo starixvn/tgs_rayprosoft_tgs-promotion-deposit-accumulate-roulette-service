@@ -40,7 +40,7 @@ internal class DistributeBonusTests
 		var command = new DistributeBonusCommand(
 			Guid.NewGuid(),
 			"player1",
-			Guid.NewGuid(),
+			distributeDate,
 			3,
 			100M,
 			100M);

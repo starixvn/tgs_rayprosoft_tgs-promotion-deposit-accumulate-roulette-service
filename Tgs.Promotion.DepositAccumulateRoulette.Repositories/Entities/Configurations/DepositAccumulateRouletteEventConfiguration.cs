@@ -14,27 +14,24 @@ namespace Tgs.Promotion.DepositAccumulateRoulette.Repositories.Entities.Configur
     {
         public void Configure(EntityTypeBuilder<DepositAccumulateRouletteEvent> entity)
         {
+            entity.HasKey(e => new { e.PlayerCode, e.PromotionId, e.Date })
+                .HasName("pk_deposit_accumulate_roulette_events");
+
             entity.ToTable("deposit_accumulate_roulette_events", "dbo");
 
             entity.HasIndex(e => e.BrandId, "ix_deposit_accumulate_roulette_events_brand_id");
 
-            entity.HasIndex(e => e.PlayerCode, "ix_deposit_accumulate_roulette_events_player_code");
-
             entity.HasIndex(e => e.PromotionId, "ix_deposit_accumulate_roulette_events_promotion_id");
-
-            entity.Property(e => e.Id)
-                .ValueGeneratedNever()
-                .HasColumnName("id");
-
-            entity.Property(e => e.BrandId).HasColumnName("brand_id");
-
-            entity.Property(e => e.Date).HasColumnName("date");
 
             entity.Property(e => e.PlayerCode)
                 .HasMaxLength(16)
                 .HasColumnName("player_code");
 
             entity.Property(e => e.PromotionId).HasColumnName("promotion_id");
+
+            entity.Property(e => e.Date).HasColumnName("date");
+
+            entity.Property(e => e.BrandId).HasColumnName("brand_id");
 
             entity.Property(e => e.RouletteCount).HasColumnName("roulette_count");
 

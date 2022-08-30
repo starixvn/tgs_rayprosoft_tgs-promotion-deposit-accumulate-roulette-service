@@ -115,7 +115,7 @@ internal class RouletteCountService : IRouletteCountService
 			return (int)cachedCount;
 
 		var usedCount = await _usedCountQueryService.GetAsync(
-			new RouletteUsedCountQuery(promotionId, playerCode, info.EventId),
+			new RouletteUsedCountQuery(promotionId, playerCode, info.Date),
 			cancellationToken).ConfigureAwait(false);
 
 		var count = info.RouletteCount >= usedCount ? info.RouletteCount - usedCount : 0;

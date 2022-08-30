@@ -5,14 +5,14 @@ internal class DistributePlanHasherTests
 	[Test]
 	public void Get_Hash_Code()
 	{
-		var eventId = Guid.Parse("89e984d8-bb60-48bb-bc5b-ad8ec8b46eb0");
+		var date = new DateOnly(2022, 08, 30);
 		var count = 10;
 
-		var expected = 1058084024;
+		var expected = 1508689012;
 
 		var sut = new DistributePlanHasher();
 
-		var actual = sut.GetHashCode(eventId, count);
+		var actual = sut.GetHashCode(date, count);
 
 		Assert.AreEqual(expected, actual);
 	}

@@ -28,7 +28,6 @@ public class DepositAccumulateRouletteEventRepositoryTests
 		var expected = new[]
 		{
 			new DepositAccumulateRouletteEventInfo(
-				Guid.NewGuid(),
 				playerCode,
 				promotionId,
 				DateOnly.Parse("2022-08-12"),
@@ -84,7 +83,6 @@ public class DepositAccumulateRouletteEventRepositoryTests
 		var expected = new[]
 		{
 			new DepositAccumulateRouletteEventInfo(
-				Guid.NewGuid(),
 				playerCode,
 				promotionId,
 				DateOnly.Parse("2022-08-12"),
@@ -155,14 +153,12 @@ public class DepositAccumulateRouletteEventRepositoryTests
 		var expected = new[]
 		{
 			new DepositAccumulateRouletteEventInfo(
-				Guid.NewGuid(),
 				playerCode,
 				promotionId,
 				DateOnly.Parse("2022-08-11"),
 				4,
 				1500),
 			new DepositAccumulateRouletteEventInfo(
-				Guid.NewGuid(),
 				playerCode,
 				promotionId,
 				DateOnly.Parse("2022-08-12"),
@@ -218,14 +214,12 @@ public class DepositAccumulateRouletteEventRepositoryTests
 		var expected = new[]
 		{
 			new DepositAccumulateRouletteEventInfo(
-				Guid.NewGuid(),
 				playerCode,
 				promotionId,
 				DateOnly.Parse("2022-08-11"),
 				4,
 				1500),
 			new DepositAccumulateRouletteEventInfo(
-				Guid.NewGuid(),
 				playerCode,
 				promotionId,
 				DateOnly.Parse("2022-08-12"),

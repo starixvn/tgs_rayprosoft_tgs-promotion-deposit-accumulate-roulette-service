@@ -7,7 +7,6 @@ namespace Tgs.Promotion.DepositAccumulateRoulette.Repositories.Entities
 {
     public partial class DepositAccumulateRouletteEvent
     {
-        public Guid Id { get; set; }
         public Guid BrandId { get; set; }
         public DateOnly Date { get; set; }
         public string PlayerCode { get; set; } = null!;
