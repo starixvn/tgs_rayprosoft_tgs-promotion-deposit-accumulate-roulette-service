@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Tgs.Promotion.DepositAccumulateRoulette.Background.Repositories.Entities;
-using Tgs.SerialNumberGenerator;
 
 namespace Tgs.Promotion.DepositAccumulateRoulette.Background.Repositories;
 
