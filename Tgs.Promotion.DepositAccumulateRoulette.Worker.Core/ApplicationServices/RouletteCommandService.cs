@@ -78,7 +78,7 @@ internal class RouletteCommandService : IGetService<RouletteCommand, RouletteRes
 					command.PromotionId,
 					command.PlayerCode,
 					countInfo.UseEvent.Date,
-					countInfo.BeforeEventCount,
+					countInfo.EventUsedCount,
 					rouletteResult.Bonus,
 					rouletteResult.Bucket),
 				default).ConfigureAwait(false);

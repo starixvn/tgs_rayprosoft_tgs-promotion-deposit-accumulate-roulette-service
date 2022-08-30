@@ -5,4 +5,7 @@ internal record RouletteCountInfo(
 	int BeforeEventCount,
 	int AfterEventCount,
 	int BeforeTotalCount,
-	int AfterTotalCount);
+	int AfterTotalCount)
+{
+	public int EventUsedCount => UseEvent?.RouletteCount - AfterEventCount ?? 0;
+}

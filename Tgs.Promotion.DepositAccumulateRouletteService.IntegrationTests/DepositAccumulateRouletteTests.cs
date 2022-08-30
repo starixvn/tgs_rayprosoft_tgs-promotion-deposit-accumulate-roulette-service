@@ -104,19 +104,33 @@ internal class DepositAccumulateRouletteTests
 			new(Guid.Parse("aadd13cf-e1ea-4a53-9426-46f44cb7dbd4"),"300PHP", 3M, 0.75M, 300M)
 		};
 
-		var settings = new DepositAccumulateRouletteSettings(depositItems, rouletteItems);
-
-		_ = fakePromotionService.GetAsync(
-				Arg.Is(new GetDepositAccumulateRoulettePromotionQuery(promotionId)),
-				Arg.Any<CancellationToken>())
-			.Returns(new DepositAccumulateRoulettePromotion(promotionId, null, settings));
-
 		var eventInfo = new DepositAccumulateRouletteEventInfo(
 			playerCode,
 			promotionId,
 			DateOnly.FromDateTime(DateTime.Now),
 			4,
 			2000);
+
+		var promotionInfo = new PromotionMainInfo
+		{
+			Id = promotionId,
+			EventDuring = (DateTime.UtcNow.AddDays(-10D), DateTime.UtcNow.AddDays(10D)),
+			IsAutoSent = true,
+			Name = "Test Deposit Accumulate Roulette",
+			PromotionLimitAmount = null,
+			PromotionType = "DepositAccumulateRoulette"
+		};
+
+		var settings = new DepositAccumulateRouletteSettings(depositItems, rouletteItems);
+
+		_ = fakePromotionService.GetAsync(
+				Arg.Is(new GetDepositAccumulateRoulettePromotionQuery(promotionId)),
+				Arg.Any<CancellationToken>())
+			.Returns(new DepositAccumulateRoulettePromotion(
+				promotionId,
+				promotionInfo.EventDuring,
+				promotionInfo.PromotionLimitAmount,
+				settings));
 
 		_ = fakeRouletteCountService.DecreaseRouletteCountAsync(
 				Arg.Is(promotionId),
@@ -148,15 +162,7 @@ internal class DepositAccumulateRouletteTests
 		_ = fakePromotionServiceClient.GetPromotionMainInfoAsync(
 				Arg.Is(promotionId),
 				Arg.Any<CancellationToken>())
-			.Returns(new PromotionMainInfo
-			{
-				Id = promotionId,
-				EventDuring = (DateTime.UtcNow.AddDays(-10D), DateTime.UtcNow.AddDays(10D)),
-				IsAutoSent = true,
-				Name = "Test Deposit Accumulate Roulette",
-				PromotionLimitAmount = null,
-				PromotionType = "DepositAccumulateRoulette"
-			});
+			.Returns(promotionInfo);
 
 		_ = fakePromotionServiceClient.GetPromotionRuleAsync<RouletteProcessor.PromotionRule>(
 				Arg.Is(promotionId),

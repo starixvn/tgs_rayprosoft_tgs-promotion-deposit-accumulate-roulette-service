@@ -37,6 +37,7 @@ internal class GetDepositAccumulateRoulettePromotionQueryService
 
 		return new DepositAccumulateRoulettePromotion(
 			mainInfo.Id,
+			mainInfo.EventDuring,
 			mainInfo.PromotionLimitAmount,
 			rule.CompaignDetail);
 	}
