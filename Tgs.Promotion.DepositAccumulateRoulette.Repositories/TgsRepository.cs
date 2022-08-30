@@ -24,8 +24,7 @@ internal class TgsRepository : ITgsRepository
 		DateOnly eventDate)
 	{
 		return _context.DepositAccumulateRouletteEvents
-			.Where(evt =>
-						  evt.PlayerCode == playerCode
+			.Where(evt => evt.PlayerCode == playerCode
 						  && evt.PromotionId == promotionId
 						  && evt.Date >= eventDate)
 			.Select(evt =>
