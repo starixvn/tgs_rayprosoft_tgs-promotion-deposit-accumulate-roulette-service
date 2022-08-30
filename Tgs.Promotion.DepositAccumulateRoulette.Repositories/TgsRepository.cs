@@ -26,6 +26,7 @@ internal class TgsRepository : ITgsRepository
 	{
 		return _context.DepositAccumulateRouletteEvents
 			.Where(evt => evt.PromotionId == promotionId
+						  && evt.PlayerCode == playerCode
 						  && evt.Date >= eventDate)
 			.Select(evt =>
 				new DepositAccumulateRouletteEventInfo(
