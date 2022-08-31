@@ -18,7 +18,9 @@ public interface IRedisRepository
 	IAsyncEnumerable<DepositAccumulateRouletteEventInfo> GetDepositAccumulateRouletteEventInfosAsync(
 		Guid promotionId,
 		string playerCode,
-		CancellationToken cancellationToken = default);
+		DateTimeOffset queryDate);
+
+	ValueTask<bool> SetDepositAccumulateRouletteEventInfoAsync(Guid promotionId, string playerCode, DateTimeOffset expireDate, DepositAccumulateRouletteEventInfo eventInfo);
 
 	ValueTask ClearExpiredDepositAccumulateRouletteEventsAsync(Guid promotionId, string playerCode);
 }

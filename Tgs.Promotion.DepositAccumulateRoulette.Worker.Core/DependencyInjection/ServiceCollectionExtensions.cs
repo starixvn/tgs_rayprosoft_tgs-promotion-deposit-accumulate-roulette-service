@@ -12,12 +12,16 @@ public static class ServiceCollectionExtensions
 			.RegisterAllServiceUtilityTypes(Assembly.GetExecutingAssembly(), ServiceLifetime.Transient);
 
 		_ = services
+			.AddSingleton<ISystemClock, SystemClock>()
 			.AddSingleton<IDistributePlanHasher, DistributePlanHasher>()
 			.AddSingleton<IStatisticsService, StatisticsService>()
 			.AddSingleton<IShuffleService, ShuffleService>();
 
 		_ = services
 			.AddTransient<IRouletteCountService, RouletteCountService>();
+
+		_ = services
+			.AddTransient<IDepositAccumulateRouletteEventService, DepositAccumulateRouletteEventService>();
 
 		_ = services.AddSingleton<RouletteTaskQueueManager>()
 			.AddHostedService<RouletteTaskBackgroundService>();
