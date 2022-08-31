@@ -2,11 +2,10 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Tgs.Promotion.DepositAccumulateRoulette.Common;
-using Tgs.Promotion.DepositAccumulateRoulette.Common.Protos;
 
 namespace Tgs.Promotion.DepositAccumulateRoulette.Worker;
 
-public class RouletteTaskQueueManager
+internal class RouletteTaskQueueManager
 {
 	private readonly IServiceProvider _serviceProvider;
 
@@ -18,7 +17,7 @@ public class RouletteTaskQueueManager
 		_serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
 	}
 
-	public Task<RouletteResult> RequestAsync(RouletteTaskRequest request)
+	public Task<RouletteResult> RequestAsync(RouletteTaskQueueRequest request)
 	{
 		var queue = _queuePool.GetOrAdd(
 			request.PlayerCode,

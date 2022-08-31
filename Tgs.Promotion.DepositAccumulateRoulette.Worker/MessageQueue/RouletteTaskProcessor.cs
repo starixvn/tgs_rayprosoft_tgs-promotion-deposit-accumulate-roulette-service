@@ -1,20 +1,23 @@
 ﻿using Google.Protobuf;
 using StackExchange.Redis;
 using Tgs.MessageQueue;
+using Tgs.Promotion.DepositAccumulateRoulette.Common;
 using Tgs.Promotion.DepositAccumulateRoulette.Common.Protos;
+using Tgs.Promotion.DepositAccumulateRoulette.Worker.ApplicationServices;
+using Tgs.ServiceUtility;
 
 namespace Tgs.Promotion.DepositAccumulateRoulette.Worker.MessageQueue;
 
 public class RouletteTaskProcessor : IMessageProcessor
 {
-	private readonly RouletteTaskQueueManager _rouletteTaskQueueManager;
+	private readonly IGetService<RouletteTaskCommand, RouletteResult> _rouletteService;
 	private readonly IDatabase _redisDatabase;
 
 	public RouletteTaskProcessor(
-		RouletteTaskQueueManager rouletteTaskQueueManager,
+		IGetService<RouletteTaskCommand, RouletteResult> rouletteService,
 		IRedisConnectionManager redisConnectionManager)
 	{
-		_rouletteTaskQueueManager = rouletteTaskQueueManager ?? throw new ArgumentNullException(nameof(rouletteTaskQueueManager));
+		_rouletteService = rouletteService ?? throw new ArgumentNullException(nameof(rouletteService));
 
 		if (redisConnectionManager is null)
 			throw new ArgumentNullException(nameof(redisConnectionManager));
@@ -40,7 +43,9 @@ public class RouletteTaskProcessor : IMessageProcessor
 			TimeSpan.FromMinutes(1),
 			CommandFlags.FireAndForget).ConfigureAwait(false);
 
-		var result = await _rouletteTaskQueueManager.RequestAsync(request).ConfigureAwait(false);
+		var command = new RouletteTaskCommand(request.PromotionId, request.PlayerCode);
+
+		var result = await _rouletteService.GetAsync(command, cancellationToken).ConfigureAwait(false);
 
 		var response = new RouletteTaskResponse
 		{

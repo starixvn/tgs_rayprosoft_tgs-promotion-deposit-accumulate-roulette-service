@@ -76,7 +76,12 @@ internal class DepositAccumulateRouletteTests
 							{
 								var request = callInfo.Arg<RouletteTaskRequest>();
 
-								return manager.RequestAsync(request).Result;
+								return manager
+									.RequestAsync(
+										new RouletteTaskQueueRequest(
+											request.PromotionId,
+											request.PlayerCode))
+									.Result;
 							});
 
 						return fakeRouletteHandleService;
