@@ -10,7 +10,7 @@ internal class RouletteCountServiceTests
 	public async Task Decrease_RouletteCount_When_Hit_Redis_Cache()
 	{
 		var fakeEventRepository = Substitute.For<IDepositAccumulateRouletteEventRepository>();
-		var fakeCountRepository = Substitute.For<IRouletteCountRepository>();
+		var fakeRedisRepository = Substitute.For<IRedisRepository>();
 		var fakeUsedCountQueryService = Substitute.For<IGetService<RouletteUsedCountQuery, int>>();
 
 		var promotionId = Guid.NewGuid();
@@ -35,19 +35,19 @@ internal class RouletteCountServiceTests
 				Arg.Any<CancellationToken>())
 			.Returns(events.ToAsyncEnumerable());
 
-		_ = fakeCountRepository.GetRouletteCountAsync(
+		_ = fakeRedisRepository.GetRouletteCountAsync(
 				Arg.Is(promotionId),
 				Arg.Is(playerCode),
 				Arg.Is(events[0].Date))
 			.Returns(3);
 
-		_ = fakeCountRepository.DecreaseRouletteCountAsync(
+		_ = fakeRedisRepository.DecreaseRouletteCountAsync(
 				Arg.Is(promotionId),
 				Arg.Is(playerCode),
 				Arg.Is(events[0].Date))
 			.Returns(2);
 
-		var sut = new RouletteCountService(fakeEventRepository, fakeCountRepository, fakeUsedCountQueryService);
+		var sut = new RouletteCountService(fakeEventRepository, fakeRedisRepository, fakeUsedCountQueryService);
 
 		var actual = await sut.DecreaseRouletteCountAsync(promotionId, playerCode).ConfigureAwait(false);
 
@@ -58,7 +58,7 @@ internal class RouletteCountServiceTests
 	public async Task Decrease_RouletteCount_When_Miss_Redis_Cache()
 	{
 		var fakeEventRepository = Substitute.For<IDepositAccumulateRouletteEventRepository>();
-		var fakeCountRepository = Substitute.For<IRouletteCountRepository>();
+		var fakeRedisRepository = Substitute.For<IRedisRepository>();
 		var fakeUsedCountQueryService = Substitute.For<IGetService<RouletteUsedCountQuery, int>>();
 
 		var promotionId = Guid.NewGuid();
@@ -83,7 +83,7 @@ internal class RouletteCountServiceTests
 				Arg.Any<CancellationToken>())
 			.Returns(events.ToAsyncEnumerable());
 
-		_ = fakeCountRepository.GetRouletteCountAsync(
+		_ = fakeRedisRepository.GetRouletteCountAsync(
 				Arg.Is(promotionId),
 				Arg.Is(playerCode),
 				Arg.Is(events[0].Date))
@@ -96,7 +96,7 @@ internal class RouletteCountServiceTests
 					events[0].Date)))
 			.Returns(2);
 
-		_ = fakeCountRepository
+		_ = fakeRedisRepository
 			.SetRouletteCountAsync(
 				Arg.Is(promotionId),
 				Arg.Is(playerCode),
@@ -104,14 +104,14 @@ internal class RouletteCountServiceTests
 				Arg.Is(3))
 			.Returns(true);
 
-		_ = _ = fakeCountRepository
+		_ = _ = fakeRedisRepository
 			.DecreaseRouletteCountAsync(
 				Arg.Is(promotionId),
 				Arg.Is(playerCode),
 				Arg.Is(events[0].Date))
 			.Returns(2);
 
-		var sut = new RouletteCountService(fakeEventRepository, fakeCountRepository, fakeUsedCountQueryService);
+		var sut = new RouletteCountService(fakeEventRepository, fakeRedisRepository, fakeUsedCountQueryService);
 
 		var actual = await sut.DecreaseRouletteCountAsync(promotionId, playerCode).ConfigureAwait(false);
 
@@ -122,12 +122,11 @@ internal class RouletteCountServiceTests
 	public async Task Decrease_RouletteCount_When_Event_Data_Is_Empty()
 	{
 		var fakeEventRepository = Substitute.For<IDepositAccumulateRouletteEventRepository>();
-		var fakeCountRepository = Substitute.For<IRouletteCountRepository>();
+		var fakeRedisRepository = Substitute.For<IRedisRepository>();
 		var fakeUsedCountQueryService = Substitute.For<IGetService<RouletteUsedCountQuery, int>>();
 
 		var promotionId = Guid.NewGuid();
 		var playerCode = "player1";
-		var brandId = Guid.NewGuid();
 
 		var expected = new RouletteCountInfo(null, 0, 0, 0, 0);
 
@@ -137,13 +136,13 @@ internal class RouletteCountServiceTests
 					Arg.Any<CancellationToken>())
 			.Returns(Array.Empty<DepositAccumulateRouletteEventInfo>().ToAsyncEnumerable());
 
-		var sut = new RouletteCountService(fakeEventRepository, fakeCountRepository, fakeUsedCountQueryService);
+		var sut = new RouletteCountService(fakeEventRepository, fakeRedisRepository, fakeUsedCountQueryService);
 
 		var actual = await sut.DecreaseRouletteCountAsync(promotionId, playerCode).ConfigureAwait(false);
 
 		Assert.AreEqual(expected, actual);
 
-		_ = fakeCountRepository
+		_ = fakeRedisRepository
 			.Received(0)
 			.GetRouletteCountAsync(
 				Arg.Is(promotionId),
@@ -151,7 +150,7 @@ internal class RouletteCountServiceTests
 				Arg.Any<DateOnly>());
 		;
 
-		_ = fakeCountRepository
+		_ = fakeRedisRepository
 			.Received(0)
 			.DecreaseRouletteCountAsync(
 				Arg.Is(promotionId),
@@ -163,12 +162,11 @@ internal class RouletteCountServiceTests
 	public async Task Decrease_RouletteCount_With_Two_Events_Returns()
 	{
 		var fakeEventRepository = Substitute.For<IDepositAccumulateRouletteEventRepository>();
-		var fakeCountRepository = Substitute.For<IRouletteCountRepository>();
+		var fakeRedisRepository = Substitute.For<IRedisRepository>();
 		var fakeUsedCountQueryService = Substitute.For<IGetService<RouletteUsedCountQuery, int>>();
 
 		var promotionId = Guid.NewGuid();
 		var playerCode = "player1";
-		var brandId = Guid.NewGuid();
 
 		var events = new[]
 		{
@@ -194,28 +192,28 @@ internal class RouletteCountServiceTests
 				Arg.Any<CancellationToken>())
 			.Returns(events.ToAsyncEnumerable());
 
-		_ = fakeCountRepository
+		_ = fakeRedisRepository
 			.GetRouletteCountAsync(
 				Arg.Is(promotionId),
 				Arg.Is(playerCode),
 				Arg.Is(events[0].Date))
 			.Returns(3);
 
-		_ = fakeCountRepository
+		_ = fakeRedisRepository
 				.GetRouletteCountAsync(
 					Arg.Is(promotionId),
 					Arg.Is(playerCode),
 					Arg.Is(events[1].Date))
 				.Returns(4);
 
-		_ = fakeCountRepository
+		_ = fakeRedisRepository
 			.DecreaseRouletteCountAsync(
 				Arg.Is(promotionId),
 				Arg.Is(playerCode),
 				Arg.Is(events[0].Date))
 			.Returns(2);
 
-		var sut = new RouletteCountService(fakeEventRepository, fakeCountRepository, fakeUsedCountQueryService);
+		var sut = new RouletteCountService(fakeEventRepository, fakeRedisRepository, fakeUsedCountQueryService);
 
 		var actual = await sut.DecreaseRouletteCountAsync(promotionId, playerCode).ConfigureAwait(false);
 
@@ -226,12 +224,11 @@ internal class RouletteCountServiceTests
 	public async Task Decrease_RouletteCount_With_Two_Events_Returns_And_First_Event_Has_Run_Out_Of_Roulette_Count()
 	{
 		var fakeEventRepository = Substitute.For<IDepositAccumulateRouletteEventRepository>();
-		var fakeCountRepository = Substitute.For<IRouletteCountRepository>();
+		var fakeRedisRepository = Substitute.For<IRedisRepository>();
 		var fakeUsedCountQueryService = Substitute.For<IGetService<RouletteUsedCountQuery, int>>();
 
 		var promotionId = Guid.NewGuid();
 		var playerCode = "player1";
-		var brandId = Guid.NewGuid();
 
 		var events = new DepositAccumulateRouletteEventInfo[]
 		{
@@ -257,33 +254,33 @@ internal class RouletteCountServiceTests
 				Arg.Any<CancellationToken>())
 			.Returns(events.ToAsyncEnumerable());
 
-		_ = fakeCountRepository
+		_ = fakeRedisRepository
 			.GetRouletteCountAsync(
 				Arg.Is(promotionId),
 				Arg.Is(playerCode),
 				Arg.Is(events[0].Date))
 			.Returns(0);
 
-		_ = fakeCountRepository
+		_ = fakeRedisRepository
 			.GetRouletteCountAsync(
 				Arg.Is(promotionId),
 				Arg.Is(playerCode),
 				Arg.Is(events[1].Date))
 			.Returns(4);
 
-		_ = fakeCountRepository.DecreaseRouletteCountAsync(
+		_ = fakeRedisRepository.DecreaseRouletteCountAsync(
 				Arg.Is(promotionId),
 				Arg.Is(playerCode),
 				Arg.Is(events[1].Date))
 			.Returns(3);
 
-		var sut = new RouletteCountService(fakeEventRepository, fakeCountRepository, fakeUsedCountQueryService);
+		var sut = new RouletteCountService(fakeEventRepository, fakeRedisRepository, fakeUsedCountQueryService);
 
 		var actual = await sut.DecreaseRouletteCountAsync(promotionId, playerCode).ConfigureAwait(false);
 
 		Assert.AreEqual(expected, actual);
 
-		_ = fakeCountRepository
+		_ = fakeRedisRepository
 			.DidNotReceive()
 			.IncreaseRouletteCountAsync(
 				Arg.Is(promotionId),
@@ -295,18 +292,18 @@ internal class RouletteCountServiceTests
 	public async Task Increase_RouletteCount()
 	{
 		var fakeEventRepository = Substitute.For<IDepositAccumulateRouletteEventRepository>();
-		var fakeCountRepository = Substitute.For<IRouletteCountRepository>();
+		var fakeRedisRepository = Substitute.For<IRedisRepository>();
 		var fakeUsedCountQueryService = Substitute.For<IGetService<RouletteUsedCountQuery, int>>();
 
 		var promotionId = Guid.NewGuid();
 		var playerCode = "player1";
 		var date = DateOnly.Parse("2022-08-11");
 
-		var sut = new RouletteCountService(fakeEventRepository, fakeCountRepository, fakeUsedCountQueryService);
+		var sut = new RouletteCountService(fakeEventRepository, fakeRedisRepository, fakeUsedCountQueryService);
 
 		await sut.IncreaseRouletteCountAsync(promotionId, playerCode, date).ConfigureAwait(false);
 
-		_ = fakeCountRepository
+		_ = fakeRedisRepository
 			.Received(1)
 			.IncreaseRouletteCountAsync(
 				Arg.Is(promotionId),

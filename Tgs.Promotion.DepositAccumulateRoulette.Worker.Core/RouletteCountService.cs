@@ -6,16 +6,16 @@ namespace Tgs.Promotion.DepositAccumulateRoulette.Worker;
 internal class RouletteCountService : IRouletteCountService
 {
 	private readonly IDepositAccumulateRouletteEventRepository _eventRepository;
-	private readonly IRouletteCountRepository _countRepository;
+	private readonly IRedisRepository _redisRepository;
 	private readonly IGetService<RouletteUsedCountQuery, int> _usedCountQueryService;
 
 	public RouletteCountService(
 		IDepositAccumulateRouletteEventRepository eventRepository,
-		IRouletteCountRepository countRepository,
+		IRedisRepository redisRepository,
 		IGetService<RouletteUsedCountQuery, int> usedCountQueryService)
 	{
 		_eventRepository = eventRepository ?? throw new ArgumentNullException(nameof(eventRepository));
-		_countRepository = countRepository ?? throw new ArgumentNullException(nameof(countRepository));
+		_redisRepository = redisRepository ?? throw new ArgumentNullException(nameof(redisRepository));
 		_usedCountQueryService = usedCountQueryService ?? throw new ArgumentNullException(nameof(usedCountQueryService));
 	}
 
@@ -59,7 +59,7 @@ internal class RouletteCountService : IRouletteCountService
 			var after = before;
 			if (before > 0 && useEvent is null)
 			{
-				after = await _countRepository
+				after = await _redisRepository
 					.DecreaseRouletteCountAsync(promotionId, playerCode, info.Date)
 					.ConfigureAwait(false);
 
@@ -96,7 +96,7 @@ internal class RouletteCountService : IRouletteCountService
 		DateOnly countDistributeDate,
 		CancellationToken cancellationToken = default)
 	{
-		_ = await _countRepository
+		_ = await _redisRepository
 			.IncreaseRouletteCountAsync(promotionId, playerCode, countDistributeDate)
 			.ConfigureAwait(false);
 	}
@@ -107,7 +107,7 @@ internal class RouletteCountService : IRouletteCountService
 		DepositAccumulateRouletteEventInfo info,
 		CancellationToken cancellationToken)
 	{
-		var cachedCount = await _countRepository
+		var cachedCount = await _redisRepository
 			.GetRouletteCountAsync(promotionId, playerCode, info.Date)
 			.ConfigureAwait(false);
 
@@ -120,7 +120,7 @@ internal class RouletteCountService : IRouletteCountService
 
 		var count = info.RouletteCount >= usedCount ? info.RouletteCount - usedCount : 0;
 
-		_ = await _countRepository
+		_ = await _redisRepository
 			.SetRouletteCountAsync(promotionId, playerCode, info.Date, count)
 			.ConfigureAwait(false);
 

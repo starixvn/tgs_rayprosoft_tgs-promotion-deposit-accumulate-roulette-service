@@ -6,8 +6,8 @@ namespace Tgs.Promotion.DepositAccumulateRoulette.Repositories;
 internal class RedisRepository : IRedisRepository
 {
 	private static readonly string _KeyPrefix = "Promotion:DepositAccumulateRoulette";
-
 	private static readonly decimal _ExchangeRate = 1_000_000M;
+
 	private readonly IDatabase _redisDatabase;
 
 	public RedisRepository(
@@ -30,17 +30,57 @@ internal class RedisRepository : IRedisRepository
 		return returnAmount / _ExchangeRate;
 	}
 
-	public async ValueTask<int?> GetRouletteCountAsync(Guid promotionId, string playerCode, DateOnly date) => throw new NotImplementedException();
+	public async ValueTask<int?> GetRouletteCountAsync(
+		Guid promotionId,
+		string playerCode,
+		DateOnly date)
+	{
+		var redisKey = GetRouletteCountRedisKey(promotionId, playerCode, date);
 
-	public async ValueTask<int> DecreaseRouletteCountAsync(Guid promotionId, string playerCode, DateOnly date) => throw new NotImplementedException();
+		var value = await _redisDatabase.StringGetAsync(redisKey).ConfigureAwait(false);
 
-	public async ValueTask<int> IncreaseRouletteCountAsync(Guid promotionId, string playerCode, DateOnly date) => throw new NotImplementedException();
+		return value.HasValue ? (int)value! : null;
+	}
 
-	public async ValueTask<bool> SetRouletteCountAsync(Guid promotionId, string playerCode, DateOnly date, int rouletteCount) => throw new NotImplementedException();
+	public async ValueTask<int> DecreaseRouletteCountAsync(
+		Guid promotionId,
+		string playerCode,
+		DateOnly date)
+	{
+		var redisKey = GetRouletteCountRedisKey(promotionId, playerCode, date);
+
+		return (int)await _redisDatabase.StringDecrementAsync(redisKey).ConfigureAwait(false);
+	}
+
+	public async ValueTask<int> IncreaseRouletteCountAsync(
+		Guid promotionId,
+		string playerCode,
+		DateOnly date)
+	{
+		var redisKey = GetRouletteCountRedisKey(promotionId, playerCode, date);
+
+		return (int)await _redisDatabase.StringIncrementAsync(redisKey).ConfigureAwait(false);
+	}
+
+	public async ValueTask<bool> SetRouletteCountAsync(
+		Guid promotionId,
+		string playerCode,
+		DateOnly date,
+		int rouletteCount)
+	{
+		var redisKey = GetRouletteCountRedisKey(promotionId, playerCode, date);
+
+		return await _redisDatabase
+			.StringSetAsync(redisKey, rouletteCount, TimeSpan.FromDays(2))
+			.ConfigureAwait(false);
+	}
 
 	public IAsyncEnumerable<DepositAccumulateRouletteEventInfo> GetDepositAccumulateRouletteEventInfosAsync(Guid promotionId, string playerCode,
 		CancellationToken cancellationToken = default) =>
 		throw new NotImplementedException();
 
 	public async ValueTask ClearExpiredDepositAccumulateRouletteEventsAsync(Guid promotionId, string playerCode) => throw new NotImplementedException();
+
+	private static string GetRouletteCountRedisKey(Guid promotionId, string playerCode, DateOnly date)
+		=> $"{_KeyPrefix}:RouletteCount:{promotionId}:{playerCode}:{date:O}";
 }
