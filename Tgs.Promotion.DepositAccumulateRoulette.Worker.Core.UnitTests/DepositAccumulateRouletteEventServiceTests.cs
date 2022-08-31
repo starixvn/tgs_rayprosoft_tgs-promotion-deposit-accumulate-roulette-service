@@ -1,7 +1,4 @@
-﻿using DateOnlyTimeOnly.AspNet.Converters;
-using System.Text.Json;
-using NSubstitute;
-using StackExchange.Redis;
+﻿using NSubstitute;
 
 namespace Tgs.Promotion.DepositAccumulateRoulette.Worker.Core.UnitTests;
 
