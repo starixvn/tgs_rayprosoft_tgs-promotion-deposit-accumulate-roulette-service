@@ -5,18 +5,19 @@ namespace Tgs.Promotion.DepositAccumulateRoulette.Worker.MessageQueue;
 
 public class ClearExpiredDepositAccumulateEventCacheHandler : IMessageHandler
 {
-	private readonly IDepositAccumulateRouletteEventHandler _eventHandler;
+	private readonly IRedisRepository _redisRepository;
 
 	public ClearExpiredDepositAccumulateEventCacheHandler(
-		IDepositAccumulateRouletteEventHandler eventHandler)
+		IRedisRepository redisRepository)
 	{
-		_eventHandler = eventHandler ?? throw new ArgumentNullException(nameof(eventHandler));
+		_redisRepository = redisRepository ?? throw new ArgumentNullException(nameof(redisRepository));
 	}
 
 	public ValueTask HandleAsync(ReadOnlyMemory<byte> data, CancellationToken cancellationToken = default)
 	{
 		var request = ClearEventCacheRequest.Parser.ParseFrom(data.Span);
 
-		return _eventHandler.ClearExpiredEventsAsync(request.PromotionId, request.PlayerCode);
+		return _redisRepository
+			.ClearExpiredDepositAccumulateRouletteEventsAsync(request.PromotionId, request.PlayerCode);
 	}
 }

@@ -31,8 +31,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tgs.Promotion.DepositAccumu
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tgs.Promotion.DepositAccumulateRoulette.Cache.UnitTests", "Tgs.Promotion.DepositAccumulateRoulette.Cache.UnitTests\Tgs.Promotion.DepositAccumulateRoulette.Cache.UnitTests.csproj", "{627AEACD-DAD8-41E6-9616-5F1DAFDDBC50}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tgs.Promotion.DepositAccumulateRoulette.Repositories.UnitTests", "Tgs.Promotion.DepositAccumulateRoulette.Repositories.UnitTests\Tgs.Promotion.DepositAccumulateRoulette.Repositories.UnitTests.csproj", "{17DBCEA4-5B5E-4450-A6B4-A5F2C974F2B6}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{699C0BCB-037C-4748-A101-8F4D67B26BA3}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
@@ -107,10 +105,6 @@ Global
 		{627AEACD-DAD8-41E6-9616-5F1DAFDDBC50}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{627AEACD-DAD8-41E6-9616-5F1DAFDDBC50}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{627AEACD-DAD8-41E6-9616-5F1DAFDDBC50}.Release|Any CPU.Build.0 = Release|Any CPU
-		{17DBCEA4-5B5E-4450-A6B4-A5F2C974F2B6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{17DBCEA4-5B5E-4450-A6B4-A5F2C974F2B6}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{17DBCEA4-5B5E-4450-A6B4-A5F2C974F2B6}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{17DBCEA4-5B5E-4450-A6B4-A5F2C974F2B6}.Release|Any CPU.Build.0 = Release|Any CPU
 		{28A32211-9FCA-48B8-9BB1-831F6C5A5321}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{28A32211-9FCA-48B8-9BB1-831F6C5A5321}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{28A32211-9FCA-48B8-9BB1-831F6C5A5321}.Release|Any CPU.ActiveCfg = Release|Any CPU

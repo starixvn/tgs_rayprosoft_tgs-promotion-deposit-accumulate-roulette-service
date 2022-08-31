@@ -27,7 +27,6 @@ internal class DepositAccumulateRouletteTests
 		var fakeTgsRepository = Substitute.For<ITgsRepository>();
 		var fakePromotionService = Substitute
 			.For<IGetService<GetDepositAccumulateRoulettePromotionQuery, DepositAccumulateRoulettePromotion?>>();
-		var fakeRouletteCountService = Substitute.For<IRouletteCountService>();
 		var fakeStatisticsService = Substitute.For<IStatisticsService>();
 		var fakeDistributeService = Substitute.For<ICommandService<DistributeBonusCommand>>();
 
@@ -40,7 +39,6 @@ internal class DepositAccumulateRouletteTests
 					.AddSingleton(fakePlayerServiceClient)
 					.AddSingleton(fakePromotionService)
 					.AddSingleton(fakeTgsRepository)
-					.AddSingleton(fakeRouletteCountService)
 					.AddSingleton(fakeDistributeService)
 					.AddSingleton(fakeRedisConnectionManager);
 
@@ -55,7 +53,6 @@ internal class DepositAccumulateRouletteTests
 						return new RouletteCommandService(
 							fakeTgsRepository,
 							fakePromotionService,
-							fakeRouletteCountService,
 							shuffleService,
 							fakeStatisticsService,
 							fakeDistributeService,
@@ -137,7 +134,7 @@ internal class DepositAccumulateRouletteTests
 				promotionInfo.PromotionLimitAmount,
 				settings));
 
-		_ = fakeRouletteCountService.DecreaseRouletteCountAsync(
+		_ = fakeStatisticsService.DecreaseRouletteCountAsync(
 				Arg.Is(promotionId),
 				Arg.Is(playerCode),
 				Arg.Any<CancellationToken>())

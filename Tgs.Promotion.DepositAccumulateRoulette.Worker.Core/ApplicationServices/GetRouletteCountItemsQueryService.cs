@@ -9,16 +9,16 @@ internal class GetRouletteCountItemsQueryService
 {
 	private readonly IPlayerServiceClient _playerServiceClient;
 	private readonly ITgsRepository _tgsRepository;
-	private readonly IRouletteCountService _rouletteCountService;
+	private readonly IStatisticsService _statisticsService;
 
 	public GetRouletteCountItemsQueryService(
 		IPlayerServiceClient playerServiceClient,
 		ITgsRepository tgsRepository,
-		IRouletteCountService rouletteCountService)
+		IStatisticsService statisticsService)
 	{
 		_playerServiceClient = playerServiceClient ?? throw new ArgumentNullException(nameof(playerServiceClient));
 		_tgsRepository = tgsRepository ?? throw new ArgumentNullException(nameof(tgsRepository));
-		_rouletteCountService = rouletteCountService ?? throw new ArgumentNullException(nameof(rouletteCountService));
+		_statisticsService = statisticsService ?? throw new ArgumentNullException(nameof(statisticsService));
 	}
 
 	public async IAsyncEnumerable<RouletteCountItemInfo> QueryAsync(
@@ -37,7 +37,7 @@ internal class GetRouletteCountItemsQueryService
 
 		foreach (var id in promotionIds)
 		{
-			var count = await _rouletteCountService
+			var count = await _statisticsService
 				.GetAvailableRouletteCountAsync(id, player.PlayerCode, cancellationToken)
 				.ConfigureAwait(false);
 

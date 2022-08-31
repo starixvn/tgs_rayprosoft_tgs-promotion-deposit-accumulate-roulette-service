@@ -15,20 +15,6 @@ public static class ServiceCollectionExtensions
 		=> services
 			.AddDbContext<TgsContext>(dbOptionsConfigure)
 			.AddTransient<ITgsRepository, TgsRepository>()
-			.AddSingleton<ISystemClock, SystemClock>()
-			.AddTransient<IDepositAccumulateRouletteEventRepository>(
-				sp =>
-				{
-					var redisDatabase = resolveRedisDatabase(sp);
-
-					return ActivatorUtilities.CreateInstance<DepositAccumulateRouletteEventRepository>(sp, redisDatabase);
-				})
-			.AddTransient<IDepositAccumulateRouletteEventHandler>(sp =>
-			{
-				var redisDatabase = resolveRedisDatabase(sp);
-
-				return ActivatorUtilities.CreateInstance<DepositAccumulateRouletteEventRepository>(sp, redisDatabase);
-			})
 			.AddTransient<IRedisRepository>(sp =>
 			{
 				var redisDatabase = resolveRedisDatabase(sp);

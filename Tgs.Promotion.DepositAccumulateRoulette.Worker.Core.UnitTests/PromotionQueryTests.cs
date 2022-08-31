@@ -80,12 +80,12 @@ internal class PromotionQueryTests
 	{
 		var fakePlayerServiceClient = Substitute.For<IPlayerServiceClient>();
 		var fakeTgsRepository = Substitute.For<ITgsRepository>();
-		var fakeRouletteService = Substitute.For<IRouletteCountService>();
+		var fakeStatisticsService = Substitute.For<IStatisticsService>();
 
 		var sut = new GetRouletteCountItemsQueryService(
 			fakePlayerServiceClient,
 			fakeTgsRepository,
-			fakeRouletteService);
+			fakeStatisticsService);
 
 		var playerInfo = new PlayerInfo
 		{
@@ -94,7 +94,7 @@ internal class PromotionQueryTests
 			UserName = "player1"
 		};
 
-		var expected = new RouletteCountItemInfo[]
+		var expected = new[]
 		{
 			new RouletteCountItemInfo(Guid.NewGuid(), 4),
 			new RouletteCountItemInfo(Guid.NewGuid(), 2)
@@ -113,13 +113,13 @@ internal class PromotionQueryTests
 				Arg.Any<CancellationToken>())
 			.Returns(promotionIds.ToAsyncEnumerable());
 
-		_ = fakeRouletteService.GetAvailableRouletteCountAsync(
+		_ = fakeStatisticsService.GetAvailableRouletteCountAsync(
 				Arg.Is(promotionIds[0]),
 				Arg.Is(playerInfo.PlayerCode),
 				Arg.Any<CancellationToken>())
 			.Returns(4);
 
-		_ = fakeRouletteService.GetAvailableRouletteCountAsync(
+		_ = fakeStatisticsService.GetAvailableRouletteCountAsync(
 				Arg.Is(promotionIds[1]),
 				Arg.Is(playerInfo.PlayerCode),
 				Arg.Any<CancellationToken>())
