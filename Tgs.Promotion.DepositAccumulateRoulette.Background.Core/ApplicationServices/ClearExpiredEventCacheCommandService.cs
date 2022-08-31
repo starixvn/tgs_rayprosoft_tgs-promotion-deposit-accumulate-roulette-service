@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Google.Protobuf;
+﻿using Google.Protobuf;
 using Tgs.MessageQueue;
 using Tgs.Promotion.DepositAccumulateRoulette.Common.Protos;
 using Tgs.ServiceUtility;
@@ -24,7 +19,7 @@ internal class ClearExpiredEventCacheCommandService : ICommandService<ClearExpir
 		ClearExpiredEventCacheCommand command,
 		CancellationToken cancellationToken = default)
 	{
-		var subject = "tgs.promotion.depositaccumulateroulette.worker.event.expired.clear";
+		var subject = "tgs.promotion.depositaccumulateroulette.event.expired.clear";
 
 		foreach (var info in command.Infos)
 		{

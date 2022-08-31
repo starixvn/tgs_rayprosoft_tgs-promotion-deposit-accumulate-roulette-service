@@ -12,9 +12,10 @@ internal class DistributeDepositAccumulateRouletteCountHandlerTests
 	[Test]
 	public async Task Process_Request_By_Daily()
 	{
-		var fakeCommandService = Substitute.For<ICommandService<DistributeDepositAccumulateRouletteCountCommand>>();
+		var fakeDistributeCommandService = Substitute.For<IQueryService<DistributeDepositAccumulateRouletteCountCommand, DepositAccumulateRouletteEventAddInfo>>();
+		var fakeClearCacheService = Substitute.For<ICommandService<ClearExpiredEventCacheCommand>>();
 
-		var sut = new DistributeDepositAccumulateRouletteCountHandler(fakeCommandService);
+		var sut = new DistributeDepositAccumulateRouletteCountHandler(fakeDistributeCommandService, fakeClearCacheService);
 
 		var request = new ProcessRequest
 		{
@@ -23,7 +24,7 @@ internal class DistributeDepositAccumulateRouletteCountHandlerTests
 
 		await sut.HandleAsync(request.ToByteArray(), CancellationToken.None);
 
-		_ = fakeCommandService.Received(1)
-			.ExecuteAsync(Arg.Is<DistributeDepositAccumulateRouletteCountCommand>(x => x.ProcessDate == (DateOnly)request.ProcessDate));
+		_ = fakeDistributeCommandService.Received(1)
+			.QueryAsync(Arg.Is<DistributeDepositAccumulateRouletteCountCommand>(x => x.ProcessDate == (DateOnly)request.ProcessDate));
 	}
 }

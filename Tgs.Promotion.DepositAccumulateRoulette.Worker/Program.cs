@@ -47,8 +47,8 @@ builder.Services
 				"tgs.promotion.depositaccumulateroulette.worker.roulettecountitems",
 				"tgs.promotion.depositaccumulateroulette.worker.roulettecountitems")
 			.AddHandler<ClearExpiredDepositAccumulateEventCacheHandler>(
-				"tgs.promotion.depositaccumulateroulette.worker.event.expired.clear",
-				"tgs.promotion.depositaccumulateroulette.worker.event.expired.clear");
+				"tgs.promotion.depositaccumulateroulette.event.expired.clear",
+				"tgs.promotion.depositaccumulateroulette.event.expired.clear");
 	})
 	.ClearAllExchanges()
 	.AddNatsGlobPatternExchange("*");

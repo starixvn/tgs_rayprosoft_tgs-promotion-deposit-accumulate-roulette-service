@@ -1,4 +1,4 @@
 ﻿namespace Tgs.Promotion.DepositAccumulateRoulette.Background.ApplicationServices;
 
-internal record ClearExpiredEventCacheCommand(
+public record ClearExpiredEventCacheCommand(
 	IEnumerable<ClearCacheInfo> Infos);
