@@ -16,12 +16,6 @@ public static class ServiceCollectionExtensions
 			.AddDbContext<TgsContext>(dbOptionsConfigure)
 			.AddTransient<ITgsRepository, TgsRepository>()
 			.AddSingleton<ISystemClock, SystemClock>()
-			.AddSingleton<IStatisticsRepository>(sp =>
-			{
-				var redisDatabase = resolveRedisDatabase(sp);
-
-				return ActivatorUtilities.CreateInstance<StatisticsRepository>(sp, redisDatabase);
-			})
 			.AddTransient<IDepositAccumulateRouletteEventRepository>(
 				sp =>
 				{
@@ -40,6 +34,12 @@ public static class ServiceCollectionExtensions
 				var redisDatabase = resolveRedisDatabase(sp);
 
 				return ActivatorUtilities.CreateInstance<RouletteCountRepository>(sp, redisDatabase);
+			})
+			.AddTransient<IRedisRepository>(sp =>
+			{
+				var redisDatabase = resolveRedisDatabase(sp);
+
+				return ActivatorUtilities.CreateInstance<RedisRepository>(sp, redisDatabase);
 			})
 			.AddSerialNumberGenerator();
 }

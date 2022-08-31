@@ -2,18 +2,18 @@
 
 internal class StatisticsService : IStatisticsService
 {
-	private readonly IStatisticsRepository _statisticsRepository;
+	private readonly IRedisRepository _redisRepository;
 
 	public StatisticsService(
-		IStatisticsRepository statisticsRepository)
+		IRedisRepository redisRepository)
 	{
-		_statisticsRepository = statisticsRepository ?? throw new ArgumentNullException(nameof(statisticsRepository));
+		_redisRepository = redisRepository ?? throw new ArgumentNullException(nameof(redisRepository));
 	}
 
 	public ValueTask<decimal> IncrementTotalDistributeAmountAsync(
 		Guid promotionId,
 		decimal amount,
 		CancellationToken cancellationToken = default)
-		=> _statisticsRepository
+		=> _redisRepository
 			.IncrementTotalDistributeAmountAsync(promotionId, amount, cancellationToken);
 }
