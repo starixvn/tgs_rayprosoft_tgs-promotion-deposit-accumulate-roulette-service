@@ -42,12 +42,15 @@ internal class DepositAccumulateRouletteTests
 				_ = services
 					.AddSingleton<IShuffleService, ShuffleService>()
 					.AddSingleton<IStatisticsService, StatisticsService>()
-					.AddSingleton<IDistributePlanHasher, DistributePlanHasher>();
+					.AddSingleton<IDistributePlanHasher, DistributePlanHasher>()
+					.AddSingleton<IDepositAccumulateRouletteEventService, DepositAccumulateRouletteEventService>();
 
 				_ = services
 					.AddSingleton<IGetService<GetDepositAccumulateRoulettePromotionQuery,
 							DepositAccumulateRoulettePromotion?>,
 						GetDepositAccumulateRoulettePromotionQueryService>()
+					.AddSingleton<IQueryService<GetRouletteEventCountQuery, RouletteEventCountInfo>,
+						GetRouletteEventCountQueryService>()
 					.AddSingleton<ICommandService<DistributeBonusCommand>, DistributeBonusCommandService>()
 					.AddSingleton<IGetService<GetPromotionDistributePlanQuery, PromotionDistributePlanInfo>,
 						GetPromotionDistributePlanQueryService>()

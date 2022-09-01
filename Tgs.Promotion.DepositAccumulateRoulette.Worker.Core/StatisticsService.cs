@@ -25,85 +25,16 @@ internal class StatisticsService : IStatisticsService
 		=> _redisRepository
 			.IncrementTotalDistributeAmountAsync(promotionId, amount, cancellationToken);
 
-	public async ValueTask<int> GetAvailableRouletteCountAsync(
+	public async ValueTask<int> DecreaseRouletteCountAsync(
 		Guid promotionId,
 		string playerCode,
+		DateOnly countDistributeDate,
 		CancellationToken cancellationToken = default)
-	{
-		var events = await GetDepositAccumulateRouletteEventInfosAsync(
-				promotionId,
-				playerCode,
-				cancellationToken)
-			.ToArrayAsync(cancellationToken).ConfigureAwait(false);
+		=> await _redisRepository
+			.DecreaseRouletteCountAsync(promotionId, playerCode, countDistributeDate)
+			.ConfigureAwait(false);
 
-		var totalCount = 0;
-
-		foreach (var info in events)
-		{
-			var count = await GetOrSetRouletteCountAsync(promotionId, playerCode, info, cancellationToken)
-				.ConfigureAwait(false);
-
-			totalCount += count;
-		}
-
-		return totalCount;
-	}
-
-	public async ValueTask<RouletteCountInfo> DecreaseRouletteCountAsync(
-		Guid promotionId,
-		string playerCode,
-		CancellationToken cancellationToken = default)
-	{
-		var events = await GetDepositAccumulateRouletteEventInfosAsync(
-				promotionId,
-				playerCode,
-				cancellationToken)
-			.OrderBy(evt => evt.Date)
-			.ToArrayAsync(cancellationToken).ConfigureAwait(false);
-
-		DepositAccumulateRouletteEventInfo? useEvent = null;
-		var counts = new Dictionary<DateOnly, CountInfo>();
-
-		foreach (var info in events)
-		{
-			var before = await GetOrSetRouletteCountAsync(promotionId, playerCode, info, cancellationToken)
-				.ConfigureAwait(false);
-
-			var after = before;
-			if (before > 0 && useEvent is null)
-			{
-				after = await _redisRepository
-					.DecreaseRouletteCountAsync(promotionId, playerCode, info.Date)
-					.ConfigureAwait(false);
-
-				if (after >= 0)
-					useEvent = info;
-			}
-
-			counts[info.Date] = new CountInfo(before, after);
-		}
-
-		var countInfo = useEvent == null ? null : counts[useEvent.Date];
-
-		var totalCountInfo =
-			counts.Count == 0
-				? new CountInfo(0, 0)
-				: counts.Values.Aggregate((a, b) =>
-				{
-					var before = a.Before + b.Before;
-					var after = a.After + b.After;
-					return new CountInfo(before, after);
-				});
-
-		return new RouletteCountInfo(
-			useEvent,
-			countInfo?.Before ?? 0,
-			countInfo?.After ?? 0,
-			totalCountInfo.Before,
-			totalCountInfo.After);
-	}
-
-	public async ValueTask IncreaseRouletteCountAsync(
+	public async ValueTask<int> IncreaseRouletteCountAsync(
 		Guid promotionId,
 		string playerCode,
 		DateOnly countDistributeDate,

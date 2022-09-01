@@ -1,9 +1,11 @@
-﻿using ExpectedObjects;
+﻿using System.Collections.Immutable;
+using ExpectedObjects;
 using NSubstitute;
 using Tgs.PlayerService.Client;
 using Tgs.Promotion.Clients;
 using Tgs.Promotion.DepositAccumulateRoulette.Common;
 using Tgs.Promotion.DepositAccumulateRoulette.Worker.ApplicationServices;
+using Tgs.ServiceUtility;
 
 namespace Tgs.Promotion.DepositAccumulateRoulette.Worker.Core.UnitTests;
 
@@ -80,12 +82,12 @@ internal class PromotionQueryTests
 	{
 		var fakePlayerServiceClient = Substitute.For<IPlayerServiceClient>();
 		var fakeTgsRepository = Substitute.For<ITgsRepository>();
-		var fakeStatisticsService = Substitute.For<IStatisticsService>();
+		var fakeEventCountQueryService = Substitute.For<IQueryService<GetRouletteEventCountQuery, RouletteEventCountInfo>>();
 
 		var sut = new GetRouletteCountItemsQueryService(
 			fakePlayerServiceClient,
 			fakeTgsRepository,
-			fakeStatisticsService);
+			fakeEventCountQueryService);
 
 		var playerInfo = new PlayerInfo
 		{
@@ -102,6 +104,13 @@ internal class PromotionQueryTests
 
 		var promotionIds = expected.Select(rp => rp.PromotionId).ToArray();
 
+		var eventCountInfos = new[]
+		{
+			new RouletteEventCountInfo(
+				EventInfo: new(playerInfo.PlayerCode, promotionIds[0], DateOnly.Parse("2022-09-01"), 5, 6000),
+				4),
+		};
+
 		var query = new GetRouletteCountItemsQuery(playerInfo.PlayerCode);
 
 		_ = fakePlayerServiceClient.GetPlayerInfoAsync(Arg.Is(query.PlayerCode))
@@ -113,17 +122,35 @@ internal class PromotionQueryTests
 				Arg.Any<CancellationToken>())
 			.Returns(promotionIds.ToAsyncEnumerable());
 
-		_ = fakeStatisticsService.GetAvailableRouletteCountAsync(
-				Arg.Is(promotionIds[0]),
-				Arg.Is(playerInfo.PlayerCode),
+		_ = fakeEventCountQueryService.QueryAsync(
+				Arg.Is(new GetRouletteEventCountQuery(promotionIds[0], playerInfo.PlayerCode)),
 				Arg.Any<CancellationToken>())
-			.Returns(4);
+			.Returns(new[]
+			{
+				new RouletteEventCountInfo(
+					EventInfo: new DepositAccumulateRouletteEventInfo(
+						playerInfo.PlayerCode,
+						promotionIds[0],
+						DateOnly.Parse("2022-09-01"),
+						5,
+						6000),
+					AvailableCount: 4),
+			}.ToAsyncEnumerable());
 
-		_ = fakeStatisticsService.GetAvailableRouletteCountAsync(
-				Arg.Is(promotionIds[1]),
-				Arg.Is(playerInfo.PlayerCode),
-				Arg.Any<CancellationToken>())
-			.Returns(2);
+		_ = fakeEventCountQueryService.QueryAsync(
+					Arg.Is(new GetRouletteEventCountQuery(promotionIds[1], playerInfo.PlayerCode)),
+					Arg.Any<CancellationToken>())
+				.Returns(new[]
+				{
+					new RouletteEventCountInfo(
+						EventInfo: new DepositAccumulateRouletteEventInfo(
+							playerInfo.PlayerCode,
+							promotionIds[1],
+							DateOnly.Parse("2022-09-01"),
+							4,
+							4500),
+						AvailableCount: 2),
+				}.ToAsyncEnumerable());
 
 		var actual = await sut.QueryAsync(query).ToArrayAsync();
 

@@ -10,6 +10,7 @@ internal class RouletteCommandService : IGetService<RouletteCommand, RouletteRes
 {
 	private readonly ITgsRepository _tgsRepository;
 	private readonly IGetService<GetDepositAccumulateRoulettePromotionQuery, DepositAccumulateRoulettePromotion?> _getPromotionService;
+	private readonly IQueryService<GetRouletteEventCountQuery, RouletteEventCountInfo> _eventCountQueryService;
 	private readonly IShuffleService _shuffleService;
 	private readonly IStatisticsService _statisticsService;
 	private readonly ICommandService<DistributeBonusCommand> _distributeService;
@@ -19,6 +20,7 @@ internal class RouletteCommandService : IGetService<RouletteCommand, RouletteRes
 	public RouletteCommandService(
 		ITgsRepository tgsRepository,
 		IGetService<GetDepositAccumulateRoulettePromotionQuery, DepositAccumulateRoulettePromotion?> getPromotionService,
+		IQueryService<GetRouletteEventCountQuery, RouletteEventCountInfo> eventCountQueryService,
 		IShuffleService shuffleService,
 		IStatisticsService statisticsService,
 		ICommandService<DistributeBonusCommand> distributeService,
@@ -27,6 +29,7 @@ internal class RouletteCommandService : IGetService<RouletteCommand, RouletteRes
 	{
 		_tgsRepository = tgsRepository ?? throw new ArgumentNullException(nameof(tgsRepository));
 		_getPromotionService = getPromotionService ?? throw new ArgumentNullException(nameof(getPromotionService));
+		_eventCountQueryService = eventCountQueryService ?? throw new ArgumentNullException(nameof(eventCountQueryService));
 		_shuffleService = shuffleService ?? throw new ArgumentNullException(nameof(shuffleService));
 		_statisticsService = statisticsService ?? throw new ArgumentNullException(nameof(statisticsService));
 		_distributeService = distributeService ?? throw new ArgumentNullException(nameof(distributeService));
@@ -46,15 +49,45 @@ internal class RouletteCommandService : IGetService<RouletteCommand, RouletteRes
 
 		var rouletteItems = promotionSetting!.CampaignDetail.RouletteItems.ToArray();
 
-		var countInfo = await _statisticsService.DecreaseRouletteCountAsync(
+		var eventCountInfos = await _eventCountQueryService.QueryAsync(
+				new GetRouletteEventCountQuery(command.PromotionId, command.PlayerCode),
+				cancellationToken)
+			.ToArrayAsync(cancellationToken)
+			.ConfigureAwait(false);
+
+		if (!eventCountInfos.Any())
+			return new RouletteResult(null, -1, 0);
+
+		var useInfo = GetUseEventCountInfo(eventCountInfos);
+
+		if (useInfo is null)
+			return new RouletteResult(null, -1, 0);
+
+		var decreaseCount = await _statisticsService.DecreaseRouletteCountAsync(
 			command.PromotionId,
 			command.PlayerCode,
+			useInfo.EventInfo.Date,
 			cancellationToken);
 
-		if (countInfo.UseEvent is null || countInfo.BeforeTotalCount <= 0)
+		if (decreaseCount < 0)
 		{
+			_ = await _statisticsService.IncreaseRouletteCountAsync(
+				command.PromotionId,
+				command.PlayerCode,
+				useInfo.EventInfo.Date,
+				cancellationToken);
+
 			return new RouletteResult(null, -1, 0);
 		}
+
+		var totalCount = eventCountInfos.Sum(info => info.AvailableCount);
+
+		var countInfo = new RouletteCountInfo(
+			useInfo.EventInfo,
+			useInfo.AvailableCount,
+			decreaseCount,
+			totalCount,
+			totalCount - 1);
 
 		var rouletteResult = await ProcessRouletteAsync(
 			command,
@@ -68,8 +101,7 @@ internal class RouletteCommandService : IGetService<RouletteCommand, RouletteRes
 			await _promotionServiceClient.UpdatePromotionUsedAmountAsync(
 				command.PromotionId,
 				rouletteResult.TotalAmount,
-				rouletteResult.RecordId,
-				default).ConfigureAwait(false);
+				rouletteResult.RecordId).ConfigureAwait(false);
 
 			await _distributeService.ExecuteAsync(new DistributeBonusCommand(
 					command.PromotionId,
@@ -77,8 +109,7 @@ internal class RouletteCommandService : IGetService<RouletteCommand, RouletteRes
 					countInfo.UseEvent.Date,
 					countInfo.EventUsedCount,
 					rouletteResult.Bonus,
-					rouletteResult.Bucket),
-				default).ConfigureAwait(false);
+					rouletteResult.Bucket)).ConfigureAwait(false);
 		});
 
 		return new RouletteResult(
@@ -86,6 +117,11 @@ internal class RouletteCommandService : IGetService<RouletteCommand, RouletteRes
 			rouletteResult.ItemIndex,
 			countInfo.AfterTotalCount);
 	}
+
+	private static RouletteEventCountInfo? GetUseEventCountInfo(
+		IEnumerable<RouletteEventCountInfo> infos)
+		=> infos.OrderBy(info => info.EventInfo.Date)
+			.FirstOrDefault(info => info.AvailableCount > 0);
 
 	private async ValueTask<ProcessRouletteResult> ProcessRouletteAsync(
 		RouletteCommand command,
@@ -103,17 +139,17 @@ internal class RouletteCommandService : IGetService<RouletteCommand, RouletteRes
 				rouletteItems,
 				brandId,
 				itemIndex,
-				countInfo.UseEvent!.Date,
+				countInfo.UseEvent.Date,
 				cancellationToken).ConfigureAwait(false);
 
 			return result;
 		}
 		catch
 		{
-			await _statisticsService.IncreaseRouletteCountAsync(
+			_ = await _statisticsService.IncreaseRouletteCountAsync(
 				command.PromotionId,
 				command.PlayerCode,
-				countInfo.UseEvent!.Date,
+				countInfo.UseEvent.Date,
 				cancellationToken);
 
 			throw;
@@ -161,7 +197,7 @@ internal class RouletteCommandService : IGetService<RouletteCommand, RouletteRes
 
 	private async ValueTask<int> PlayRouletteAsync(
 		RouletteCommand command,
-		RouletteItem[] rouletteItems)
+		IEnumerable<RouletteItem> rouletteItems)
 	{
 		var deck = await _shuffleService
 			.ShuffleAsync(command.PromotionId, rouletteItems)

@@ -9,16 +9,16 @@ internal class GetRouletteCountItemsQueryService
 {
 	private readonly IPlayerServiceClient _playerServiceClient;
 	private readonly ITgsRepository _tgsRepository;
-	private readonly IStatisticsService _statisticsService;
+	private readonly IQueryService<GetRouletteEventCountQuery, RouletteEventCountInfo> _eventCountQueryService;
 
 	public GetRouletteCountItemsQueryService(
 		IPlayerServiceClient playerServiceClient,
 		ITgsRepository tgsRepository,
-		IStatisticsService statisticsService)
+		IQueryService<GetRouletteEventCountQuery, RouletteEventCountInfo> eventCountQueryService)
 	{
 		_playerServiceClient = playerServiceClient ?? throw new ArgumentNullException(nameof(playerServiceClient));
 		_tgsRepository = tgsRepository ?? throw new ArgumentNullException(nameof(tgsRepository));
-		_statisticsService = statisticsService ?? throw new ArgumentNullException(nameof(statisticsService));
+		_eventCountQueryService = eventCountQueryService ?? throw new ArgumentNullException(nameof(eventCountQueryService));
 	}
 
 	public async IAsyncEnumerable<RouletteCountItemInfo> QueryAsync(
@@ -37,12 +37,16 @@ internal class GetRouletteCountItemsQueryService
 
 		foreach (var id in promotionIds)
 		{
-			var count = await _statisticsService
-				.GetAvailableRouletteCountAsync(id, player.PlayerCode, cancellationToken)
+			var infos = await _eventCountQueryService.QueryAsync(
+					new GetRouletteEventCountQuery(id, query.PlayerCode),
+					cancellationToken)
+				.ToArrayAsync(cancellationToken)
 				.ConfigureAwait(false);
 
-			if (count > 0)
-				yield return new RouletteCountItemInfo(id, count);
+			var totalCount = infos.Sum(info => info.AvailableCount);
+
+			if (totalCount > 0)
+				yield return new RouletteCountItemInfo(id, totalCount);
 		}
 	}
 }
