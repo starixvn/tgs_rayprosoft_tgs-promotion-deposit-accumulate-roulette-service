@@ -134,14 +134,15 @@ internal class StatisticsService : IStatisticsService
 		}
 		else
 		{
-			await foreach (var evt in
-						   QueryAndSetDepositAccumulateRouletteEventInfosQueryAndSetEventsAsync(
-							   promotionId,
-							   playerCode,
-							   queryDate,
-							   currentDate,
-							   now,
-							   cancellationToken))
+			var eventInfos = QueryAndSetDepositAccumulateRouletteEventInfosQueryAndSetEventsAsync(
+				promotionId,
+				playerCode,
+				queryDate,
+				currentDate,
+				now,
+				cancellationToken);
+
+			await foreach (var evt in eventInfos.WithCancellation(cancellationToken))
 				yield return evt;
 		}
 	}
