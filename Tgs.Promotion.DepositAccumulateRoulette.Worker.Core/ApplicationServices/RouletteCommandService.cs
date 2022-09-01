@@ -1,4 +1,5 @@
-﻿using System.Security.Cryptography;
+﻿using System.Linq;
+using System.Security.Cryptography;
 using Tgs.PlayerService.Client;
 using Tgs.Promotion.Clients;
 using Tgs.Promotion.DepositAccumulateRoulette.Common;
@@ -80,14 +81,13 @@ internal class RouletteCommandService : IGetService<RouletteCommand, RouletteRes
 			return new RouletteResult(null, -1, 0);
 		}
 
-		var totalCount = eventCountInfos.Sum(info => info.AvailableCount);
+		var afterTotalCount =
+			eventCountInfos.Except(new[] { useInfo }).Sum(info => info.AvailableCount) + decreaseCount;
 
 		var countInfo = new RouletteCountInfo(
 			useInfo.EventInfo,
-			useInfo.AvailableCount,
 			decreaseCount,
-			totalCount,
-			totalCount - 1);
+			afterTotalCount);
 
 		var rouletteResult = await ProcessRouletteAsync(
 			command,
@@ -215,4 +215,12 @@ internal class RouletteCommandService : IGetService<RouletteCommand, RouletteRes
 		decimal Bucket,
 		Guid RouletteId,
 		int ItemIndex);
+
+	internal record RouletteCountInfo(
+		DepositAccumulateRouletteEventInfo UseEvent,
+		int AfterEventCount,
+		int AfterTotalCount)
+	{
+		public int EventUsedCount => UseEvent.RouletteCount - AfterEventCount;
+	}
 }
