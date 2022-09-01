@@ -19,7 +19,8 @@ internal class GetRouletteEventCountQueryService : IQueryService<GetRouletteEven
 		_tgsRepository = tgsRepository ?? throw new ArgumentNullException(nameof(tgsRepository));
 	}
 
-	public async IAsyncEnumerable<RouletteEventCountInfo> QueryAsync(GetRouletteEventCountQuery query,
+	public async IAsyncEnumerable<RouletteEventCountInfo> QueryAsync(
+		GetRouletteEventCountQuery query,
 		[EnumeratorCancellation] CancellationToken cancellationToken = default)
 	{
 		var events = await _eventService
@@ -39,7 +40,7 @@ internal class GetRouletteEventCountQueryService : IQueryService<GetRouletteEven
 	}
 
 	private async ValueTask<int> GetOrSetRouletteCountAsync(
-			Guid promotionId,
+		Guid promotionId,
 		string playerCode,
 		DepositAccumulateRouletteEventInfo info,
 		CancellationToken cancellationToken)

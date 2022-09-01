@@ -1,8 +1,7 @@
 ﻿using Tgs.Promotion.DepositAccumulateRoulette.Common;
-using Tgs.Promotion.DepositAccumulateRoulette.Worker.ApplicationServices;
 using Tgs.ServiceUtility;
 
-namespace Tgs.Promotion.DepositAccumulateRoulette.Worker;
+namespace Tgs.Promotion.DepositAccumulateRoulette.Worker.ApplicationServices;
 
 internal class RouletteTaskCommandService : IGetService<RouletteTaskCommand, RouletteResult>
 {

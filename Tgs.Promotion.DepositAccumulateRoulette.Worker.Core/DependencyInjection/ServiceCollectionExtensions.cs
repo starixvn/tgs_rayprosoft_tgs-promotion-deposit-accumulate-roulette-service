@@ -12,7 +12,8 @@ public static class ServiceCollectionExtensions
 			.RegisterAllServiceUtilityTypes(Assembly.GetExecutingAssembly(), ServiceLifetime.Transient);
 
 		_ = services
-			.AddTransient<IStatisticsService, StatisticsService>();
+			.AddTransient<IStatisticsService, StatisticsService>()
+			.AddTransient<IDepositAccumulateRouletteEventService, DepositAccumulateRouletteEventService>();
 
 		_ = services
 			.AddSingleton<ISystemClock, SystemClock>()

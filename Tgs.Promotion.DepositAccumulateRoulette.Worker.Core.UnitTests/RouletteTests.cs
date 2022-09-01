@@ -438,4 +438,119 @@ internal class RouletteTests
 					x.CurrentRouletteCount == 2),
 				Arg.Any<CancellationToken>());
 	}
+
+	[Test]
+	public async Task Can_Get_Roulette_Event_Count_Infos_When_Count_Hit_Cache()
+	{
+		var fakeEventService = Substitute.For<IDepositAccumulateRouletteEventService>();
+		var fakeRedisRepository = Substitute.For<IRedisRepository>();
+		var fakeTgsRepository = Substitute.For<ITgsRepository>();
+
+		var promotionId = Guid.NewGuid();
+		var playerCode = "player1";
+
+		var eventInfo = new DepositAccumulateRouletteEventInfo(
+			playerCode,
+			promotionId,
+			DateOnly.Parse("2022-09-01"),
+			6,
+			6600);
+
+		var expected = new[]
+		{
+			new RouletteEventCountInfo(eventInfo, 4)
+		};
+
+		_ = fakeEventService.GetDepositAccumulateRouletteEventInfosAsync(
+				Arg.Is(promotionId),
+				Arg.Is(playerCode),
+				Arg.Any<CancellationToken>())
+			.Returns(new[] { eventInfo }.ToAsyncEnumerable());
+
+		_ = fakeRedisRepository.GetRouletteCountAsync(
+				Arg.Is(promotionId),
+				Arg.Is(playerCode),
+				Arg.Is(eventInfo.Date))
+			.Returns(4);
+
+		var query = new GetRouletteEventCountQuery(promotionId, playerCode);
+
+		var sut = new GetRouletteEventCountQueryService(
+			fakeEventService,
+			fakeRedisRepository,
+			fakeTgsRepository);
+
+		var actual = await sut.QueryAsync(query).ToArrayAsync();
+
+		CollectionAssert.AreEqual(expected, actual);
+	}
+
+	[Test]
+	public async Task Can_Get_Roulette_Event_Count_Infos_When_Count_Miss_Cache()
+	{
+		var fakeEventService = Substitute.For<IDepositAccumulateRouletteEventService>();
+		var fakeRedisRepository = Substitute.For<IRedisRepository>();
+		var fakeTgsRepository = Substitute.For<ITgsRepository>();
+
+		var promotionId = Guid.NewGuid();
+		var playerCode = "player1";
+
+		var eventInfo = new DepositAccumulateRouletteEventInfo(
+			playerCode,
+			promotionId,
+			DateOnly.Parse("2022-09-01"),
+			6,
+			6600);
+
+		var expected = new[]
+		{
+			new RouletteEventCountInfo(eventInfo, 4)
+		};
+
+		_ = fakeEventService.GetDepositAccumulateRouletteEventInfosAsync(
+				Arg.Is(promotionId),
+				Arg.Is(playerCode),
+				Arg.Any<CancellationToken>())
+			.Returns(new[] { eventInfo }.ToAsyncEnumerable());
+
+		_ = fakeRedisRepository.GetRouletteCountAsync(
+				Arg.Is(promotionId),
+				Arg.Is(playerCode),
+				Arg.Is(eventInfo.Date))
+			.Returns((int?)null);
+
+		_ = fakeTgsRepository.GetRouletteUsedCountAsync(
+				Arg.Is(promotionId),
+				Arg.Is(playerCode),
+				Arg.Is(eventInfo.Date),
+				Arg.Any<CancellationToken>())
+			.Returns(2);
+
+		var query = new GetRouletteEventCountQuery(promotionId, playerCode);
+
+		var sut = new GetRouletteEventCountQueryService(
+			fakeEventService,
+			fakeRedisRepository,
+			fakeTgsRepository);
+
+		var actual = await sut.QueryAsync(query).ToArrayAsync();
+
+		CollectionAssert.AreEqual(expected, actual);
+
+		_ = fakeTgsRepository
+			.Received(1)
+			.GetRouletteUsedCountAsync(
+				Arg.Is(promotionId),
+				Arg.Is(playerCode),
+				Arg.Is(eventInfo.Date),
+				Arg.Any<CancellationToken>());
+
+		_ = fakeRedisRepository
+			.Received(1)
+			.SetRouletteCountAsync(
+			Arg.Is(promotionId),
+			Arg.Is(playerCode),
+			Arg.Is(eventInfo.Date),
+			Arg.Is(expected[0].AvailableCount));
+	}
 }
