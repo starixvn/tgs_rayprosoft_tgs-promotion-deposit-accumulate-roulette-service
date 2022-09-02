@@ -7,25 +7,39 @@ namespace Tgs.Promotion.DepositAccumulateRoulette.Background.MessageQueue;
 
 internal class DistributeDepositAccumulateRouletteCountHandler : IMessageHandler
 {
-	private readonly ICommandService<DistributeDepositAccumulateRouletteCountCommand> _commandService;
+	private readonly IQueryService<DistributeDepositAccumulateRouletteCountCommand, DepositAccumulateRouletteEventAddInfo> _distributeCommandService;
+	private readonly ICommandService<ClearExpiredEventCacheCommand> _clearCacheCommandService;
 
 	public DistributeDepositAccumulateRouletteCountHandler(
-		ICommandService<DistributeDepositAccumulateRouletteCountCommand> commandService)
+		IQueryService<DistributeDepositAccumulateRouletteCountCommand, DepositAccumulateRouletteEventAddInfo> distributeCommandService,
+		ICommandService<ClearExpiredEventCacheCommand> clearCacheCommandService)
 	{
-		_commandService = commandService ?? throw new ArgumentNullException(nameof(commandService));
+		_distributeCommandService = distributeCommandService ?? throw new ArgumentNullException(nameof(distributeCommandService));
+		_clearCacheCommandService = clearCacheCommandService ?? throw new ArgumentNullException(nameof(clearCacheCommandService));
 	}
 
-	public ValueTask HandleAsync(ReadOnlyMemory<byte> data, CancellationToken cancellationToken = default)
+	public async ValueTask HandleAsync(ReadOnlyMemory<byte> data, CancellationToken cancellationToken = default)
 	{
 		var request = ProcessRequest.Parser.ParseFrom(data.Span);
 
 		var requestDate = request.ProcessDate.ToDateOnly();
 
 		if (requestDate is null)
-			return ValueTask.CompletedTask;
+			return;
 
 		var command = new DistributeDepositAccumulateRouletteCountCommand(requestDate.Value);
 
-		return _commandService.ExecuteAsync(command, cancellationToken);
+		var distributeEvents = await _distributeCommandService
+			.QueryAsync(command, cancellationToken)
+			.ToArrayAsync(cancellationToken);
+
+		var clearCacheInfos = distributeEvents.Select(evt =>
+				new ClearCacheInfo(evt.PromotionId, evt.PlayerCode))
+			.Distinct();
+
+		await _clearCacheCommandService.ExecuteAsync(
+			new ClearExpiredEventCacheCommand(clearCacheInfos),
+			cancellationToken)
+			.ConfigureAwait(false);
 	}
 }

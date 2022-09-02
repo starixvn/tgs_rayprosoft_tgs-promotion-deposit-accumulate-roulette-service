@@ -1,3 +1,0 @@
-﻿namespace Tgs.Promotion.DepositAccumulateRouletteServices.ApplicationServices;
-
-public record GetPlayerRouletteCountItemsQuery(string PlayerCode);

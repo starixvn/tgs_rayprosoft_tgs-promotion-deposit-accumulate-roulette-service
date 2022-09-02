@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Tgs.Promotion.DepositAccumulateRoulette.Common;
 using Tgs.Promotion.DepositAccumulateRoulette.Repositories.Entities;
-using Tgs.Promotion.DepositAccumulateRouletteServices;
+using Tgs.Promotion.DepositAccumulateRoulette.Worker;
 using Tgs.SerialNumberGenerator;
 
 namespace Tgs.Promotion.DepositAccumulateRoulette.Repositories;
@@ -25,12 +24,11 @@ internal class TgsRepository : ITgsRepository
 		DateOnly eventDate)
 	{
 		return _context.DepositAccumulateRouletteEvents
-			.Where(evt => evt.PromotionId == promotionId
-						  && evt.PlayerCode == playerCode
+			.Where(evt => evt.PlayerCode == playerCode
+						  && evt.PromotionId == promotionId
 						  && evt.Date >= eventDate)
 			.Select(evt =>
 				new DepositAccumulateRouletteEventInfo(
-					evt.Id,
 					evt.PlayerCode,
 					evt.PromotionId,
 					evt.Date,
@@ -42,13 +40,13 @@ internal class TgsRepository : ITgsRepository
 	public async ValueTask<int> GetRouletteUsedCountAsync(
 		Guid promotionId,
 		string playerCode,
-		Guid depositAccumulateRouletteEventId,
+		DateOnly eventDate,
 		CancellationToken cancellationToken = default)
 	{
 		var count = await _context.DepositAccumulateRouletteGameEvents
-			.Where(evt => evt.PromotionId == promotionId
-						  && evt.PlayerCode == playerCode
-						  && evt.DepositAccumulateRouletteEventId == depositAccumulateRouletteEventId)
+			.Where(evt => evt.PlayerCode == playerCode
+						  && evt.PromotionId == promotionId
+						  && evt.Date == eventDate)
 			.CountAsync(cancellationToken)
 			.ConfigureAwait(false);
 
@@ -57,8 +55,9 @@ internal class TgsRepository : ITgsRepository
 
 	public async ValueTask<Guid> AddRouletteRecordAsync(
 		Guid promotionId,
-		string playerCode, Guid brandId,
-		Guid depositAccumulateRouletteEventId,
+		string playerCode,
+		Guid brandId,
+		DateOnly eventDate,
 		decimal bonus,
 		int itemIndex,
 		CancellationToken cancellationToken = default)
@@ -73,7 +72,7 @@ internal class TgsRepository : ITgsRepository
 			PlayerCode = playerCode,
 			BrandId = brandId,
 			ItemIndex = itemIndex,
-			DepositAccumulateRouletteEventId = depositAccumulateRouletteEventId
+			Date = eventDate
 		};
 
 		_ = await _context.DepositAccumulateRouletteGameEvents

@@ -8,3 +8,34 @@ message ClearEventCacheRequest {
 	phoenix.protobuf.GuidValue promotion_id = 1;
 	string player_code = 2;
 }
+
+message RouletteTaskRequest {
+	phoenix.protobuf.GuidValue promotion_id = 1;
+	string player_code = 2;
+}
+
+message RouletteTaskResponse {
+	phoenix.protobuf.GuidValue id = 1;
+	int32 item_index = 2;
+}
+
+message RouletteCountItemsQueryRequest {
+	string player_code = 1;
+}
+
+message RouletteCountItemsQueryResponse {
+	repeated RouletteCountItemInfo items = 1;
+}
+
+message RouletteCountItemInfo {
+	phoenix.protobuf.GuidValue promotion_id = 1;
+	int32 roulette_count = 2;
+}
+
+message BidRequest {
+	string player_code = 1;
+}
+
+message BidResponse {
+	string subject = 1;
+}

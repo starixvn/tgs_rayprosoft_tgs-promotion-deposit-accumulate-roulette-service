@@ -1,7 +1,7 @@
 ﻿using Tgs.Promotion.Clients;
 using Tgs.Promotion.DepositAccumulateRoulette.Cache;
-using Tgs.Promotion.DepositAccumulateRouletteServices;
-using Tgs.Promotion.DepositAccumulateRouletteServices.ApplicationServices;
+using Tgs.Promotion.DepositAccumulateRoulette.Worker;
+using Tgs.Promotion.DepositAccumulateRoulette.Worker.ApplicationServices;
 using Tgs.ServiceUtility;
 
 namespace Microsoft.Extensions.DependencyInjection;

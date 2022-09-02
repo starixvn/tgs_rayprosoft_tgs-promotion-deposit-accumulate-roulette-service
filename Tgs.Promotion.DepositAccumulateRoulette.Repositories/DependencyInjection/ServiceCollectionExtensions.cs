@@ -2,7 +2,7 @@
 using StackExchange.Redis;
 using Tgs.Promotion.DepositAccumulateRoulette.Repositories;
 using Tgs.Promotion.DepositAccumulateRoulette.Repositories.Entities;
-using Tgs.Promotion.DepositAccumulateRouletteServices;
+using Tgs.Promotion.DepositAccumulateRoulette.Worker;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
@@ -15,31 +15,11 @@ public static class ServiceCollectionExtensions
 		=> services
 			.AddDbContext<TgsContext>(dbOptionsConfigure)
 			.AddTransient<ITgsRepository, TgsRepository>()
-			.AddSingleton<ISystemClock, SystemClock>()
-			.AddSingleton<IStatisticsRepository>(sp =>
+			.AddTransient<IRedisRepository>(sp =>
 			{
 				var redisDatabase = resolveRedisDatabase(sp);
 
-				return ActivatorUtilities.CreateInstance<StatisticsRepository>(sp, redisDatabase);
-			})
-			.AddTransient<IDepositAccumulateRouletteEventRepository>(
-				sp =>
-				{
-					var redisDatabase = resolveRedisDatabase(sp);
-
-					return ActivatorUtilities.CreateInstance<DepositAccumulateRouletteEventRepository>(sp, redisDatabase);
-				})
-			.AddTransient<IDepositAccumulateRouletteEventHandler>(sp =>
-			{
-				var redisDatabase = resolveRedisDatabase(sp);
-
-				return ActivatorUtilities.CreateInstance<DepositAccumulateRouletteEventRepository>(sp, redisDatabase);
-			})
-			.AddTransient<IRouletteCountRepository>(sp =>
-			{
-				var redisDatabase = resolveRedisDatabase(sp);
-
-				return ActivatorUtilities.CreateInstance<RouletteCountRepository>(sp, redisDatabase);
+				return ActivatorUtilities.CreateInstance<RedisRepository>(sp, redisDatabase);
 			})
 			.AddSerialNumberGenerator();
 }

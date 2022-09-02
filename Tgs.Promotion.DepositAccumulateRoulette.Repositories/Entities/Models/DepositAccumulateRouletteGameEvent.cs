@@ -11,10 +11,10 @@ namespace Tgs.Promotion.DepositAccumulateRoulette.Repositories.Entities
         public decimal Bonus { get; set; }
         public Guid BrandId { get; set; }
         public DateTime CreatedOn { get; set; }
-        public Guid DepositAccumulateRouletteEventId { get; set; }
         public int ItemIndex { get; set; }
         public string PlayerCode { get; set; } = null!;
         public Guid PromotionId { get; set; }
+        public DateOnly Date { get; set; }
 
         public virtual Promotion Promotion { get; set; } = null!;
     }

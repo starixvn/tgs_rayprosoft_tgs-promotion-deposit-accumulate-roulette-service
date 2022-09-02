@@ -1,7 +1,6 @@
 using NSubstitute;
 using Tgs.Promotion.DepositAccumulateRoulette.Background.ApplicationServices;
 using Tgs.Promotion.DepositAccumulateRoulette.Common;
-using Tgs.ServiceUtility;
 
 namespace Tgs.Promotion.DepositAccumulateRoulette.Background.Core.UnitTests;
 
@@ -12,8 +11,6 @@ internal class DepositAccumulatedCalculateCommandServiceUnitTests
 	{
 		var fakeBackgroundRepository = Substitute.For<IBackgroundRepository>();
 		var serializer = new DepositAccumulateRouletteSerializer();
-		var fakeClearCacheCommandService =
-			Substitute.For<ICommandService<ClearExpiredEventCacheCommand>>();
 
 		var settings = new DepositAccumulateRouletteSettings(
 			new DepositAccumulateItem[]
@@ -53,10 +50,28 @@ internal class DepositAccumulatedCalculateCommandServiceUnitTests
 				1300),
 		};
 
+		var expected = new[]
+		{
+			new DepositAccumulateRouletteEventAddInfo(
+				"Player1",
+				brandId,
+				promotionId,
+				1,
+				1000),
+			new DepositAccumulateRouletteEventAddInfo(
+				"Player2",
+				brandId,
+				promotionId,
+				1,
+				1200)
+		};
+
 		var command = new DistributeDepositAccumulateRouletteCountCommand(DateOnly.Parse("2022-07-29"));
 
 		_ = fakeBackgroundRepository
-			.GetValidDepositAccumulateRoulettePromotionsAsync(Arg.Is(command.ProcessDate), Arg.Any<CancellationToken>())
+			.GetValidDepositAccumulateRoulettePromotionsAsync(
+				Arg.Is(command.ProcessDate),
+				Arg.Any<CancellationToken>())
 			.Returns(promotions.ToAsyncEnumerable());
 
 		_ = fakeBackgroundRepository.GetApprovedDepositFormsAsync(
@@ -65,22 +80,18 @@ internal class DepositAccumulatedCalculateCommandServiceUnitTests
 				Arg.Any<CancellationToken>())
 			.Returns(depositForms.ToAsyncEnumerable());
 
-		var sut = new DistributeDepositAccumulateRouletteCountCommandService(fakeBackgroundRepository, serializer, fakeClearCacheCommandService);
+		var sut = new DistributeDepositAccumulateRouletteCountCommandService(fakeBackgroundRepository, serializer);
 
-		await sut.ExecuteAsync(command);
+		var actual = await sut.QueryAsync(command).ToArrayAsync();
+
+		CollectionAssert.AreEqual(expected, actual);
 
 		_ = fakeBackgroundRepository
 			   .Received(1)
-				.AddDepositAccumulateRouletteEventsAsync(
+			   .AddDepositAccumulateRouletteEventsAsync(
 				   Arg.Is(command.ProcessDate),
-				   Arg.Is<IEnumerable<DepositAccumulateRouletteEventAddInfo>>(x => x.Count() == 2),
+				   Arg.Any<IEnumerable<DepositAccumulateRouletteEventAddInfo>>(),
 				   Arg.Any<CancellationToken>());
-
-		_ = fakeClearCacheCommandService
-			.Received(1)
-			.ExecuteAsync(
-			Arg.Any<ClearExpiredEventCacheCommand>(),
-			Arg.Any<CancellationToken>());
 	}
 
 	[Test]
@@ -88,8 +99,6 @@ internal class DepositAccumulatedCalculateCommandServiceUnitTests
 	{
 		var fakeBackgroundRepository = Substitute.For<IBackgroundRepository>();
 		var serializer = new DepositAccumulateRouletteSerializer();
-		var fakeClearCacheCommandService =
-			Substitute.For<ICommandService<ClearExpiredEventCacheCommand>>();
 
 		var promotions = Array.Empty<PromotionInfo>();
 
@@ -100,9 +109,11 @@ internal class DepositAccumulatedCalculateCommandServiceUnitTests
 				Arg.Is(command.ProcessDate), Arg.Any<CancellationToken>())
 			.Returns(promotions.ToAsyncEnumerable());
 
-		var sut = new DistributeDepositAccumulateRouletteCountCommandService(fakeBackgroundRepository, serializer, fakeClearCacheCommandService);
+		var sut = new DistributeDepositAccumulateRouletteCountCommandService(fakeBackgroundRepository, serializer);
 
-		await sut.ExecuteAsync(command);
+		var actual = await sut.QueryAsync(command).ToArrayAsync();
+
+		Assert.AreEqual(0, actual.Length);
 
 		_ = fakeBackgroundRepository
 			.DidNotReceive()
@@ -117,12 +128,6 @@ internal class DepositAccumulatedCalculateCommandServiceUnitTests
 				Arg.Is(command.ProcessDate),
 				Arg.Any<IEnumerable<DepositAccumulateRouletteEventAddInfo>>(),
 				Arg.Any<CancellationToken>());
-
-		_ = fakeClearCacheCommandService
-			.DidNotReceive()
-			.ExecuteAsync(
-				Arg.Any<ClearExpiredEventCacheCommand>(),
-				Arg.Any<CancellationToken>());
 	}
 
 	[Test]
@@ -130,8 +135,6 @@ internal class DepositAccumulatedCalculateCommandServiceUnitTests
 	{
 		var fakeBackgroundRepository = Substitute.For<IBackgroundRepository>();
 		var serializer = new DepositAccumulateRouletteSerializer();
-		var fakeClearCacheCommandService =
-			Substitute.For<ICommandService<ClearExpiredEventCacheCommand>>();
 
 		var settings = new DepositAccumulateRouletteSettings(
 			new DepositAccumulateItem[]
@@ -171,21 +174,17 @@ internal class DepositAccumulatedCalculateCommandServiceUnitTests
 				Arg.Any<CancellationToken>())
 			.Returns(depositForms.ToAsyncEnumerable());
 
-		var sut = new DistributeDepositAccumulateRouletteCountCommandService(fakeBackgroundRepository, serializer, fakeClearCacheCommandService);
+		var sut = new DistributeDepositAccumulateRouletteCountCommandService(fakeBackgroundRepository, serializer);
 
-		await sut.ExecuteAsync(command);
+		var actual = await sut.QueryAsync(command).ToArrayAsync();
+
+		Assert.AreEqual(0, actual.Length);
 
 		_ = fakeBackgroundRepository
 			.DidNotReceive()
 			.AddDepositAccumulateRouletteEventsAsync(
 				Arg.Is(command.ProcessDate),
 				Arg.Any<IEnumerable<DepositAccumulateRouletteEventAddInfo>>(),
-				Arg.Any<CancellationToken>());
-
-		_ = fakeClearCacheCommandService
-			.DidNotReceive()
-			.ExecuteAsync(
-				Arg.Any<ClearExpiredEventCacheCommand>(),
 				Arg.Any<CancellationToken>());
 	}
 
@@ -194,8 +193,6 @@ internal class DepositAccumulatedCalculateCommandServiceUnitTests
 	{
 		var fakeBackgroundRepository = Substitute.For<IBackgroundRepository>();
 		var serializer = new DepositAccumulateRouletteSerializer();
-		var fakeClearCacheCommandService =
-			Substitute.For<ICommandService<ClearExpiredEventCacheCommand>>();
 
 		var promotionId = Guid.NewGuid();
 		var brandId = Guid.NewGuid();
@@ -239,21 +236,17 @@ internal class DepositAccumulatedCalculateCommandServiceUnitTests
 				Arg.Any<CancellationToken>())
 			.Returns(depositForms.ToAsyncEnumerable());
 
-		var sut = new DistributeDepositAccumulateRouletteCountCommandService(fakeBackgroundRepository, serializer, fakeClearCacheCommandService);
+		var sut = new DistributeDepositAccumulateRouletteCountCommandService(fakeBackgroundRepository, serializer);
 
-		await sut.ExecuteAsync(command);
+		var actual = await sut.QueryAsync(command).ToArrayAsync();
+
+		Assert.AreEqual(0, actual.Length);
 
 		_ = fakeBackgroundRepository
 			.DidNotReceive()
 			.AddDepositAccumulateRouletteEventsAsync(
 				Arg.Is(command.ProcessDate),
 				Arg.Any<IEnumerable<DepositAccumulateRouletteEventAddInfo>>(),
-				Arg.Any<CancellationToken>());
-
-		_ = fakeClearCacheCommandService
-			.DidNotReceive()
-			.ExecuteAsync(
-				Arg.Any<ClearExpiredEventCacheCommand>(),
 				Arg.Any<CancellationToken>());
 	}
 
@@ -262,7 +255,6 @@ internal class DepositAccumulatedCalculateCommandServiceUnitTests
 	{
 		var fakeBackgroundRepository = Substitute.For<IBackgroundRepository>();
 		var serializer = new DepositAccumulateRouletteSerializer();
-		var fakeClearCacheCommandService = Substitute.For<ICommandService<ClearExpiredEventCacheCommand>>();
 
 		var settings = new DepositAccumulateRouletteSettings(
 			new DepositAccumulateItem[]
@@ -308,21 +300,17 @@ internal class DepositAccumulatedCalculateCommandServiceUnitTests
 				Arg.Any<CancellationToken>())
 			.Returns(depositForms.ToAsyncEnumerable());
 
-		var sut = new DistributeDepositAccumulateRouletteCountCommandService(fakeBackgroundRepository, serializer, fakeClearCacheCommandService);
+		var sut = new DistributeDepositAccumulateRouletteCountCommandService(fakeBackgroundRepository, serializer);
 
-		await sut.ExecuteAsync(command);
+		var actual = await sut.QueryAsync(command).ToArrayAsync();
+
+		Assert.AreEqual(0, actual.Length);
 
 		_ = fakeBackgroundRepository
 			.DidNotReceive()
 			.AddDepositAccumulateRouletteEventsAsync(
 				Arg.Is(command.ProcessDate),
 				Arg.Any<IEnumerable<DepositAccumulateRouletteEventAddInfo>>(),
-				Arg.Any<CancellationToken>());
-
-		_ = fakeClearCacheCommandService
-			.DidNotReceive()
-			.ExecuteAsync(
-				Arg.Any<ClearExpiredEventCacheCommand>(),
 				Arg.Any<CancellationToken>());
 	}
 }

@@ -14,29 +14,6 @@ internal class DepositAccumulateRouletteClient : IDepositAccumulateRouletteClien
 		_messageSender = messageSender ?? throw new ArgumentNullException(nameof(messageSender));
 	}
 
-	public async ValueTask<RouletteSetting?> GetRouletteSettingAsync(Guid promotionId, CancellationToken cancellationToken = default)
-	{
-		var request = new RouletteSettingQueryRequest
-		{
-			PromotionId = promotionId
-		};
-
-		var responseData = await _messageSender.RequestAsync(
-			"tgs.promotion.depositaccumulateroulette.roulettesetting.query",
-			request.ToByteArray(),
-			cancellationToken)
-			.ConfigureAwait(false);
-
-		var response = RouletteSettingQueryResponse.Parser.ParseFrom(responseData.Span);
-
-		if (response?.PromotionId is null)
-			return null;
-
-		var items = response.Items.Select(item => new RouletteItem(item.Id, item.Title));
-
-		return new RouletteSetting(response.PromotionId, items);
-	}
-
 	public async ValueTask<RouletteResult> RouletteAsync(
 		Guid promotionId,
 		string playerCode,
@@ -58,7 +35,6 @@ internal class DepositAccumulateRouletteClient : IDepositAccumulateRouletteClien
 
 		return new RouletteResult(
 			response.Id,
-			response.ItemIndex,
-			response.RemainingCount);
+			response.ItemIndex);
 	}
 }

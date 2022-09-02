@@ -26,5 +26,6 @@ namespace Tgs.Promotion.DepositAccumulateRoulette.Background.Repositories.Entiti
         public string? ReviewedUserName { get; set; }
         public string? OrderNo { get; set; }
         public int? PromotionPlayerId { get; set; }
+        public decimal HandlingFee { get; set; }
     }
 }

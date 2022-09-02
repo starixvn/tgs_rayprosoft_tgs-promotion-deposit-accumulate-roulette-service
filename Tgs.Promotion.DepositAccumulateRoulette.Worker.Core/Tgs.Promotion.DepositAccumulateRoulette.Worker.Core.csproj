@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>Tgs.Promotion.DepositAccumulateRoulette.Worker</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="DateOnlyTimeOnly.AspNet" Version="1.0.3" />
+    <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="6.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="6.0.0" />
+    <PackageReference Include="murmurhash" Version="1.0.3" />
+    <PackageReference Include="Scrutor" Version="4.2.0" />
+    <PackageReference Include="StackExchange.Redis" Version="2.6.48" />
+    <PackageReference Include="System.Linq.Async" Version="6.0.1" />
+    <PackageReference Include="Tgs.MessageQueue" Version="2.1.0" />
+    <PackageReference Include="Tgs.PlayerService.Client" Version="0.0.15" />
+    <PackageReference Include="Tgs.Promotion.Client" Version="1.0.24-alpha" />
+    <PackageReference Include="TGS.ServiceUtility" Version="0.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Tgs.Promotion.DepositAccumulateRoulette.Common\Tgs.Promotion.DepositAccumulateRoulette.Common.csproj" />
+  </ItemGroup>
+
+</Project>

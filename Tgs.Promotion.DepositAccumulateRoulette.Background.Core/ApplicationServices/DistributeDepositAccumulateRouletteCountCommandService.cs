@@ -1,27 +1,25 @@
-﻿using Tgs.Promotion.DepositAccumulateRoulette.Common;
+﻿using System.Runtime.CompilerServices;
+using Tgs.Promotion.DepositAccumulateRoulette.Common;
 using Tgs.ServiceUtility;
 
 namespace Tgs.Promotion.DepositAccumulateRoulette.Background.ApplicationServices;
 
-internal class DistributeDepositAccumulateRouletteCountCommandService : ICommandService<DistributeDepositAccumulateRouletteCountCommand>
+internal class DistributeDepositAccumulateRouletteCountCommandService
+	: IQueryService<DistributeDepositAccumulateRouletteCountCommand, DepositAccumulateRouletteEventAddInfo>
 {
 	private readonly IBackgroundRepository _backgroundRepository;
 	private readonly DepositAccumulateRouletteSerializer _serializer;
-	private readonly ICommandService<ClearExpiredEventCacheCommand> _clearCacheCommandService;
 
 	public DistributeDepositAccumulateRouletteCountCommandService(
 		IBackgroundRepository backgroundRepository,
-		DepositAccumulateRouletteSerializer serializer,
-		ICommandService<ClearExpiredEventCacheCommand> clearCacheCommandService)
+		DepositAccumulateRouletteSerializer serializer)
 	{
 		_backgroundRepository = backgroundRepository ?? throw new ArgumentNullException(nameof(backgroundRepository));
 		_serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
-		_clearCacheCommandService = clearCacheCommandService ?? throw new ArgumentNullException(nameof(clearCacheCommandService));
 	}
 
-	public async ValueTask ExecuteAsync(
-		DistributeDepositAccumulateRouletteCountCommand command,
-		CancellationToken cancellationToken = default)
+	public async IAsyncEnumerable<DepositAccumulateRouletteEventAddInfo> QueryAsync(DistributeDepositAccumulateRouletteCountCommand command,
+		[EnumeratorCancellation] CancellationToken cancellationToken = default)
 	{
 		var promotions = await _backgroundRepository
 			.GetValidDepositAccumulateRoulettePromotionsAsync(command.ProcessDate, cancellationToken)
@@ -29,7 +27,7 @@ internal class DistributeDepositAccumulateRouletteCountCommandService : ICommand
 			.ConfigureAwait(false);
 
 		if (promotions.Length == 0)
-			return;
+			yield break;
 
 		var brandIds = promotions.Select(p => p.BrandId).Distinct();
 
@@ -39,7 +37,7 @@ internal class DistributeDepositAccumulateRouletteCountCommandService : ICommand
 			.ConfigureAwait(false);
 
 		if (depositForms.Length == 0)
-			return;
+			yield break;
 
 		var depositAccumulateEvents = new List<DepositAccumulateRouletteEventAddInfo>();
 
@@ -54,7 +52,7 @@ internal class DistributeDepositAccumulateRouletteCountCommandService : ICommand
 				(from info in depositForms
 				 where info.PromotionId == promotion.Id
 				 group info by info.PlayerCode
-				 into g
+					into g
 				 select new
 				 {
 					 PlayerCode = g.Key,
@@ -84,19 +82,13 @@ internal class DistributeDepositAccumulateRouletteCountCommandService : ICommand
 		}
 
 		if (depositAccumulateEvents.Count == 0)
-			return;
+			yield break;
 
 		await _backgroundRepository
 			.AddDepositAccumulateRouletteEventsAsync(command.ProcessDate, depositAccumulateEvents, cancellationToken)
 			.ConfigureAwait(false);
 
-		var infos = depositAccumulateEvents.Select(evt =>
-				new ClearCacheInfo(evt.PromotionId, evt.PlayerCode))
-			.Distinct();
-
-		await _clearCacheCommandService.ExecuteAsync(
-				new ClearExpiredEventCacheCommand(infos),
-				cancellationToken)
-			.ConfigureAwait(false);
+		foreach (var addEvt in depositAccumulateEvents)
+			yield return addEvt;
 	}
 }

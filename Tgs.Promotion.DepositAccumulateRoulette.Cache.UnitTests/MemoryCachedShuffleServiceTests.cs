@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Options;
 using NSubstitute;
 using Tgs.Promotion.DepositAccumulateRoulette.Common;
-using Tgs.Promotion.DepositAccumulateRouletteServices;
+using Tgs.Promotion.DepositAccumulateRoulette.Worker;
 
 namespace Tgs.Promotion.DepositAccumulateRoulette.Cache.UnitTests;
 

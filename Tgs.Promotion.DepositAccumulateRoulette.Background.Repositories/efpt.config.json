@@ -22,11 +22,11 @@
          "ObjectType": 0
       },
       {
-         "Name": "dbo.promotions",
+         "Name": "dbo.deposit_forms",
          "ObjectType": 0
       },
       {
-         "Name": "dbo.deposit_forms",
+         "Name": "dbo.promotions",
          "ObjectType": 0
       }
    ],

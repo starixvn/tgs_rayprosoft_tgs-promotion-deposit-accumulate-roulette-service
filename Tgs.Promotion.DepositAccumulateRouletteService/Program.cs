@@ -1,4 +1,3 @@
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Npgsql;
 using OpenTelemetry.Exporter;
@@ -40,19 +39,14 @@ builder.Services
 			.AddProcessor<DepositAccumulateRouletteSettingProcessor>(
 				"tgs.promotion.depositaccumulateroulette.setting",
 				"tgs.promotion.depositaccumulateroulette.setting")
-			.AddProcessor<RouletteSettingQueryProcessor>(
-				"tgs.promotion.depositaccumulateroulette.roulettesetting.query",
-				"tgs.promotion.depositaccumulateroulette.roulettesetting.query")
 			.AddProcessor<RouletteCountItemsQueryProcessor>(
 				"tgs.promotion.depositaccumulateroulette.roulettecountitems.query",
 				"tgs.promotion.depositaccumulateroulette.roulettecountitems.query")
 			.AddProcessor<RouletteProcessor>(
 				"tgs.promotion.depositaccumulateroulette.roulette.play",
-				"tgs.promotion.depositaccumulateroulette.roulette.play")
-			.AddHandler<ClearExpiredDepositAccumulateEventCacheHandler>(
-				"tgs.promotion.depositaccumulateroulette.event.expired.clear",
-				"tgs.promotion.depositaccumulateroulette.event.expired.clear");
+				"tgs.promotion.depositaccumulateroulette.roulette.play");
 	})
+	.ClearAllExchanges()
 	.AddNatsGlobPatternExchange("*");
 
 builder.Services
@@ -61,21 +55,12 @@ builder.Services
 		var config = sp.GetRequiredService<IConfiguration>();
 		return new RedisConnectionManager(config.GetConnectionString("Redis"));
 	})
-	.AddMemoryCache()
 	.AddDepositAccumulateRouletteCommon()
-	.AddDepositAccumulateRouletteCore()
-	.AddDepositAccumulateRouletteCache()
-	.AddDepositAccumulateRouletteRepositories(
-		dbOptionsConfigure: (sp, dbOptions) =>
-		{
-			var config = sp.GetRequiredService<IConfiguration>();
-			_ = dbOptions.UseNpgsql(config.GetConnectionString("Tgs"));
-		},
-		resolveRedisDatabase: sp =>
-		{
-			var redisConnectionManager = sp.GetRequiredService<IRedisConnectionManager>();
-			return redisConnectionManager.Database;
-		})
+	.AddDepositAccumulateRouletteService(sp =>
+	{
+		var redisConnectionManager = sp.GetRequiredService<IRedisConnectionManager>();
+		return redisConnectionManager.Database;
+	})
 	.AddPromotionClientServices((options, sp) =>
 	{
 		var config = sp.GetRequiredService<IConfiguration>();
