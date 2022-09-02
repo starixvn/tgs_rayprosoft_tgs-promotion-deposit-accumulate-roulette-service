@@ -1,5 +1,8 @@
 ﻿namespace Tgs.Promotion.DepositAccumulateRoulette.Worker;
 
 internal record RouletteEventCountInfo(
-	DepositAccumulateRouletteEventInfo EventInfo,
+	string PlayerCode,
+	Guid PromotionId,
+	DateOnly Date,
+	int DistributeCount,
 	int AvailableCount);

@@ -67,7 +67,7 @@ internal class RouletteCommandService : IGetService<RouletteCommand, RouletteRes
 		var decreaseCount = await _statisticsService.DecreaseRouletteCountAsync(
 			command.PromotionId,
 			command.PlayerCode,
-			useInfo.EventInfo.Date,
+			useInfo.Date,
 			cancellationToken);
 
 		if (decreaseCount < 0)
@@ -75,7 +75,7 @@ internal class RouletteCommandService : IGetService<RouletteCommand, RouletteRes
 			_ = await _statisticsService.IncreaseRouletteCountAsync(
 				command.PromotionId,
 				command.PlayerCode,
-				useInfo.EventInfo.Date,
+				useInfo.Date,
 				cancellationToken);
 
 			return new RouletteResult(null, -1, 0);
@@ -85,7 +85,7 @@ internal class RouletteCommandService : IGetService<RouletteCommand, RouletteRes
 			eventCountInfos.Except(new[] { useInfo }).Sum(info => info.AvailableCount) + decreaseCount;
 
 		var countInfo = new RouletteCountInfo(
-			useInfo.EventInfo,
+			useInfo,
 			decreaseCount,
 			afterTotalCount);
 
@@ -120,7 +120,7 @@ internal class RouletteCommandService : IGetService<RouletteCommand, RouletteRes
 
 	private static RouletteEventCountInfo? GetUseEventCountInfo(
 		IEnumerable<RouletteEventCountInfo> infos)
-		=> infos.OrderBy(info => info.EventInfo.Date)
+		=> infos.OrderBy(info => info.Date)
 			.FirstOrDefault(info => info.AvailableCount > 0);
 
 	private async ValueTask<ProcessRouletteResult> ProcessRouletteAsync(
@@ -217,10 +217,10 @@ internal class RouletteCommandService : IGetService<RouletteCommand, RouletteRes
 		int ItemIndex);
 
 	internal record RouletteCountInfo(
-		DepositAccumulateRouletteEventInfo UseEvent,
+		RouletteEventCountInfo UseEvent,
 		int AfterEventCount,
 		int AfterTotalCount)
 	{
-		public int EventUsedCount => UseEvent.RouletteCount - AfterEventCount;
+		public int EventUsedCount => UseEvent.DistributeCount - AfterEventCount;
 	}
 }

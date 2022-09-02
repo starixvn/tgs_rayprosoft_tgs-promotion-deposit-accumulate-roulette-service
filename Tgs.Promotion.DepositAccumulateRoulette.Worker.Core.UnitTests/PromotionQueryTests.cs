@@ -107,7 +107,10 @@ internal class PromotionQueryTests
 		var eventCountInfos = new[]
 		{
 			new RouletteEventCountInfo(
-				EventInfo: new(playerInfo.PlayerCode, promotionIds[0], DateOnly.Parse("2022-09-01"), 5, 6000),
+				playerInfo.PlayerCode,
+				promotionIds[0],
+				DateOnly.Parse("2022-09-01"),
+				5,
 				4),
 		};
 
@@ -128,13 +131,11 @@ internal class PromotionQueryTests
 			.Returns(new[]
 			{
 				new RouletteEventCountInfo(
-					EventInfo: new DepositAccumulateRouletteEventInfo(
-						playerInfo.PlayerCode,
-						promotionIds[0],
-						DateOnly.Parse("2022-09-01"),
-						5,
-						6000),
-					AvailableCount: 4),
+					playerInfo.PlayerCode,
+					promotionIds[0],
+					DateOnly.Parse("2022-09-01"),
+					5,
+					4)
 			}.ToAsyncEnumerable());
 
 		_ = fakeEventCountQueryService.QueryAsync(
@@ -143,13 +144,11 @@ internal class PromotionQueryTests
 				.Returns(new[]
 				{
 					new RouletteEventCountInfo(
-						EventInfo: new DepositAccumulateRouletteEventInfo(
-							playerInfo.PlayerCode,
-							promotionIds[1],
-							DateOnly.Parse("2022-09-01"),
-							4,
-							4500),
-						AvailableCount: 2),
+						playerInfo.PlayerCode,
+						promotionIds[1],
+						DateOnly.Parse("2022-09-01"),
+						4,
+						2)
 				}.ToAsyncEnumerable());
 
 		var actual = await sut.QueryAsync(query).ToArrayAsync();

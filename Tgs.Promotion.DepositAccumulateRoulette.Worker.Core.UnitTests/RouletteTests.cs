@@ -97,7 +97,10 @@ internal class RouletteTests
 			.Returns(new[]
 			{
 				new RouletteEventCountInfo(
-					EventInfo: eventInfo,
+					eventInfo.PlayerCode,
+					eventInfo.PromotionId,
+					eventInfo.Date,
+					eventInfo.RouletteCount,
 					AvailableCount: 3),
 			}.ToAsyncEnumerable());
 
@@ -230,10 +233,16 @@ internal class RouletteTests
 			.Returns(new[]
 			{
 				new RouletteEventCountInfo(
-					EventInfo: eventInfos[0],
+					eventInfos[0].PlayerCode,
+					eventInfos[0].PromotionId,
+					eventInfos[0].Date,
+					eventInfos[0].RouletteCount,
 					AvailableCount: 2),
 				new RouletteEventCountInfo(
-					EventInfo: eventInfos[1],
+					eventInfos[1].PlayerCode,
+					eventInfos[1].PromotionId,
+					eventInfos[1].Date,
+					eventInfos[1].RouletteCount,
 					AvailableCount: 1)
 			}.ToAsyncEnumerable());
 
@@ -540,7 +549,10 @@ internal class RouletteTests
 			.Returns(new[]
 			{
 				new RouletteEventCountInfo(
-					EventInfo: eventInfo,
+					eventInfo.PlayerCode,
+					eventInfo.PromotionId,
+					eventInfo.Date,
+					eventInfo.RouletteCount,
 					AvailableCount: 3),
 			}.ToAsyncEnumerable());
 
@@ -588,7 +600,12 @@ internal class RouletteTests
 
 		var expected = new[]
 		{
-			new RouletteEventCountInfo(eventInfo, 4)
+			new RouletteEventCountInfo(
+				eventInfo.PlayerCode,
+				eventInfo.PromotionId,
+				eventInfo.Date,
+				eventInfo.RouletteCount,
+				4)
 		};
 
 		_ = fakeEventService.GetDepositAccumulateRouletteEventInfosAsync(
@@ -634,7 +651,12 @@ internal class RouletteTests
 
 		var expected = new[]
 		{
-			new RouletteEventCountInfo(eventInfo, 4)
+			new RouletteEventCountInfo(
+				eventInfo.PlayerCode,
+				eventInfo.PromotionId,
+				eventInfo.Date,
+				eventInfo.RouletteCount,
+				4)
 		};
 
 		_ = fakeEventService.GetDepositAccumulateRouletteEventInfosAsync(

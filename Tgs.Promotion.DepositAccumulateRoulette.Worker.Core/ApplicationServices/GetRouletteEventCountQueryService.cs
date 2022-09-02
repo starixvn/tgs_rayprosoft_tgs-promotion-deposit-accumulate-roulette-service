@@ -35,7 +35,12 @@ internal class GetRouletteEventCountQueryService : IQueryService<GetRouletteEven
 			var count = await GetOrSetRouletteCountAsync(query.PromotionId, query.PlayerCode, info, cancellationToken)
 				.ConfigureAwait(false);
 
-			yield return new RouletteEventCountInfo(info, count);
+			yield return new RouletteEventCountInfo(
+				info.PlayerCode,
+				info.PromotionId,
+				info.Date,
+				info.RouletteCount,
+				count);
 		}
 	}
 
