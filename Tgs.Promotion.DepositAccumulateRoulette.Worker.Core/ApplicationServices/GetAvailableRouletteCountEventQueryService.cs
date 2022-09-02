@@ -6,16 +6,16 @@ internal class GetAvailableRouletteCountEventQueryService : IGetService<GetAvail
 {
 	private readonly IDepositAccumulateRouletteEventService _eventService;
 	private readonly ITgsRepository _tgsRepository;
-	private readonly IRedisRepository _redisRepository;
+	private readonly IStoreRepository _storeRepository;
 
 	public GetAvailableRouletteCountEventQueryService(
 		IDepositAccumulateRouletteEventService eventService,
 		ITgsRepository tgsRepository,
-		IRedisRepository redisRepository)
+		IStoreRepository storeRepository)
 	{
 		_eventService = eventService ?? throw new ArgumentNullException(nameof(eventService));
 		_tgsRepository = tgsRepository ?? throw new ArgumentNullException(nameof(tgsRepository));
-		_redisRepository = redisRepository ?? throw new ArgumentNullException(nameof(redisRepository));
+		_storeRepository = storeRepository ?? throw new ArgumentNullException(nameof(storeRepository));
 	}
 
 	public async ValueTask<RouletteEventCountInfo?> GetAsync(
@@ -31,7 +31,7 @@ internal class GetAvailableRouletteCountEventQueryService : IGetService<GetAvail
 
 		foreach (var info in eventInfos)
 		{
-			var count = await _redisRepository
+			var count = await _storeRepository
 				.GetRouletteCountAsync(info.PromotionId, info.PlayerCode, info.Date)
 				.ConfigureAwait(false);
 

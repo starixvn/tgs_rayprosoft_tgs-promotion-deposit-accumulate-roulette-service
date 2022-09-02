@@ -25,7 +25,7 @@ internal class DepositAccumulateRouletteTests
 		var fakeRedisConnectionManager = Substitute.For<IRedisConnectionManager>();
 
 		var fakeTgsRepository = Substitute.For<ITgsRepository>();
-		var fakeRedisRepository = Substitute.For<IRedisRepository>();
+		var fakeStoreRepository = Substitute.For<IStoreRepository>();
 		var fakeSystemClock = Substitute.For<ISystemClock>();
 
 		await using var web = new TestDepositAccumulateRouletteServiceApplication(builder => builder
@@ -33,7 +33,7 @@ internal class DepositAccumulateRouletteTests
 			{
 				_ = services
 					.AddSingleton(fakePromotionServiceClient)
-					.AddSingleton(fakeRedisRepository)
+					.AddSingleton(fakeStoreRepository)
 					.AddSingleton(fakePlayerServiceClient)
 					.AddSingleton(fakeTgsRepository)
 					.AddSingleton(fakeRedisConnectionManager)
@@ -125,19 +125,19 @@ internal class DepositAccumulateRouletteTests
 
 		_ = fakeSystemClock.UtcNow.Returns(now);
 
-		_ = fakeRedisRepository.GetDepositAccumulateRouletteEventInfosAsync(
+		_ = fakeStoreRepository.GetDepositAccumulateRouletteEventInfosAsync(
 				Arg.Is(promotionId),
 				Arg.Is(playerCode),
 				Arg.Any<DateTimeOffset>())
 			.Returns(new[] { eventInfo }.ToAsyncEnumerable());
 
-		_ = fakeRedisRepository.GetRouletteCountAsync(
+		_ = fakeStoreRepository.GetRouletteCountAsync(
 				Arg.Is(promotionId),
 				Arg.Is(playerCode),
 				Arg.Any<DateOnly>())
 			.Returns(eventInfo.RouletteCount);
 
-		_ = fakeRedisRepository.DecreaseRouletteCountAsync(
+		_ = fakeStoreRepository.DecreaseRouletteCountAsync(
 				Arg.Is(promotionId),
 				Arg.Is(playerCode),
 				Arg.Any<DateOnly>())

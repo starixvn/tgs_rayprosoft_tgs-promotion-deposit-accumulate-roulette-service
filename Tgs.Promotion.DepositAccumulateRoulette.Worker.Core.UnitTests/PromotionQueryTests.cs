@@ -1,11 +1,9 @@
-﻿using System.Collections.Immutable;
-using ExpectedObjects;
+﻿using ExpectedObjects;
 using NSubstitute;
 using Tgs.PlayerService.Client;
 using Tgs.Promotion.Clients;
 using Tgs.Promotion.DepositAccumulateRoulette.Common;
 using Tgs.Promotion.DepositAccumulateRoulette.Worker.ApplicationServices;
-using Tgs.ServiceUtility;
 
 namespace Tgs.Promotion.DepositAccumulateRoulette.Worker.Core.UnitTests;
 
@@ -82,14 +80,14 @@ internal class PromotionQueryTests
 	{
 		var fakePlayerServiceClient = Substitute.For<IPlayerServiceClient>();
 		var fakeTgsRepository = Substitute.For<ITgsRepository>();
-		var fakeRedisRepository = Substitute.For<IRedisRepository>();
+		var fakeStoreRepository = Substitute.For<IStoreRepository>();
 		var fakeEventService = Substitute.For<IDepositAccumulateRouletteEventService>();
 
 		var sut = new GetRouletteCountItemsQueryService(
 			fakePlayerServiceClient,
 			fakeEventService,
 			fakeTgsRepository,
-			fakeRedisRepository);
+			fakeStoreRepository);
 
 		var playerInfo = new PlayerInfo
 		{
@@ -143,14 +141,14 @@ internal class PromotionQueryTests
 				Arg.Any<CancellationToken>())
 				.Returns(new[] { secondEventInfo }.ToAsyncEnumerable());
 
-		_ = fakeRedisRepository
+		_ = fakeStoreRepository
 			.GetRouletteCountAsync(
 				Arg.Is(firstEventInfo.PromotionId),
 				Arg.Is(firstEventInfo.PlayerCode),
 				Arg.Is(firstEventInfo.Date))
 			.Returns(4);
 
-		_ = fakeRedisRepository
+		_ = fakeStoreRepository
 			.GetRouletteCountAsync(
 				Arg.Is(secondEventInfo.PromotionId),
 				Arg.Is(secondEventInfo.PlayerCode),

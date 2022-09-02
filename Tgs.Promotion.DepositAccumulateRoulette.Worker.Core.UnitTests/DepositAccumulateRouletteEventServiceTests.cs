@@ -7,7 +7,7 @@ internal class DepositAccumulateRouletteEventServiceTests
 	[Test]
 	public async Task Get_Data_When_Hit_Cache()
 	{
-		var fakeRedisRepository = Substitute.For<IRedisRepository>();
+		var fakeStoreRepository = Substitute.For<IStoreRepository>();
 		var fakeTgsRepository = Substitute.For<ITgsRepository>();
 		var fakeSystemClock = Substitute.For<ISystemClock>();
 
@@ -29,13 +29,13 @@ internal class DepositAccumulateRouletteEventServiceTests
 
 		_ = fakeSystemClock.UtcNow.Returns(now);
 
-		_ = fakeRedisRepository.GetDepositAccumulateRouletteEventInfosAsync(
+		_ = fakeStoreRepository.GetDepositAccumulateRouletteEventInfosAsync(
 				Arg.Is(promotionId),
 				Arg.Is(playerCode),
 				Arg.Is(now))
 			.Returns(expected.ToAsyncEnumerable());
 
-		var sut = new DepositAccumulateRouletteEventService(fakeSystemClock, fakeTgsRepository, fakeRedisRepository);
+		var sut = new DepositAccumulateRouletteEventService(fakeSystemClock, fakeTgsRepository, fakeStoreRepository);
 
 		var actual = await sut
 			.GetDepositAccumulateRouletteEventInfosAsync(promotionId, playerCode)
@@ -54,7 +54,7 @@ internal class DepositAccumulateRouletteEventServiceTests
 	[Test]
 	public async Task Get_Data_When_Miss_Cache()
 	{
-		var fakeRedisRepository = Substitute.For<IRedisRepository>();
+		var fakeStoreRepository = Substitute.For<IStoreRepository>();
 		var fakeTgsRepository = Substitute.For<ITgsRepository>();
 		var fakeSystemClock = Substitute.For<ISystemClock>();
 
@@ -77,7 +77,7 @@ internal class DepositAccumulateRouletteEventServiceTests
 
 		_ = fakeSystemClock.UtcNow.Returns(now);
 
-		_ = fakeRedisRepository.GetDepositAccumulateRouletteEventInfosAsync(
+		_ = fakeStoreRepository.GetDepositAccumulateRouletteEventInfosAsync(
 				Arg.Is(promotionId),
 				Arg.Is(playerCode),
 				Arg.Is(now))
@@ -90,7 +90,7 @@ internal class DepositAccumulateRouletteEventServiceTests
 				Arg.Is(queryDate))
 			.Returns(expected.ToAsyncEnumerable());
 
-		var sut = new DepositAccumulateRouletteEventService(fakeSystemClock, fakeTgsRepository, fakeRedisRepository);
+		var sut = new DepositAccumulateRouletteEventService(fakeSystemClock, fakeTgsRepository, fakeStoreRepository);
 
 		var actual = await sut
 			.GetDepositAccumulateRouletteEventInfosAsync(promotionId, playerCode)
@@ -105,7 +105,7 @@ internal class DepositAccumulateRouletteEventServiceTests
 				Arg.Is(playerCode),
 				Arg.Is(queryDate));
 
-		_ = fakeRedisRepository
+		_ = fakeStoreRepository
 			.Received(1)
 			.SetDepositAccumulateRouletteEventInfoAsync(
 				Arg.Is(promotionId),
@@ -117,7 +117,7 @@ internal class DepositAccumulateRouletteEventServiceTests
 	[Test]
 	public async Task Get_Data_When_Hit_Cache_And_CurrentDate_Is_Different_From_QueryDate()
 	{
-		var fakeRedisRepository = Substitute.For<IRedisRepository>();
+		var fakeStoreRepository = Substitute.For<IStoreRepository>();
 		var fakeTgsRepository = Substitute.For<ITgsRepository>();
 		var fakeSystemClock = Substitute.For<ISystemClock>();
 
@@ -145,13 +145,13 @@ internal class DepositAccumulateRouletteEventServiceTests
 
 		_ = fakeSystemClock.UtcNow.Returns(now);
 
-		_ = fakeRedisRepository.GetDepositAccumulateRouletteEventInfosAsync(
+		_ = fakeStoreRepository.GetDepositAccumulateRouletteEventInfosAsync(
 				Arg.Is(promotionId),
 				Arg.Is(playerCode),
 				Arg.Is(now))
 			.Returns(expected.ToAsyncEnumerable());
 
-		var sut = new DepositAccumulateRouletteEventService(fakeSystemClock, fakeTgsRepository, fakeRedisRepository);
+		var sut = new DepositAccumulateRouletteEventService(fakeSystemClock, fakeTgsRepository, fakeStoreRepository);
 
 		var actual = await sut
 			.GetDepositAccumulateRouletteEventInfosAsync(promotionId, playerCode)
@@ -170,7 +170,7 @@ internal class DepositAccumulateRouletteEventServiceTests
 	[Test]
 	public async Task Get_Data_When_Miss_Cache_And_CurrentDate_Is_Different_From_QueryDate()
 	{
-		var fakeRedisRepository = Substitute.For<IRedisRepository>();
+		var fakeStoreRepository = Substitute.For<IStoreRepository>();
 		var fakeTgsRepository = Substitute.For<ITgsRepository>();
 		var fakeSystemClock = Substitute.For<ISystemClock>();
 
@@ -198,7 +198,7 @@ internal class DepositAccumulateRouletteEventServiceTests
 
 		_ = fakeSystemClock.UtcNow.Returns(now);
 
-		_ = fakeRedisRepository.GetDepositAccumulateRouletteEventInfosAsync(
+		_ = fakeStoreRepository.GetDepositAccumulateRouletteEventInfosAsync(
 				Arg.Is(promotionId),
 				Arg.Is(playerCode),
 				Arg.Is(now))
@@ -211,7 +211,7 @@ internal class DepositAccumulateRouletteEventServiceTests
 				Arg.Is(queryDate))
 			.Returns(expected.ToAsyncEnumerable());
 
-		var sut = new DepositAccumulateRouletteEventService(fakeSystemClock, fakeTgsRepository, fakeRedisRepository);
+		var sut = new DepositAccumulateRouletteEventService(fakeSystemClock, fakeTgsRepository, fakeStoreRepository);
 
 		var actual = await sut
 			.GetDepositAccumulateRouletteEventInfosAsync(promotionId, playerCode)
@@ -226,7 +226,7 @@ internal class DepositAccumulateRouletteEventServiceTests
 				Arg.Is(playerCode),
 				Arg.Is(queryDate));
 
-		_ = fakeRedisRepository
+		_ = fakeStoreRepository
 			.Received(2)
 			.SetDepositAccumulateRouletteEventInfoAsync(
 				Arg.Is(promotionId),

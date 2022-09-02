@@ -6,16 +6,16 @@ internal class DepositAccumulateRouletteEventService : IDepositAccumulateRoulett
 {
 	private readonly ISystemClock _systemClock;
 	private readonly ITgsRepository _tgsRepository;
-	private readonly IRedisRepository _redisRepository;
+	private readonly IStoreRepository _storeRepository;
 
 	public DepositAccumulateRouletteEventService(
 		ISystemClock systemClock,
 		ITgsRepository tgsRepository,
-		IRedisRepository redisRepository)
+		IStoreRepository storeRepository)
 	{
 		_systemClock = systemClock ?? throw new ArgumentNullException(nameof(systemClock));
 		_tgsRepository = tgsRepository ?? throw new ArgumentNullException(nameof(tgsRepository));
-		_redisRepository = redisRepository ?? throw new ArgumentNullException(nameof(redisRepository));
+		_storeRepository = storeRepository ?? throw new ArgumentNullException(nameof(storeRepository));
 	}
 
 	public async IAsyncEnumerable<DepositAccumulateRouletteEventInfo> GetDepositAccumulateRouletteEventInfosAsync(
@@ -29,7 +29,7 @@ internal class DepositAccumulateRouletteEventService : IDepositAccumulateRoulett
 		// assume the query date is 08:00 UTC+8
 		var queryDate = DateOnly.FromDateTime(now.ToOffset(TimeSpan.FromHours(8 - 8)).DateTime);
 
-		var events = await _redisRepository
+		var events = await _storeRepository
 			.GetDepositAccumulateRouletteEventInfosAsync(promotionId, playerCode, now)
 			.ToArrayAsync(cancellationToken);
 
@@ -78,7 +78,7 @@ internal class DepositAccumulateRouletteEventService : IDepositAccumulateRoulett
 			var info = new DepositAccumulateRouletteEventInfo(
 				playerCode, promotionId, currentDate, 0, 0);
 
-			_ = await _redisRepository
+			_ = await _storeRepository
 				.SetDepositAccumulateRouletteEventInfoAsync(promotionId, playerCode, expired, info)
 				.ConfigureAwait(false);
 
@@ -92,7 +92,7 @@ internal class DepositAccumulateRouletteEventService : IDepositAccumulateRoulett
 					TimeSpan.FromHours(8D))
 				: now.AddMinutes(5D);
 
-			_ = await _redisRepository
+			_ = await _storeRepository
 				.SetDepositAccumulateRouletteEventInfoAsync(promotionId, playerCode, expired, evt)
 				.ConfigureAwait(false);
 

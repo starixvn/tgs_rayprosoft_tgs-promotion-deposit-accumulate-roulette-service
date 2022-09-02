@@ -5,7 +5,7 @@ using Tgs.Promotion.DepositAccumulateRoulette.Worker;
 
 namespace Tgs.Promotion.DepositAccumulateRoulette.Repositories;
 
-internal class RedisRepository : IRedisRepository
+internal class StoreRepository : IStoreRepository
 {
 	private static readonly string _KeyPrefix = "Promotion:DepositAccumulateRoulette";
 	private static readonly decimal _ExchangeRate = 1_000_000M;
@@ -17,7 +17,7 @@ internal class RedisRepository : IRedisRepository
 
 	private readonly IDatabase _redisDatabase;
 
-	public RedisRepository(
+	public StoreRepository(
 		IDatabase redisDatabase)
 	{
 		_redisDatabase = redisDatabase ?? throw new ArgumentNullException(nameof(redisDatabase));

@@ -9,18 +9,18 @@ internal class GetRouletteCountItemsQueryService
 {
 	private readonly IPlayerServiceClient _playerServiceClient;
 	private readonly ITgsRepository _tgsRepository;
-	private readonly IRedisRepository _redisRepository;
+	private readonly IStoreRepository _storeRepository;
 	private readonly IDepositAccumulateRouletteEventService _eventService;
 
 	public GetRouletteCountItemsQueryService(
 		IPlayerServiceClient playerServiceClient,
 		IDepositAccumulateRouletteEventService eventService,
 		ITgsRepository tgsRepository,
-		IRedisRepository redisRepository)
+		IStoreRepository storeRepository)
 	{
 		_playerServiceClient = playerServiceClient ?? throw new ArgumentNullException(nameof(playerServiceClient));
 		_tgsRepository = tgsRepository ?? throw new ArgumentNullException(nameof(tgsRepository));
-		_redisRepository = redisRepository ?? throw new ArgumentNullException(nameof(redisRepository));
+		_storeRepository = storeRepository ?? throw new ArgumentNullException(nameof(storeRepository));
 		_eventService = eventService ?? throw new ArgumentNullException(nameof(eventService));
 	}
 
@@ -72,7 +72,7 @@ internal class GetRouletteCountItemsQueryService
 		DepositAccumulateRouletteEventInfo info,
 		CancellationToken cancellationToken)
 	{
-		var cachedCount = await _redisRepository
+		var cachedCount = await _storeRepository
 			.GetRouletteCountAsync(promotionId, playerCode, info.Date)
 			.ConfigureAwait(false);
 
@@ -85,7 +85,7 @@ internal class GetRouletteCountItemsQueryService
 
 		var count = info.RouletteCount >= usedCount ? info.RouletteCount - usedCount : 0;
 
-		_ = await _redisRepository
+		_ = await _storeRepository
 			.SetRouletteCountAsync(promotionId, playerCode, info.Date, count)
 			.ConfigureAwait(false);
 

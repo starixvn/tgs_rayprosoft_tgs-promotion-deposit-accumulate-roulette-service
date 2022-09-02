@@ -2,19 +2,19 @@
 
 internal class StatisticsService : IStatisticsService
 {
-	private readonly IRedisRepository _redisRepository;
+	private readonly IStoreRepository _storeRepository;
 
 	public StatisticsService(
-		IRedisRepository redisRepository)
+		IStoreRepository storeRepository)
 	{
-		_redisRepository = redisRepository ?? throw new ArgumentNullException(nameof(redisRepository));
+		_storeRepository = storeRepository ?? throw new ArgumentNullException(nameof(storeRepository));
 	}
 
 	public ValueTask<decimal> IncrementTotalDistributeAmountAsync(
 		Guid promotionId,
 		decimal amount,
 		CancellationToken cancellationToken = default)
-		=> _redisRepository
+		=> _storeRepository
 			.IncrementTotalDistributeAmountAsync(promotionId, amount, cancellationToken);
 
 	public async ValueTask<(bool Success, int AvailableCount)> DecreaseRouletteCountAsync(
@@ -23,14 +23,14 @@ internal class StatisticsService : IStatisticsService
 		DateOnly countDistributeDate,
 		CancellationToken cancellationToken = default)
 	{
-		var decreasedCount = await _redisRepository
+		var decreasedCount = await _storeRepository
 			.DecreaseRouletteCountAsync(promotionId, playerCode, countDistributeDate)
 			.ConfigureAwait(false);
 
 		if (decreasedCount >= 0)
 			return (true, decreasedCount);
 
-		var increasedCount = await _redisRepository
+		var increasedCount = await _storeRepository
 			.IncreaseRouletteCountAsync(promotionId, playerCode, countDistributeDate)
 			.ConfigureAwait(false);
 
@@ -42,7 +42,7 @@ internal class StatisticsService : IStatisticsService
 		string playerCode,
 		DateOnly countDistributeDate,
 		CancellationToken cancellationToken = default)
-		=> await _redisRepository
+		=> await _storeRepository
 			.IncreaseRouletteCountAsync(promotionId, playerCode, countDistributeDate)
 			.ConfigureAwait(false);
 }

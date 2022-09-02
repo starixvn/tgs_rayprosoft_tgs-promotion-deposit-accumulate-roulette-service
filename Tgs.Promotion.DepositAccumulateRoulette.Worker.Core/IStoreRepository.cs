@@ -1,6 +1,6 @@
 ﻿namespace Tgs.Promotion.DepositAccumulateRoulette.Worker;
 
-public interface IRedisRepository
+public interface IStoreRepository
 {
 	ValueTask<decimal> IncrementTotalDistributeAmountAsync(
 		Guid promotionId,
