@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
 using Tgs.PlayerService.Client;
 using Tgs.Promotion.Clients;
 using Tgs.Promotion.DepositAccumulateRoulette.Common;
@@ -50,16 +49,11 @@ internal class RouletteCommandService : IGetService<RouletteCommand, RouletteRes
 
 		var rouletteItems = promotionSetting!.CampaignDetail.RouletteItems.ToArray();
 
-		var eventCountInfos = await _eventCountQueryService.QueryAsync(
-				new GetRouletteEventCountQuery(command.PromotionId, command.PlayerCode),
-				cancellationToken)
-			.ToArrayAsync(cancellationToken)
+		var useInfo = await GetUseEventCountInfoAsync(
+			command.PromotionId,
+			command.PlayerCode,
+			cancellationToken)
 			.ConfigureAwait(false);
-
-		if (!eventCountInfos.Any())
-			return new RouletteResult(null, -1);
-
-		var useInfo = GetUseEventCountInfo(eventCountInfos);
 
 		if (useInfo is null)
 			return new RouletteResult(null, -1);
@@ -71,24 +65,16 @@ internal class RouletteCommandService : IGetService<RouletteCommand, RouletteRes
 			cancellationToken);
 
 		if (!success)
-		{
 			return new RouletteResult(null, -1);
-		}
-
-		var afterTotalCount =
-			eventCountInfos.Except(new[] { useInfo }).Sum(info => info.AvailableCount) + decreasedCount;
-
-		var countInfo = new RouletteCountInfo(
-			useInfo,
-			decreasedCount,
-			afterTotalCount);
 
 		var rouletteResult = await ProcessRouletteAsync(
 			command,
 			rouletteItems,
 			player!.BrandId,
-			countInfo,
+			useInfo.Date,
 			cancellationToken).ConfigureAwait(false);
+
+		var playedCount = useInfo.DistributeCount - decreasedCount;
 
 		_ = Task.Run(async () =>
 		{
@@ -100,8 +86,8 @@ internal class RouletteCommandService : IGetService<RouletteCommand, RouletteRes
 			await _distributeService.ExecuteAsync(new DistributeBonusCommand(
 					command.PromotionId,
 					command.PlayerCode,
-					countInfo.UseEvent.Date,
-					countInfo.EventUsedCount,
+					useInfo.Date,
+					playedCount,
 					rouletteResult.Bonus,
 					rouletteResult.Bucket)).ConfigureAwait(false);
 		});
@@ -111,16 +97,27 @@ internal class RouletteCommandService : IGetService<RouletteCommand, RouletteRes
 			rouletteResult.ItemIndex);
 	}
 
-	private static RouletteEventCountInfo? GetUseEventCountInfo(
-		IEnumerable<RouletteEventCountInfo> infos)
-		=> infos.OrderBy(info => info.Date)
-			.FirstOrDefault(info => info.AvailableCount > 0);
+	private async ValueTask<RouletteEventCountInfo?> GetUseEventCountInfoAsync(
+		Guid promotionId,
+		string playerCode,
+		CancellationToken cancellationToken)
+	{
+		var eventCountInfos = await _eventCountQueryService
+			.QueryAsync(
+				new GetRouletteEventCountQuery(promotionId, playerCode),
+				cancellationToken)
+			.OrderBy(info => info.Date)
+			.ToArrayAsync(cancellationToken)
+			.ConfigureAwait(false);
+
+		return eventCountInfos.FirstOrDefault(info => info.AvailableCount > 0);
+	}
 
 	private async ValueTask<ProcessRouletteResult> ProcessRouletteAsync(
 		RouletteCommand command,
 		RouletteItem[] rouletteItems,
 		Guid brandId,
-		RouletteCountInfo countInfo,
+		DateOnly date,
 		CancellationToken cancellationToken)
 	{
 		try
@@ -132,7 +129,7 @@ internal class RouletteCommandService : IGetService<RouletteCommand, RouletteRes
 				rouletteItems,
 				brandId,
 				itemIndex,
-				countInfo.UseEvent.Date,
+				date,
 				cancellationToken).ConfigureAwait(false);
 
 			return result;
@@ -142,7 +139,7 @@ internal class RouletteCommandService : IGetService<RouletteCommand, RouletteRes
 			_ = await _statisticsService.IncreaseRouletteCountAsync(
 				command.PromotionId,
 				command.PlayerCode,
-				countInfo.UseEvent.Date,
+				date,
 				cancellationToken);
 
 			throw;
@@ -208,12 +205,4 @@ internal class RouletteCommandService : IGetService<RouletteCommand, RouletteRes
 		decimal Bucket,
 		Guid RouletteId,
 		int ItemIndex);
-
-	internal record RouletteCountInfo(
-		RouletteEventCountInfo UseEvent,
-		int AfterEventCount,
-		int AfterTotalCount)
-	{
-		public int EventUsedCount => UseEvent.DistributeCount - AfterEventCount;
-	}
 }

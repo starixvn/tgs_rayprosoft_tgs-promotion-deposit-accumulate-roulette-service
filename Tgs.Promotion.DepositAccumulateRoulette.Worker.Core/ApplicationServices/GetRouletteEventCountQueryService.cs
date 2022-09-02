@@ -32,7 +32,7 @@ internal class GetRouletteEventCountQueryService : IQueryService<GetRouletteEven
 
 		foreach (var info in events)
 		{
-			var count = await GetOrSetRouletteCountAsync(query.PromotionId, query.PlayerCode, info, cancellationToken)
+			var count = await GetRouletteCountAsync(query.PromotionId, query.PlayerCode, info, cancellationToken)
 				.ConfigureAwait(false);
 
 			yield return new RouletteEventCountInfo(
@@ -44,7 +44,7 @@ internal class GetRouletteEventCountQueryService : IQueryService<GetRouletteEven
 		}
 	}
 
-	private async ValueTask<int> GetOrSetRouletteCountAsync(
+	private async ValueTask<int> GetRouletteCountAsync(
 		Guid promotionId,
 		string playerCode,
 		DepositAccumulateRouletteEventInfo info,
