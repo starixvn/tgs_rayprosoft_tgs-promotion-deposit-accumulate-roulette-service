@@ -57,12 +57,12 @@ internal class RouletteCommandService : IGetService<RouletteCommand, RouletteRes
 			.ConfigureAwait(false);
 
 		if (!eventCountInfos.Any())
-			return new RouletteResult(null, -1, 0);
+			return new RouletteResult(null, -1);
 
 		var useInfo = GetUseEventCountInfo(eventCountInfos);
 
 		if (useInfo is null)
-			return new RouletteResult(null, -1, 0);
+			return new RouletteResult(null, -1);
 
 		var (success, decreasedCount) = await _statisticsService.DecreaseRouletteCountAsync(
 			useInfo.PromotionId,
@@ -72,7 +72,7 @@ internal class RouletteCommandService : IGetService<RouletteCommand, RouletteRes
 
 		if (!success)
 		{
-			return new RouletteResult(null, -1, 0);
+			return new RouletteResult(null, -1);
 		}
 
 		var afterTotalCount =
@@ -108,8 +108,7 @@ internal class RouletteCommandService : IGetService<RouletteCommand, RouletteRes
 
 		return new RouletteResult(
 			rouletteResult.RouletteId,
-			rouletteResult.ItemIndex,
-			countInfo.AfterTotalCount);
+			rouletteResult.ItemIndex);
 	}
 
 	private static RouletteEventCountInfo? GetUseEventCountInfo(

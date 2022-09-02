@@ -185,6 +185,5 @@ internal class DepositAccumulateRouletteTests
 		Assert.IsNotNull(actual);
 		Assert.AreNotEqual(Guid.Empty, actual.Id);
 		Assert.AreNotEqual(-1, actual.ItemIndex);
-		Assert.AreEqual(3, actual.RemainingCount);
 	}
 }

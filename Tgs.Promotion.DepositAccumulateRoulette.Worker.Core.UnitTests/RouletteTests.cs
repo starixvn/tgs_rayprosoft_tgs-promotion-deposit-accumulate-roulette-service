@@ -116,7 +116,6 @@ internal class RouletteTests
 		Assert.IsNotNull(actual);
 		Assert.IsNotNull(actual.Id);
 		Assert.AreNotEqual(-1, actual.ItemIndex);
-		Assert.AreEqual(2, actual.RemainingCount);
 
 		_ = fakeTgsRepository
 			.Received(1)
@@ -258,7 +257,6 @@ internal class RouletteTests
 		Assert.IsNotNull(actual);
 		Assert.IsNotNull(actual.Id);
 		Assert.AreNotEqual(-1, actual.ItemIndex);
-		Assert.AreEqual(1, actual.RemainingCount);
 
 		_ = fakeTgsRepository
 			.Received(1)
@@ -443,7 +441,6 @@ internal class RouletteTests
 		Assert.IsNotNull(actual);
 		Assert.IsNull(actual.Id);
 		Assert.AreEqual(-1, actual.ItemIndex);
-		Assert.AreEqual(0, actual.RemainingCount);
 
 		_ = fakeTgsRepository
 			.Received(0)
@@ -568,7 +565,6 @@ internal class RouletteTests
 		Assert.IsNotNull(actual);
 		Assert.IsNotNull(actual.Id);
 		Assert.AreNotEqual(-1, actual.ItemIndex);
-		Assert.AreEqual(2, actual.RemainingCount);
 
 		_ = fakeDistributeService
 			.Received(1)

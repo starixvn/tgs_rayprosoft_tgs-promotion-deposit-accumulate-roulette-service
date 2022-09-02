@@ -50,8 +50,7 @@ public class RouletteTaskProcessor : IMessageProcessor
 		var response = new RouletteTaskResponse
 		{
 			Id = result.Id,
-			ItemIndex = result.ItemIndex,
-			RemainingCount = result.RemainingCount
+			ItemIndex = result.ItemIndex
 		};
 
 		return response.ToByteArray();

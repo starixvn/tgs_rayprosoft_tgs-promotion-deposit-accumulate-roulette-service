@@ -17,6 +17,5 @@ message RouletteRequest {
 message RouletteResponse {
 	phoenix.protobuf.GuidValue id = 1;
 	int32 item_index = 2;
-	int32 remaining_count = 3;
 }
 

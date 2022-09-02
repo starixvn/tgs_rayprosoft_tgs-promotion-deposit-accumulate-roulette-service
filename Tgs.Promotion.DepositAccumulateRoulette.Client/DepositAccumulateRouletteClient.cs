@@ -35,7 +35,6 @@ internal class DepositAccumulateRouletteClient : IDepositAccumulateRouletteClien
 
 		return new RouletteResult(
 			response.Id,
-			response.ItemIndex,
-			response.RemainingCount);
+			response.ItemIndex);
 	}
 }

@@ -37,7 +37,7 @@ internal class RouletteHandleService : IRouletteHandleService
 
 		var response = RouletteTaskResponse.Parser.ParseFrom(data.Span);
 
-		return new RouletteResult(response.Id, response.ItemIndex, response.RemainingCount);
+		return new RouletteResult(response.Id, response.ItemIndex);
 	}
 
 	private async ValueTask<string> GetProcessSubjectAsync(string playerCode, CancellationToken cancellationToken)
