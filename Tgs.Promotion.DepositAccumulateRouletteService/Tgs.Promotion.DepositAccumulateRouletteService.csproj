@@ -41,5 +41,9 @@
     <Protobuf Include="Protos\depositaccumulateroulette.proto" GrpcServices="None" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="ApplicationServices\" />
+  </ItemGroup>
+
 
 </Project>

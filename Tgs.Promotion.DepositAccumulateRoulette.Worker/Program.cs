@@ -62,7 +62,7 @@ builder.Services
 	.AddMemoryCache()
 	.AddDepositAccumulateRouletteCommon()
 	.AddDepositAccumulateRouletteWorkerCore()
-	.AddDepositAccumulateRouletteCache()
+	.AddDepositAccumulateRouletteWorkerCache()
 	.AddDepositAccumulateRouletteRepositories(
 		dbOptionsConfigure: (sp, dbOptions) =>
 		{
