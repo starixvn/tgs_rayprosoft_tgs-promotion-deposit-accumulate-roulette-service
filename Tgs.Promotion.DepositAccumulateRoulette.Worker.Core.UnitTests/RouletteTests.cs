@@ -109,7 +109,7 @@ internal class RouletteTests
 				Arg.Is(command.PlayerCode),
 				Arg.Is(eventInfo.Date),
 				Arg.Any<CancellationToken>())
-			.Returns(2);
+			.Returns((true, 2));
 
 		var actual = await sut.GetAsync(command);
 
@@ -251,7 +251,7 @@ internal class RouletteTests
 				Arg.Is(command.PlayerCode),
 				Arg.Is(eventInfos[0].Date),
 				Arg.Any<CancellationToken>())
-			.Returns(0);
+			.Returns((true, 0));
 
 		var actual = await sut.GetAsync(command);
 
@@ -436,7 +436,7 @@ internal class RouletteTests
 			Arg.Is(command.PlayerCode),
 			Arg.Is(eventInfo.Date),
 			Arg.Any<CancellationToken>())
-			.Returns(0);
+			.Returns((true, 0));
 
 		var actual = await sut.GetAsync(command);
 
@@ -561,7 +561,7 @@ internal class RouletteTests
 				Arg.Is(command.PlayerCode),
 				Arg.Is(eventInfo.Date),
 				Arg.Any<CancellationToken>())
-			.Returns(2);
+			.Returns((true, 2));
 
 		var actual = await sut.GetAsync(command);
 

@@ -1,4 +1,5 @@
-﻿using NSubstitute;
+﻿using ExpectedObjects;
+using NSubstitute;
 
 namespace Tgs.Promotion.DepositAccumulateRoulette.Worker.Core.UnitTests;
 
@@ -7,9 +8,7 @@ internal class StatisticsServiceTests
 	[Test]
 	public async Task Increase_Total_Used_Amount()
 	{
-		var fakeSystemClock = Substitute.For<ISystemClock>();
 		var fakeRedisRepository = Substitute.For<IRedisRepository>();
-		var fakeTgsRepository = Substitute.For<ITgsRepository>();
 
 		var promotionId = Guid.NewGuid();
 		var distributeAmount = 20m;
@@ -21,7 +20,7 @@ internal class StatisticsServiceTests
 				Arg.Is(distributeAmount))
 			.Returns(expected);
 
-		var sut = new StatisticsService(fakeSystemClock, fakeTgsRepository, fakeRedisRepository);
+		var sut = new StatisticsService(fakeRedisRepository);
 
 		var actual = await sut.IncrementTotalDistributeAmountAsync(promotionId, distributeAmount);
 
@@ -29,23 +28,59 @@ internal class StatisticsServiceTests
 	}
 
 	[Test]
-	public async Task Decrease_RouletteCount()
+	public async Task Decrease_RouletteCount_If_Returns_Is_Not_Negative()
 	{
-		var fakeSystemClock = Substitute.For<ISystemClock>();
 		var fakeRedisRepository = Substitute.For<IRedisRepository>();
-		var fakeTgsRepository = Substitute.For<ITgsRepository>();
 
 		var promotionId = Guid.NewGuid();
 		var playerCode = "player1";
 		var date = DateOnly.Parse("2022-08-11");
 
-		var sut = new StatisticsService(fakeSystemClock, fakeTgsRepository, fakeRedisRepository);
+		_ = fakeRedisRepository.DecreaseRouletteCountAsync(
+				Arg.Is(promotionId),
+				Arg.Is(playerCode),
+				Arg.Is(date))
+			.Returns(2);
 
-		await sut.DecreaseRouletteCountAsync(promotionId, playerCode, date).ConfigureAwait(false);
+		var sut = new StatisticsService(fakeRedisRepository);
+
+		var actual = await sut.DecreaseRouletteCountAsync(promotionId, playerCode, date).ConfigureAwait(false);
+
+		Assert.AreEqual(true, actual.Success);
+		Assert.AreEqual(2, actual.AvailableCount);
+
+		_ = fakeRedisRepository
+			.DidNotReceive()
+			.IncreaseRouletteCountAsync(
+				Arg.Is(promotionId),
+				Arg.Is(playerCode),
+				Arg.Is(date));
+	}
+
+	[Test]
+	public async Task Decrease_RouletteCount_If_Returns_Is_Negative()
+	{
+		var fakeRedisRepository = Substitute.For<IRedisRepository>();
+
+		var promotionId = Guid.NewGuid();
+		var playerCode = "player1";
+		var date = DateOnly.Parse("2022-08-11");
+
+		_ = fakeRedisRepository.DecreaseRouletteCountAsync(
+				Arg.Is(promotionId),
+				Arg.Is(playerCode),
+				Arg.Is(date))
+			.Returns(-1);
+
+		var sut = new StatisticsService(fakeRedisRepository);
+
+		var actual = await sut.DecreaseRouletteCountAsync(promotionId, playerCode, date).ConfigureAwait(false);
+
+		Assert.AreEqual(false, actual.Success);
 
 		_ = fakeRedisRepository
 			.Received(1)
-			.DecreaseRouletteCountAsync(
+			.IncreaseRouletteCountAsync(
 				Arg.Is(promotionId),
 				Arg.Is(playerCode),
 				Arg.Is(date));
@@ -54,15 +89,13 @@ internal class StatisticsServiceTests
 	[Test]
 	public async Task Increase_RouletteCount()
 	{
-		var fakeSystemClock = Substitute.For<ISystemClock>();
 		var fakeRedisRepository = Substitute.For<IRedisRepository>();
-		var fakeTgsRepository = Substitute.For<ITgsRepository>();
 
 		var promotionId = Guid.NewGuid();
 		var playerCode = "player1";
 		var date = DateOnly.Parse("2022-08-11");
 
-		var sut = new StatisticsService(fakeSystemClock, fakeTgsRepository, fakeRedisRepository);
+		var sut = new StatisticsService(fakeRedisRepository);
 
 		await sut.IncreaseRouletteCountAsync(promotionId, playerCode, date).ConfigureAwait(false);
 

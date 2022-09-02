@@ -64,29 +64,23 @@ internal class RouletteCommandService : IGetService<RouletteCommand, RouletteRes
 		if (useInfo is null)
 			return new RouletteResult(null, -1, 0);
 
-		var decreaseCount = await _statisticsService.DecreaseRouletteCountAsync(
-			command.PromotionId,
-			command.PlayerCode,
+		var (success, decreasedCount) = await _statisticsService.DecreaseRouletteCountAsync(
+			useInfo.PromotionId,
+			useInfo.PlayerCode,
 			useInfo.Date,
 			cancellationToken);
 
-		if (decreaseCount < 0)
+		if (!success)
 		{
-			_ = await _statisticsService.IncreaseRouletteCountAsync(
-				command.PromotionId,
-				command.PlayerCode,
-				useInfo.Date,
-				cancellationToken);
-
 			return new RouletteResult(null, -1, 0);
 		}
 
 		var afterTotalCount =
-			eventCountInfos.Except(new[] { useInfo }).Sum(info => info.AvailableCount) + decreaseCount;
+			eventCountInfos.Except(new[] { useInfo }).Sum(info => info.AvailableCount) + decreasedCount;
 
 		var countInfo = new RouletteCountInfo(
 			useInfo,
-			decreaseCount,
+			decreasedCount,
 			afterTotalCount);
 
 		var rouletteResult = await ProcessRouletteAsync(

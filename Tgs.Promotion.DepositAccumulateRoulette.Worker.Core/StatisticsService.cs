@@ -4,17 +4,11 @@ namespace Tgs.Promotion.DepositAccumulateRoulette.Worker;
 
 internal class StatisticsService : IStatisticsService
 {
-	private readonly ISystemClock _systemClock;
-	private readonly ITgsRepository _tgsRepository;
 	private readonly IRedisRepository _redisRepository;
 
 	public StatisticsService(
-		ISystemClock systemClock,
-		ITgsRepository tgsRepository,
 		IRedisRepository redisRepository)
 	{
-		_systemClock = systemClock ?? throw new ArgumentNullException(nameof(systemClock));
-		_tgsRepository = tgsRepository ?? throw new ArgumentNullException(nameof(tgsRepository));
 		_redisRepository = redisRepository ?? throw new ArgumentNullException(nameof(redisRepository));
 	}
 
@@ -25,14 +19,25 @@ internal class StatisticsService : IStatisticsService
 		=> _redisRepository
 			.IncrementTotalDistributeAmountAsync(promotionId, amount, cancellationToken);
 
-	public async ValueTask<int> DecreaseRouletteCountAsync(
+	public async ValueTask<(bool Success, int AvailableCount)> DecreaseRouletteCountAsync(
 		Guid promotionId,
 		string playerCode,
 		DateOnly countDistributeDate,
 		CancellationToken cancellationToken = default)
-		=> await _redisRepository
+	{
+		var decreasedCount = await _redisRepository
 			.DecreaseRouletteCountAsync(promotionId, playerCode, countDistributeDate)
 			.ConfigureAwait(false);
+
+		if (decreasedCount >= 0)
+			return (true, decreasedCount);
+
+		var increasedCount = await _redisRepository
+			.IncreaseRouletteCountAsync(promotionId, playerCode, countDistributeDate)
+			.ConfigureAwait(false);
+
+		return (false, increasedCount);
+	}
 
 	public async ValueTask<int> IncreaseRouletteCountAsync(
 		Guid promotionId,
@@ -42,127 +47,4 @@ internal class StatisticsService : IStatisticsService
 		=> await _redisRepository
 			.IncreaseRouletteCountAsync(promotionId, playerCode, countDistributeDate)
 			.ConfigureAwait(false);
-
-	private async IAsyncEnumerable<DepositAccumulateRouletteEventInfo> GetDepositAccumulateRouletteEventInfosAsync(
-		Guid promotionId,
-		string playerCode,
-		[EnumeratorCancellation] CancellationToken cancellationToken = default)
-	{
-		var now = _systemClock.UtcNow.ToOffset(TimeSpan.FromHours(8D));
-		var currentDate = DateOnly.FromDateTime(now.DateTime);
-
-		// assume the query date is 08:00 UTC+8
-		var queryDate = DateOnly.FromDateTime(now.ToOffset(TimeSpan.FromHours(8 - 8)).DateTime);
-
-		var events = await _redisRepository
-			.GetDepositAccumulateRouletteEventInfosAsync(promotionId, playerCode, now)
-			.ToArrayAsync(cancellationToken);
-
-		if (events.Length > 0)
-		{
-			foreach (var evt in events)
-				yield return evt;
-		}
-		else
-		{
-			var eventInfos = QueryAndSetDepositAccumulateRouletteEventInfosQueryAndSetEventsAsync(
-				promotionId,
-				playerCode,
-				queryDate,
-				currentDate,
-				now,
-				cancellationToken);
-
-			await foreach (var evt in eventInfos.WithCancellation(cancellationToken))
-				yield return evt;
-		}
-	}
-
-	private async IAsyncEnumerable<DepositAccumulateRouletteEventInfo> QueryAndSetDepositAccumulateRouletteEventInfosQueryAndSetEventsAsync(
-		Guid promotionId,
-		string playerCode,
-		DateOnly queryDate,
-		DateOnly currentDate,
-		DateTimeOffset now,
-		[EnumeratorCancellation] CancellationToken cancellationToken)
-	{
-		var events = await _tgsRepository
-			.GetDepositAccumulateRouletteEventInfosAsync(
-				promotionId,
-				playerCode,
-				queryDate)
-			.ToArrayAsync(cancellationToken);
-
-		var isCurrentDateEqualsQueryDate = currentDate == queryDate;
-
-		if (events.Length == 0)
-		{
-			var expired = isCurrentDateEqualsQueryDate
-				? new DateTimeOffset(currentDate.Year, currentDate.Month, currentDate.Day + 1, 8, 0, 0,
-					TimeSpan.FromHours(8D))
-				: now.AddMinutes(5D);
-
-			var info = new DepositAccumulateRouletteEventInfo(
-				playerCode, promotionId, currentDate, 0, 0);
-
-			_ = await _redisRepository
-				.SetDepositAccumulateRouletteEventInfoAsync(promotionId, playerCode, expired, info)
-				.ConfigureAwait(false);
-
-			yield break;
-		}
-
-		foreach (var evt in events)
-		{
-			var expired = isCurrentDateEqualsQueryDate
-				? new DateTimeOffset(evt.Date.Year, evt.Date.Month, evt.Date.Day + 1, 8, 0, 0,
-					TimeSpan.FromHours(8D))
-				: now.AddMinutes(5D);
-
-			_ = await _redisRepository
-				.SetDepositAccumulateRouletteEventInfoAsync(promotionId, playerCode, expired, evt)
-				.ConfigureAwait(false);
-
-			yield return evt;
-		}
-	}
-
-	private async ValueTask<int> GetOrSetRouletteCountAsync(
-		Guid promotionId,
-		string playerCode,
-		DepositAccumulateRouletteEventInfo info,
-		CancellationToken cancellationToken)
-	{
-		var cachedCount = await _redisRepository
-			.GetRouletteCountAsync(promotionId, playerCode, info.Date)
-			.ConfigureAwait(false);
-
-		if (cachedCount.HasValue)
-			return (int)cachedCount;
-
-		var usedCount = await _tgsRepository
-			.GetRouletteUsedCountAsync(promotionId, playerCode, info.Date, cancellationToken)
-			.ConfigureAwait(false);
-
-		var count = info.RouletteCount >= usedCount ? info.RouletteCount - usedCount : 0;
-
-		_ = await _redisRepository
-			.SetRouletteCountAsync(promotionId, playerCode, info.Date, count)
-			.ConfigureAwait(false);
-
-		return count;
-	}
-
-	private class CountInfo
-	{
-		public int After { get; }
-
-		public int Before { get; }
-
-		public CountInfo(int before, int after)
-		{
-			Before = before < 0 ? 0 : before;
-			After = after < 0 ? 0 : after;
-		}
-	}
 }
