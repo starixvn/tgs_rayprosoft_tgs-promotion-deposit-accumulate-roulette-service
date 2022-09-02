@@ -49,8 +49,8 @@ internal class DepositAccumulateRouletteTests
 					.AddSingleton<IGetService<GetDepositAccumulateRoulettePromotionQuery,
 							DepositAccumulateRoulettePromotion?>,
 						GetDepositAccumulateRoulettePromotionQueryService>()
-					.AddSingleton<IQueryService<GetRouletteEventCountQuery, RouletteEventCountInfo>,
-						GetRouletteEventCountQueryService>()
+					.AddSingleton<IGetService<GetAvailableRouletteCountEventQuery, RouletteEventCountInfo?>,
+						GetAvailableRouletteCountEventQueryService>()
 					.AddSingleton<ICommandService<DistributeBonusCommand>, DistributeBonusCommandService>()
 					.AddSingleton<IGetService<GetPromotionDistributePlanQuery, PromotionDistributePlanInfo>,
 						GetPromotionDistributePlanQueryService>()
@@ -130,6 +130,12 @@ internal class DepositAccumulateRouletteTests
 				Arg.Is(playerCode),
 				Arg.Any<DateTimeOffset>())
 			.Returns(new[] { eventInfo }.ToAsyncEnumerable());
+
+		_ = fakeRedisRepository.GetRouletteCountAsync(
+				Arg.Is(promotionId),
+				Arg.Is(playerCode),
+				Arg.Any<DateOnly>())
+			.Returns(eventInfo.RouletteCount);
 
 		_ = fakeRedisRepository.DecreaseRouletteCountAsync(
 				Arg.Is(promotionId),

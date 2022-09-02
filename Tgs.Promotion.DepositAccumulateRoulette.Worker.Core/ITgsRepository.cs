@@ -23,7 +23,6 @@ public interface ITgsRepository
 		CancellationToken cancellationToken = default);
 
 	IAsyncEnumerable<Guid> GetAvailablePromotionIdsAsync(
-		Guid brandId,
 		string playerCode,
 		CancellationToken cancellationToken);
 }

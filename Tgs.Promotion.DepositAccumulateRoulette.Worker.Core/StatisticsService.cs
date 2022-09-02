@@ -1,6 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-
-namespace Tgs.Promotion.DepositAccumulateRoulette.Worker;
+﻿namespace Tgs.Promotion.DepositAccumulateRoulette.Worker;
 
 internal class StatisticsService : IStatisticsService
 {

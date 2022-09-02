@@ -9,16 +9,19 @@ internal class GetRouletteCountItemsQueryService
 {
 	private readonly IPlayerServiceClient _playerServiceClient;
 	private readonly ITgsRepository _tgsRepository;
-	private readonly IQueryService<GetRouletteEventCountQuery, RouletteEventCountInfo> _eventCountQueryService;
+	private readonly IRedisRepository _redisRepository;
+	private readonly IDepositAccumulateRouletteEventService _eventService;
 
 	public GetRouletteCountItemsQueryService(
 		IPlayerServiceClient playerServiceClient,
+		IDepositAccumulateRouletteEventService eventService,
 		ITgsRepository tgsRepository,
-		IQueryService<GetRouletteEventCountQuery, RouletteEventCountInfo> eventCountQueryService)
+		IRedisRepository redisRepository)
 	{
 		_playerServiceClient = playerServiceClient ?? throw new ArgumentNullException(nameof(playerServiceClient));
 		_tgsRepository = tgsRepository ?? throw new ArgumentNullException(nameof(tgsRepository));
-		_eventCountQueryService = eventCountQueryService ?? throw new ArgumentNullException(nameof(eventCountQueryService));
+		_redisRepository = redisRepository ?? throw new ArgumentNullException(nameof(redisRepository));
+		_eventService = eventService ?? throw new ArgumentNullException(nameof(eventService));
 	}
 
 	public async IAsyncEnumerable<RouletteCountItemInfo> QueryAsync(
@@ -31,22 +34,61 @@ internal class GetRouletteCountItemsQueryService
 		if (player is null)
 			throw new InvalidOperationException($"Can't find player with code {query.PlayerCode}");
 
-		var promotionIds = await _tgsRepository.GetAvailablePromotionIdsAsync(
-				player.BrandId, player.PlayerCode, cancellationToken)
-			.ToArrayAsync(cancellationToken).ConfigureAwait(false);
+		var promotionIds = await _tgsRepository
+			.GetAvailablePromotionIdsAsync(
+				player.PlayerCode,
+				cancellationToken)
+			.ToArrayAsync(cancellationToken)
+			.ConfigureAwait(false);
 
-		foreach (var id in promotionIds)
+		foreach (var promotionId in promotionIds)
 		{
-			var infos = await _eventCountQueryService.QueryAsync(
-					new GetRouletteEventCountQuery(id, query.PlayerCode),
+			var infos = await _eventService
+				.GetDepositAccumulateRouletteEventInfosAsync(
+					promotionId,
+					query.PlayerCode,
 					cancellationToken)
 				.ToArrayAsync(cancellationToken)
 				.ConfigureAwait(false);
 
-			var totalCount = infos.Sum(info => info.AvailableCount);
+			var totalCount = 0;
+
+			foreach (var info in infos)
+			{
+				var count = await GetRouletteCountAsync(promotionId, player.PlayerCode, info, cancellationToken)
+					.ConfigureAwait(false);
+
+				totalCount += count;
+			}
 
 			if (totalCount > 0)
-				yield return new RouletteCountItemInfo(id, totalCount);
+				yield return new RouletteCountItemInfo(promotionId, totalCount);
 		}
+	}
+
+	private async ValueTask<int> GetRouletteCountAsync(
+		Guid promotionId,
+		string playerCode,
+		DepositAccumulateRouletteEventInfo info,
+		CancellationToken cancellationToken)
+	{
+		var cachedCount = await _redisRepository
+			.GetRouletteCountAsync(promotionId, playerCode, info.Date)
+			.ConfigureAwait(false);
+
+		if (cachedCount.HasValue)
+			return (int)cachedCount;
+
+		var usedCount = await _tgsRepository
+			.GetRouletteUsedCountAsync(promotionId, playerCode, info.Date, cancellationToken)
+			.ConfigureAwait(false);
+
+		var count = info.RouletteCount >= usedCount ? info.RouletteCount - usedCount : 0;
+
+		_ = await _redisRepository
+			.SetRouletteCountAsync(promotionId, playerCode, info.Date, count)
+			.ConfigureAwait(false);
+
+		return count;
 	}
 }

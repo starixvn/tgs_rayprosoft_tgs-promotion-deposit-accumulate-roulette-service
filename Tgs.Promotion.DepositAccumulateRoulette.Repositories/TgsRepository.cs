@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Runtime.CompilerServices;
+using Microsoft.EntityFrameworkCore;
 using Tgs.Promotion.DepositAccumulateRoulette.Repositories.Entities;
 using Tgs.Promotion.DepositAccumulateRoulette.Worker;
 using Tgs.SerialNumberGenerator;
@@ -84,20 +85,28 @@ internal class TgsRepository : ITgsRepository
 		return recordId;
 	}
 
-	public IAsyncEnumerable<Guid> GetAvailablePromotionIdsAsync(
-		Guid brandId,
+	public async IAsyncEnumerable<Guid> GetAvailablePromotionIdsAsync(
 		string playerCode,
-		CancellationToken cancellationToken)
+		[EnumeratorCancellation] CancellationToken cancellationToken)
 	{
 		var date = DateOnly.FromDateTime(DateTimeOffset.UtcNow.ToOffset(TimeSpan.FromHours(8D - 8D)).DateTime);
 
-		return _context.DepositAccumulateRouletteEvents
+		var queryIds = await _context.DepositAccumulateRouletteEvents
 			.Where(evt =>
-					evt.BrandId == brandId &&
-					evt.PlayerCode == playerCode &&
-					evt.Date >= date)
+				evt.PlayerCode == playerCode &&
+				evt.Date >= date)
 			.Select(evt => evt.PromotionId)
 			.Distinct()
-			.ToAsyncEnumerable();
+			.ToArrayAsync(cancellationToken)
+			.ConfigureAwait(false);
+
+		var promotionIds = await _context.Promotions
+			.Where(p => queryIds.Contains(p.Id) && p.Status == 0)
+			.Select(p => p.Id)
+			.ToArrayAsync(cancellationToken)
+			.ConfigureAwait(false);
+
+		foreach (var promotionId in promotionIds)
+			yield return promotionId;
 	}
 }

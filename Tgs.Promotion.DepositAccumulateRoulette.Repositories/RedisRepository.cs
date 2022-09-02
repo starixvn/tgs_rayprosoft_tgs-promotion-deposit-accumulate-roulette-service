@@ -42,7 +42,7 @@ internal class RedisRepository : IRedisRepository
 		string playerCode,
 		DateOnly date)
 	{
-		var redisKey = GetRouletteCountRedisKey(promotionId, playerCode, date);
+		var redisKey = $"{_KeyPrefix}:RouletteCount:{promotionId}:{playerCode}:{date:O}";
 
 		var value = await _redisDatabase.StringGetAsync(redisKey).ConfigureAwait(false);
 
@@ -54,7 +54,7 @@ internal class RedisRepository : IRedisRepository
 		string playerCode,
 		DateOnly date)
 	{
-		var redisKey = GetRouletteCountRedisKey(promotionId, playerCode, date);
+		var redisKey = $"{_KeyPrefix}:RouletteCount:{promotionId}:{playerCode}:{date:O}";
 
 		return (int)await _redisDatabase.StringDecrementAsync(redisKey).ConfigureAwait(false);
 	}
@@ -64,7 +64,7 @@ internal class RedisRepository : IRedisRepository
 		string playerCode,
 		DateOnly date)
 	{
-		var redisKey = GetRouletteCountRedisKey(promotionId, playerCode, date);
+		var redisKey = $"{_KeyPrefix}:RouletteCount:{promotionId}:{playerCode}:{date:O}";
 
 		return (int)await _redisDatabase.StringIncrementAsync(redisKey).ConfigureAwait(false);
 	}
@@ -75,7 +75,7 @@ internal class RedisRepository : IRedisRepository
 		DateOnly date,
 		int rouletteCount)
 	{
-		var redisKey = GetRouletteCountRedisKey(promotionId, playerCode, date);
+		var redisKey = $"{_KeyPrefix}:RouletteCount:{promotionId}:{playerCode}:{date:O}";
 
 		return await _redisDatabase
 			.StringSetAsync(redisKey, rouletteCount, TimeSpan.FromDays(2))
@@ -87,18 +87,18 @@ internal class RedisRepository : IRedisRepository
 		string playerCode,
 		DateTimeOffset queryDate)
 	{
-		var redisKey = GetDepositEventsRedisKey(promotionId, playerCode);
+		var redisKey = $"{_KeyPrefix}:DepositEvents:{promotionId}:{playerCode}";
 
-		var score = queryDate.ToOffset(TimeSpan.FromHours(8)).Ticks;
+		var score = queryDate.ToUnixTimeMilliseconds();
 
 		var values = await _redisDatabase
-			.SortedSetRangeByScoreAsync(redisKey, start: score, exclude: Exclude.None, order: Order.Ascending)
+			.SortedSetRangeByScoreWithScoresAsync(redisKey, start: score)
 			.ConfigureAwait(false);
 
-		foreach (var value in values)
+		foreach (var value in values.OrderBy(v => v.Score))
 		{
-			var eventInfo = value.HasValue
-				? JsonSerializer.Deserialize<DepositAccumulateRouletteEventInfo>(value!, _DepositEventJsonSerializerOptions)
+			var eventInfo = value.Element.HasValue
+				? JsonSerializer.Deserialize<DepositAccumulateRouletteEventInfo>(value.Element!, _DepositEventJsonSerializerOptions)
 				: null;
 
 			if (eventInfo is not null)
@@ -114,27 +114,25 @@ internal class RedisRepository : IRedisRepository
 	{
 		var data = JsonSerializer.Serialize(eventInfo, _DepositEventJsonSerializerOptions);
 
-		var redisKey = GetDepositEventsRedisKey(promotionId, playerCode);
+		var redisKey = $"{_KeyPrefix}:DepositEvents:{promotionId}:{playerCode}";
 
-		var score = expireDate.ToOffset(TimeSpan.FromHours(8)).Ticks;
+		var score = expireDate.ToUnixTimeMilliseconds();
 
-		return await _redisDatabase.SortedSetAddAsync(redisKey, data, score)
+		var isSet = await _redisDatabase.SortedSetAddAsync(redisKey, data, score)
 			.ConfigureAwait(false);
+
+		_ = await _redisDatabase.KeyExpireAsync(redisKey, DateTime.Now.AddDays(1)).ConfigureAwait(false);
+
+		return isSet;
 	}
 
 	public async ValueTask ClearExpiredDepositAccumulateRouletteEventsAsync(Guid promotionId, string playerCode)
 	{
-		var redisKey = GetDepositEventsRedisKey(promotionId, playerCode);
+		var redisKey = $"{_KeyPrefix}:DepositEvents:{promotionId}:{playerCode}";
 
 		var score = DateTimeOffset.UtcNow.ToOffset(TimeSpan.FromHours(8D)).Ticks;
 
 		_ = await _redisDatabase.SortedSetRemoveRangeByScoreAsync(redisKey, start: 0, stop: score, exclude: Exclude.Stop)
 			.ConfigureAwait(false);
 	}
-
-	private static string GetRouletteCountRedisKey(Guid promotionId, string playerCode, DateOnly date)
-		=> $"{_KeyPrefix}:RouletteCount:{promotionId}:{playerCode}:{date:O}";
-
-	private static string GetDepositEventsRedisKey(Guid promotionId, string playerCode)
-		=> $"{_KeyPrefix}:DepositEvents:{promotionId}:{playerCode}";
 }
