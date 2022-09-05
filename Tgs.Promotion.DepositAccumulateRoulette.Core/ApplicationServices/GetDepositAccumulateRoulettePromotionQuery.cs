@@ -1,0 +1,3 @@
+﻿namespace Tgs.Promotion.DepositAccumulateRouletteService.ApplicationServices;
+
+public record GetDepositAccumulateRoulettePromotionQuery(Guid PromotionId);

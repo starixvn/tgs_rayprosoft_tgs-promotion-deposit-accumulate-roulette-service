@@ -35,14 +35,11 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Tgs.Promotion.DepositAccumulateRoulette.Common\Tgs.Promotion.DepositAccumulateRoulette.Common.csproj" />
+    <ProjectReference Include="..\Tgs.Promotion.DepositAccumulateRoulette.Core\Tgs.Promotion.DepositAccumulateRoulette.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <Protobuf Include="Protos\depositaccumulateroulette.proto" GrpcServices="None" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="ApplicationServices\" />
   </ItemGroup>
 
 

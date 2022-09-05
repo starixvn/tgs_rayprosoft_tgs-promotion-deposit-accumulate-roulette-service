@@ -1,26 +1,27 @@
 ﻿using Google.Protobuf;
 using Tgs.MessageQueue;
 using Tgs.PlayerService.Client;
-using Tgs.Promotion.Clients;
 using Tgs.Promotion.DepositAccumulateRoulette.Common;
 using Tgs.Promotion.DepositAccumulateRoulette.Common.Protos;
+using Tgs.Promotion.DepositAccumulateRouletteService.ApplicationServices;
 using Tgs.Promotion.DepositAccumulateRouletteService.Protos;
+using Tgs.ServiceUtility;
 
 namespace Tgs.Promotion.DepositAccumulateRouletteService.MessageQueue;
 
 public class RouletteProcessor : IMessageProcessor
 {
-	private readonly IPromotionServiceClient _promotionServiceClient;
 	private readonly IPlayerServiceClient _playerServiceClient;
+	private readonly IGetService<GetDepositAccumulateRoulettePromotionQuery, DepositAccumulateRoulettePromotionInfo?> _getPromotionService;
 	private readonly IRouletteHandleService _handleService;
 
 	public RouletteProcessor(
-		IPromotionServiceClient promotionServiceClient,
 		IPlayerServiceClient playerServiceClient,
+		IGetService<GetDepositAccumulateRoulettePromotionQuery, DepositAccumulateRoulettePromotionInfo?> getPromotionService,
 		IRouletteHandleService handleService)
 	{
-		_promotionServiceClient = promotionServiceClient ?? throw new ArgumentNullException(nameof(promotionServiceClient));
 		_playerServiceClient = playerServiceClient ?? throw new ArgumentNullException(nameof(playerServiceClient));
+		_getPromotionService = getPromotionService ?? throw new ArgumentNullException(nameof(getPromotionService));
 		_handleService = handleService ?? throw new ArgumentNullException(nameof(handleService));
 	}
 
@@ -34,24 +35,16 @@ public class RouletteProcessor : IMessageProcessor
 		if (player is null)
 			throw new InvalidOperationException($"Can't find player with code {request.PlayerCode}");
 
-		var mainInfo = await _promotionServiceClient
-			.GetPromotionMainInfoAsync(request.PromotionId, cancellationToken)
+		var promotion = await _getPromotionService
+			.GetAsync(
+				new GetDepositAccumulateRoulettePromotionQuery(request.PromotionId),
+				cancellationToken)
 			.ConfigureAwait(false);
 
-		if (mainInfo is null)
+		if (promotion is null)
 			throw new InvalidOperationException($"Promotion with id {request.PromotionId} does not exist");
 
-		if (mainInfo.PromotionType != "DepositAccumulateRoulette")
-			throw new InvalidOperationException($"Promotion with id {request.PromotionId} is not a DepositAccumulateRoulette promotion");
-
-		var rule = await _promotionServiceClient
-			.GetPromotionRuleAsync<PromotionRule>(request.PromotionId, cancellationToken)
-			.ConfigureAwait(false);
-
-		if (rule is null)
-			throw new InvalidOperationException("DepositAccumulateRoulette setting is null");
-
-		if (!rule.CompaignDetail.RouletteItems.Any())
+		if (!promotion.CampaignDetail.RouletteItems.Any())
 			throw new InvalidOperationException($"Promotion {request.PromotionId} does not have any roulette items.");
 
 		var taskRequest = new RouletteTaskRequest

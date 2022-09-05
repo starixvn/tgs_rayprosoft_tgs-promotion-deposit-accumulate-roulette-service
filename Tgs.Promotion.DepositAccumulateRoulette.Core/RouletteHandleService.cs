@@ -1,11 +1,11 @@
 ﻿using Google.Protobuf;
+using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
 using Tgs.MessageQueue;
 using Tgs.Promotion.DepositAccumulateRoulette.Common;
 using Tgs.Promotion.DepositAccumulateRoulette.Common.Protos;
-using Tgs.Promotion.DepositAccumulateRouletteService.Protos;
 
-namespace Tgs.Promotion.DepositAccumulateRouletteService.Services;
+namespace Tgs.Promotion.DepositAccumulateRouletteService;
 
 internal class RouletteHandleService : IRouletteHandleService
 {

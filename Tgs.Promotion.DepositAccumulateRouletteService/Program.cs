@@ -50,6 +50,7 @@ builder.Services
 	.AddNatsGlobPatternExchange("*");
 
 builder.Services
+	.AddMemoryCache()
 	.AddSingleton<IRedisConnectionManager>(sp =>
 	{
 		var config = sp.GetRequiredService<IConfiguration>();

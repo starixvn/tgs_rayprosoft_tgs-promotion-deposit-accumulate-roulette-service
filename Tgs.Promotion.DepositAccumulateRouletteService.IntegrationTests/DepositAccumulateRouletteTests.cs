@@ -10,6 +10,7 @@ using Tgs.Promotion.DepositAccumulateRoulette.Worker;
 using Tgs.Promotion.DepositAccumulateRoulette.Worker.ApplicationServices;
 using Tgs.Promotion.DepositAccumulateRouletteService.MessageQueue;
 using Tgs.ServiceUtility;
+
 using RouletteResult = Tgs.Promotion.DepositAccumulateRoulette.Common.RouletteResult;
 
 namespace Tgs.Promotion.DepositAccumulateRouletteService.IntegrationTests;
@@ -164,10 +165,10 @@ internal class DepositAccumulateRouletteTests
 				Arg.Any<CancellationToken>())
 			.Returns(promotionInfo);
 
-		_ = fakePromotionServiceClient.GetPromotionRuleAsync<RouletteProcessor.PromotionRule>(
+		_ = fakePromotionServiceClient.GetPromotionRuleAsync<ApplicationServices.GetDepositAccumulateRoulettePromotionQueryService.PromotionRule>(
 				Arg.Is(promotionId),
 				Arg.Any<CancellationToken>())
-			.Returns(new RouletteProcessor.PromotionRule { CompaignDetail = settings });
+			.Returns(new ApplicationServices.GetDepositAccumulateRoulettePromotionQueryService.PromotionRule { CompaignDetail = settings });
 
 		_ = fakePromotionServiceClient.GetPromotionRuleAsync<GetDepositAccumulateRoulettePromotionQueryService.PromotionRule>(
 				Arg.Is(promotionId),
