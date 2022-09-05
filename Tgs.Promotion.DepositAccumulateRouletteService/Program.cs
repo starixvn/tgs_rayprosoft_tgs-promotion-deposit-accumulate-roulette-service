@@ -74,6 +74,10 @@ builder.Services
 	});
 
 builder.Services
+	.AddRouting(options => options.LowercaseUrls = true)
+	.AddControllers();
+
+builder.Services
 	.AddSingleton<IConfigureOptions<OtlpExporterOptions>>(
 		sp => new ConfigureNamedOptions<OtlpExporterOptions>(
 			Options.DefaultName,
@@ -111,9 +115,16 @@ builder.Services
 	.AddInterceptionService()
 	.AddServiceUtiltiyInterceptors();
 
+builder.Services.AddSwaggerGen();
+
 builder.Services.AddHealthChecks();
 
 var app = builder.Build();
+
+app.MapControllers();
+app.MapProfileViewer();
+app.MapSwagger();
+app.UseSwaggerUI();
 
 app.MapHealthChecks("/healthz");
 

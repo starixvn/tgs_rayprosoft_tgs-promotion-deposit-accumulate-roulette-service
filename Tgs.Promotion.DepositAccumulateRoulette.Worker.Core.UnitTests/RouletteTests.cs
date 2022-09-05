@@ -3,6 +3,7 @@ using Tgs.PlayerService.Client;
 using Tgs.Promotion.Clients;
 using Tgs.Promotion.DepositAccumulateRoulette.Common;
 using Tgs.Promotion.DepositAccumulateRoulette.Worker.ApplicationServices;
+using Tgs.Promotion.DepositAccumulateRoulette.Worker.Clients;
 using Tgs.ServiceUtility;
 
 namespace Tgs.Promotion.DepositAccumulateRoulette.Worker.Core.UnitTests;
@@ -13,8 +14,7 @@ internal class RouletteTests
 	public async Task Play_Roulette()
 	{
 		var fakeTgsRepository = Substitute.For<ITgsRepository>();
-		var fakeGetPromotionService = Substitute.For<
-			IGetService<GetDepositAccumulateRoulettePromotionQuery, DepositAccumulateRoulettePromotion?>>();
+		var fakeRouletteServiceClient = Substitute.For<IDepositAccumulateRouletteServiceClient>();
 
 		var fakeGetRouletteEventCountService = Substitute.For<
 			IGetService<GetAvailableRouletteCountEventQuery, RouletteEventCountInfo?>>();
@@ -27,13 +27,13 @@ internal class RouletteTests
 
 		var sut = new RouletteCommandService(
 			fakeTgsRepository,
-			fakeGetPromotionService,
 			fakeGetRouletteEventCountService,
 			fakeShuffleService,
 			fakeStatisticsService,
 			fakeDistributeService,
 			fakePromotionServiceClient,
-			fakePlayerServiceClient);
+			fakePlayerServiceClient,
+			fakeRouletteServiceClient);
 
 		var depositItems = new DepositAccumulateItem[]
 		{
@@ -73,12 +73,12 @@ internal class RouletteTests
 				BrandId = brandId
 			});
 
-		_ = fakeGetPromotionService.GetAsync(
-			Arg.Is<GetDepositAccumulateRoulettePromotionQuery>(cmd =>
-				cmd.PromotionId == command.PromotionId))
+		_ = fakeRouletteServiceClient.GetDepositAccumulateRoulettePromotionAsync(
+				Arg.Is(command.PromotionId),
+				Arg.Any<CancellationToken>())
 			.Returns(new DepositAccumulateRoulettePromotion(
 				command.PromotionId,
-				new During(DateTime.Parse("2022-08-10"), DateTime.Parse("2022-08-12")),
+				new EventDuring(DateTime.Parse("2022-08-10"), DateTime.Parse("2022-08-12")),
 				null,
 				settings));
 
@@ -136,8 +136,7 @@ internal class RouletteTests
 	public async Task Play_Roulette_In_Count_Distribute_Period()
 	{
 		var fakeTgsRepository = Substitute.For<ITgsRepository>();
-		var fakeGetPromotionService = Substitute.For<
-			IGetService<GetDepositAccumulateRoulettePromotionQuery, DepositAccumulateRoulettePromotion?>>();
+		var fakeRouletteServiceClient = Substitute.For<IDepositAccumulateRouletteServiceClient>();
 
 		var fakeGetRouletteEventCountService = Substitute.For<
 			IGetService<GetAvailableRouletteCountEventQuery, RouletteEventCountInfo?>>();
@@ -150,13 +149,13 @@ internal class RouletteTests
 
 		var sut = new RouletteCommandService(
 			fakeTgsRepository,
-			fakeGetPromotionService,
 			fakeGetRouletteEventCountService,
 			fakeShuffleService,
 			fakeStatisticsService,
 			fakeDistributeService,
 			fakePromotionServiceClient,
-			fakePlayerServiceClient);
+			fakePlayerServiceClient,
+			fakeRouletteServiceClient);
 
 		var depositItems = new DepositAccumulateItem[]
 		{
@@ -205,12 +204,12 @@ internal class RouletteTests
 				BrandId = brandId
 			});
 
-		_ = fakeGetPromotionService.GetAsync(
-			Arg.Is<GetDepositAccumulateRoulettePromotionQuery>(cmd =>
-				cmd.PromotionId == command.PromotionId))
+		_ = fakeRouletteServiceClient.GetDepositAccumulateRoulettePromotionAsync(
+				Arg.Is(command.PromotionId),
+				Arg.Any<CancellationToken>())
 			.Returns(new DepositAccumulateRoulettePromotion(
 				command.PromotionId,
-				new During(DateTime.Parse("2022-08-10"), DateTime.Parse("2022-08-12")),
+				new EventDuring(DateTime.Parse("2022-08-10"), DateTime.Parse("2022-08-12")),
 				null,
 				settings));
 
@@ -269,8 +268,7 @@ internal class RouletteTests
 	public void Play_Roulette_If_Not_Found_Roulette_Promotion_Will_Throw_Exception()
 	{
 		var fakeTgsRepository = Substitute.For<ITgsRepository>();
-		var fakeGetPromotionService = Substitute.For<
-			IGetService<GetDepositAccumulateRoulettePromotionQuery, DepositAccumulateRoulettePromotion?>>();
+		var fakeRouletteServiceClient = Substitute.For<IDepositAccumulateRouletteServiceClient>();
 
 		var fakeGetRouletteEventCountService = Substitute.For<
 			IGetService<GetAvailableRouletteCountEventQuery, RouletteEventCountInfo?>>();
@@ -283,13 +281,13 @@ internal class RouletteTests
 
 		var sut = new RouletteCommandService(
 			fakeTgsRepository,
-			fakeGetPromotionService,
 			fakeGetRouletteEventCountService,
 			fakeShuffleService,
 			fakeStatisticsService,
 			fakeDistributeService,
 			fakePromotionServiceClient,
-			fakePlayerServiceClient);
+			fakePlayerServiceClient,
+			fakeRouletteServiceClient);
 
 		var command = new RouletteCommand(
 			Guid.NewGuid(),
@@ -303,6 +301,11 @@ internal class RouletteTests
 				BrandId = Guid.NewGuid()
 			});
 
+		_ = fakeRouletteServiceClient.GetDepositAccumulateRoulettePromotionAsync(
+				Arg.Is(command.PromotionId),
+				Arg.Any<CancellationToken>())
+			.Returns((DepositAccumulateRoulettePromotion?)null);
+
 		_ = Assert.CatchAsync(async () => await sut.GetAsync(command));
 	}
 
@@ -310,8 +313,7 @@ internal class RouletteTests
 	public void Play_Roulette_If_Not_Found_PlayerInfo_Will_Throw_Exception()
 	{
 		var fakeTgsRepository = Substitute.For<ITgsRepository>();
-		var fakeGetPromotionService = Substitute.For<
-			IGetService<GetDepositAccumulateRoulettePromotionQuery, DepositAccumulateRoulettePromotion?>>();
+		var fakeRouletteServiceClient = Substitute.For<IDepositAccumulateRouletteServiceClient>();
 
 		var fakeGetRouletteEventCountService = Substitute.For<
 			IGetService<GetAvailableRouletteCountEventQuery, RouletteEventCountInfo?>>();
@@ -324,17 +326,22 @@ internal class RouletteTests
 
 		var sut = new RouletteCommandService(
 			fakeTgsRepository,
-			fakeGetPromotionService,
 			fakeGetRouletteEventCountService,
 			fakeShuffleService,
 			fakeStatisticsService,
 			fakeDistributeService,
 			fakePromotionServiceClient,
-			fakePlayerServiceClient);
+			fakePlayerServiceClient,
+			fakeRouletteServiceClient);
 
 		var command = new RouletteCommand(
 			Guid.NewGuid(),
 			"player1");
+
+		_ = fakePlayerServiceClient.GetPlayerInfoAsync(
+				Arg.Is(command.PlayerCode),
+				Arg.Any<CancellationToken>())
+			.Returns((PlayerInfo?)null);
 
 		_ = Assert.CatchAsync(async () => await sut.GetAsync(command));
 	}
@@ -343,8 +350,7 @@ internal class RouletteTests
 	public async Task Play_Roulette_If_Run_Out_Of_Roulette_Count_Cannot_Play_Roulette()
 	{
 		var fakeTgsRepository = Substitute.For<ITgsRepository>();
-		var fakeGetPromotionService = Substitute.For<
-			IGetService<GetDepositAccumulateRoulettePromotionQuery, DepositAccumulateRoulettePromotion?>>();
+		var fakeRouletteServiceClient = Substitute.For<IDepositAccumulateRouletteServiceClient>();
 
 		var fakeGetRouletteEventCountService = Substitute.For<
 			IGetService<GetAvailableRouletteCountEventQuery, RouletteEventCountInfo?>>();
@@ -357,13 +363,13 @@ internal class RouletteTests
 
 		var sut = new RouletteCommandService(
 			fakeTgsRepository,
-			fakeGetPromotionService,
 			fakeGetRouletteEventCountService,
 			fakeShuffleService,
 			fakeStatisticsService,
 			fakeDistributeService,
 			fakePromotionServiceClient,
-			fakePlayerServiceClient);
+			fakePlayerServiceClient,
+			fakeRouletteServiceClient);
 
 		var depositItems = new DepositAccumulateItem[]
 		{
@@ -403,12 +409,12 @@ internal class RouletteTests
 				BrandId = brandId
 			});
 
-		_ = fakeGetPromotionService.GetAsync(
-			Arg.Is<GetDepositAccumulateRoulettePromotionQuery>(cmd =>
-				cmd.PromotionId == command.PromotionId))
+		_ = fakeRouletteServiceClient.GetDepositAccumulateRoulettePromotionAsync(
+			Arg.Is(command.PromotionId),
+			Arg.Any<CancellationToken>())
 			.Returns(new DepositAccumulateRoulettePromotion(
 				command.PromotionId,
-				new During(DateTime.Parse("2022-08-10"), DateTime.Parse("2022-08-12")),
+				new EventDuring(DateTime.Parse("2022-08-10"), DateTime.Parse("2022-08-12")),
 				null,
 				settings));
 
@@ -456,8 +462,7 @@ internal class RouletteTests
 	public async Task Play_Roulette_Set_Current_Count_To_Distribution_Plan()
 	{
 		var fakeTgsRepository = Substitute.For<ITgsRepository>();
-		var fakeGetPromotionService = Substitute.For<
-			IGetService<GetDepositAccumulateRoulettePromotionQuery, DepositAccumulateRoulettePromotion?>>();
+		var fakeRouletteServiceClient = Substitute.For<IDepositAccumulateRouletteServiceClient>();
 		var fakeGetRouletteEventCountService = Substitute.For<
 			IGetService<GetAvailableRouletteCountEventQuery, RouletteEventCountInfo?>>();
 		var fakeShuffleService = Substitute.For<IShuffleService>();
@@ -468,13 +473,13 @@ internal class RouletteTests
 
 		var sut = new RouletteCommandService(
 			fakeTgsRepository,
-			fakeGetPromotionService,
 			fakeGetRouletteEventCountService,
 			fakeShuffleService,
 			fakeStatisticsService,
 			fakeDistributeService,
 			fakePromotionServiceClient,
-			fakePlayerServiceClient);
+			fakePlayerServiceClient,
+			fakeRouletteServiceClient);
 
 		var depositItems = new DepositAccumulateItem[]
 		{
@@ -514,12 +519,12 @@ internal class RouletteTests
 				BrandId = brandId
 			});
 
-		_ = fakeGetPromotionService.GetAsync(
-			Arg.Is<GetDepositAccumulateRoulettePromotionQuery>(cmd =>
-				cmd.PromotionId == command.PromotionId))
+		_ = fakeRouletteServiceClient.GetDepositAccumulateRoulettePromotionAsync(
+				Arg.Is(command.PromotionId),
+			Arg.Any<CancellationToken>())
 			.Returns(new DepositAccumulateRoulettePromotion(
 				command.PromotionId,
-				new During(DateTime.Parse("2022-08-10"), DateTime.Parse("2022-08-12")),
+				new EventDuring(DateTime.Parse("2022-08-10"), DateTime.Parse("2022-08-12")),
 				null,
 				settings));
 

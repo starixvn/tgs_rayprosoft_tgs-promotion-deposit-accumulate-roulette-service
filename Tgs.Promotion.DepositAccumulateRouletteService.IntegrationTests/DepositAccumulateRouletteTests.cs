@@ -8,6 +8,8 @@ using Tgs.Promotion.DepositAccumulateRoulette.Common;
 using Tgs.Promotion.DepositAccumulateRoulette.Common.Protos;
 using Tgs.Promotion.DepositAccumulateRoulette.Worker;
 using Tgs.Promotion.DepositAccumulateRoulette.Worker.ApplicationServices;
+using Tgs.Promotion.DepositAccumulateRoulette.Worker.Clients;
+using Tgs.Promotion.DepositAccumulateRouletteService.ApplicationServices;
 using Tgs.Promotion.DepositAccumulateRouletteService.MessageQueue;
 using Tgs.ServiceUtility;
 
@@ -28,6 +30,7 @@ internal class DepositAccumulateRouletteTests
 		var fakeTgsRepository = Substitute.For<ITgsRepository>();
 		var fakeStoreRepository = Substitute.For<IStoreRepository>();
 		var fakeSystemClock = Substitute.For<ISystemClock>();
+		var fakeRouletteServiceClient = Substitute.For<IDepositAccumulateRouletteServiceClient>();
 
 		await using var web = new TestDepositAccumulateRouletteServiceApplication(builder => builder
 			.ConfigureServices(services =>
@@ -38,7 +41,8 @@ internal class DepositAccumulateRouletteTests
 					.AddSingleton(fakePlayerServiceClient)
 					.AddSingleton(fakeTgsRepository)
 					.AddSingleton(fakeRedisConnectionManager)
-					.AddSingleton(fakeSystemClock);
+					.AddSingleton(fakeSystemClock)
+					.AddSingleton(fakeRouletteServiceClient);
 
 				_ = services
 					.AddSingleton<IShuffleService, ShuffleService>()
@@ -47,9 +51,6 @@ internal class DepositAccumulateRouletteTests
 					.AddSingleton<IDepositAccumulateRouletteEventService, DepositAccumulateRouletteEventService>();
 
 				_ = services
-					.AddSingleton<IGetService<GetDepositAccumulateRoulettePromotionQuery,
-							DepositAccumulateRoulettePromotion?>,
-						GetDepositAccumulateRoulettePromotionQueryService>()
 					.AddSingleton<IGetService<GetAvailableRouletteCountEventQuery, RouletteEventCountInfo?>,
 						GetAvailableRouletteCountEventQueryService>()
 					.AddSingleton<ICommandService<DistributeBonusCommand>, DistributeBonusCommandService>()
@@ -165,15 +166,19 @@ internal class DepositAccumulateRouletteTests
 				Arg.Any<CancellationToken>())
 			.Returns(promotionInfo);
 
-		_ = fakePromotionServiceClient.GetPromotionRuleAsync<ApplicationServices.GetDepositAccumulateRoulettePromotionQueryService.PromotionRule>(
-				Arg.Is(promotionId),
-				Arg.Any<CancellationToken>())
-			.Returns(new ApplicationServices.GetDepositAccumulateRoulettePromotionQueryService.PromotionRule { CompaignDetail = settings });
-
 		_ = fakePromotionServiceClient.GetPromotionRuleAsync<GetDepositAccumulateRoulettePromotionQueryService.PromotionRule>(
 				Arg.Is(promotionId),
 				Arg.Any<CancellationToken>())
 			.Returns(new GetDepositAccumulateRoulettePromotionQueryService.PromotionRule { CompaignDetail = settings });
+
+		_ = fakeRouletteServiceClient.GetDepositAccumulateRoulettePromotionAsync(
+				Arg.Is(promotionId),
+				Arg.Any<CancellationToken>())
+			.Returns(new DepositAccumulateRoulettePromotion(
+				promotionInfo.Id,
+				new EventDuring(promotionInfo.EventDuring.From, promotionInfo.EventDuring.To),
+				promotionInfo.PromotionLimitAmount,
+				settings));
 
 		_ = fakeMessageSender.RequestAsync(
 				Arg.Is("tgs.promotion.depositaccumulateroulette.roulette.play"),

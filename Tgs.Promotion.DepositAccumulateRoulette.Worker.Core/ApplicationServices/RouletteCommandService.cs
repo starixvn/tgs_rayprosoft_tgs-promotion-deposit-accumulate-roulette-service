@@ -9,32 +9,32 @@ namespace Tgs.Promotion.DepositAccumulateRoulette.Worker.ApplicationServices;
 internal class RouletteCommandService : IGetService<RouletteCommand, RouletteResult>
 {
 	private readonly ITgsRepository _tgsRepository;
-	private readonly IGetService<GetDepositAccumulateRoulettePromotionQuery, DepositAccumulateRoulettePromotion?> _getPromotionService;
 	private readonly IGetService<GetAvailableRouletteCountEventQuery, RouletteEventCountInfo?> _getAvailableCountEventService;
 	private readonly IShuffleService _shuffleService;
 	private readonly IStatisticsService _statisticsService;
 	private readonly ICommandService<DistributeBonusCommand> _distributeService;
 	private readonly IPromotionServiceClient _promotionServiceClient;
 	private readonly IPlayerServiceClient _playerServiceClient;
+	private readonly IDepositAccumulateRouletteServiceClient _rouletteServiceClient;
 
 	public RouletteCommandService(
 		ITgsRepository tgsRepository,
-		IGetService<GetDepositAccumulateRoulettePromotionQuery, DepositAccumulateRoulettePromotion?> getPromotionService,
 		IGetService<GetAvailableRouletteCountEventQuery, RouletteEventCountInfo?> getAvailableCountEventService,
 		IShuffleService shuffleService,
 		IStatisticsService statisticsService,
 		ICommandService<DistributeBonusCommand> distributeService,
 		IPromotionServiceClient promotionServiceClient,
-		IPlayerServiceClient playerServiceClient)
+		IPlayerServiceClient playerServiceClient,
+		IDepositAccumulateRouletteServiceClient rouletteServiceClient)
 	{
 		_tgsRepository = tgsRepository ?? throw new ArgumentNullException(nameof(tgsRepository));
-		_getPromotionService = getPromotionService ?? throw new ArgumentNullException(nameof(getPromotionService));
 		_getAvailableCountEventService = getAvailableCountEventService ?? throw new ArgumentNullException(nameof(getAvailableCountEventService));
 		_shuffleService = shuffleService ?? throw new ArgumentNullException(nameof(shuffleService));
 		_statisticsService = statisticsService ?? throw new ArgumentNullException(nameof(statisticsService));
 		_distributeService = distributeService ?? throw new ArgumentNullException(nameof(distributeService));
 		_promotionServiceClient = promotionServiceClient ?? throw new ArgumentNullException(nameof(promotionServiceClient));
 		_playerServiceClient = playerServiceClient ?? throw new ArgumentNullException(nameof(playerServiceClient));
+		_rouletteServiceClient = rouletteServiceClient ?? throw new ArgumentNullException(nameof(rouletteServiceClient));
 	}
 
 	public async ValueTask<RouletteResult> GetAsync(
@@ -43,9 +43,11 @@ internal class RouletteCommandService : IGetService<RouletteCommand, RouletteRes
 		var player = await _playerServiceClient.GetPlayerInfoAsync(command.PlayerCode, cancellationToken)
 			.ConfigureAwait(false);
 
-		var promotionSetting = await _getPromotionService.GetAsync(
-			new GetDepositAccumulateRoulettePromotionQuery(command.PromotionId),
-			cancellationToken).ConfigureAwait(false);
+		var promotionSetting = await _rouletteServiceClient
+			.GetDepositAccumulateRoulettePromotionAsync(
+				command.PromotionId,
+				cancellationToken)
+			.ConfigureAwait(false);
 
 		var rouletteItems = promotionSetting!.CampaignDetail.RouletteItems.ToArray();
 

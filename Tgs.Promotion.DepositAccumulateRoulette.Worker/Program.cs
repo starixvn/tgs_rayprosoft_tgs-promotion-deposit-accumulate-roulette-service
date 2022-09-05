@@ -74,6 +74,11 @@ builder.Services
 			var redisConnectionManager = sp.GetRequiredService<IRedisConnectionManager>();
 			return redisConnectionManager.Database;
 		})
+	.AddDepositAccumulateRouletteServiceClient((options, sp) =>
+	{
+		var config = sp.GetRequiredService<IConfiguration>();
+		options.BaseUrl = config.GetValue<Uri>("DepositAccumulateRouletteWorker:DepositAccumulateRouletteServiceBaseUrl");
+	})
 	.AddPromotionClientServices((options, sp) =>
 	{
 		var config = sp.GetRequiredService<IConfiguration>();
