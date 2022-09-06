@@ -31,7 +31,7 @@ public class RouletteTaskProcessor : IMessageProcessor
 	{
 		var request = RouletteTaskRequest.Parser.ParseFrom(data.Span);
 
-		var redisKey = $"Promotion:DepositAccumulateRoulette:Worker:{request.PlayerCode}";
+		var redisKey = $"Promotion:DepositAccumulateRoulette:Worker:{request.PlayerCode}:{request.PromotionId.ToGuid()}";
 
 		var subject = await _redisDatabase.StringGetAsync(redisKey).ConfigureAwait(false);
 

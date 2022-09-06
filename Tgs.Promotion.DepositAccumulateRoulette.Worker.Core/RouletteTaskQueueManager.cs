@@ -19,10 +19,13 @@ internal class RouletteTaskQueueManager
 
 	public Task<RouletteResult> RequestAsync(RouletteTaskQueueRequest request)
 	{
+		var key = $"{request.PlayerCode}:{request.PromotionId}";
+
 		var queue = _queuePool.GetOrAdd(
-			request.PlayerCode,
+			key,
 			_ => new RouletteTaskQueue(
 				request.PlayerCode,
+				request.PromotionId,
 				_serviceProvider,
 				_serviceProvider.GetRequiredService<ILogger<RouletteTaskQueue>>()));
 
@@ -52,7 +55,9 @@ internal class RouletteTaskQueueManager
 			.Where(queue => currentTime > queue.Expired)
 			.Select(queue => Task.Run(() =>
 			{
-				if (!_queuePool.TryRemove(queue.PlayerCode, out _))
+				var key = $"{queue.PlayerCode}:{queue.PromotionId}";
+
+				if (!_queuePool.TryRemove(key, out _))
 					return;
 
 				queue.StopProcess();

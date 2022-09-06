@@ -27,7 +27,7 @@ internal class RouletteHandleService : IRouletteHandleService
 		RouletteTaskRequest request,
 		CancellationToken cancellationToken)
 	{
-		var machineName = await GetProcessSubjectAsync(request.PlayerCode, cancellationToken).ConfigureAwait(false);
+		var machineName = await GetProcessSubjectAsync(request.PlayerCode, request.PromotionId, cancellationToken).ConfigureAwait(false);
 
 		var data = await _messageSender.RequestAsync(
 			$"tgs.promotion.depositaccumulateroulette.worker.{machineName}.roulette",
@@ -40,9 +40,9 @@ internal class RouletteHandleService : IRouletteHandleService
 		return new RouletteResult(response.Id, response.ItemIndex);
 	}
 
-	private async ValueTask<string> GetProcessSubjectAsync(string playerCode, CancellationToken cancellationToken)
+	private async ValueTask<string> GetProcessSubjectAsync(string playerCode, Guid promotionId, CancellationToken cancellationToken)
 	{
-		var redisKey = $"Promotion:DepositAccumulateRoulette:Worker:{playerCode}";
+		var redisKey = $"Promotion:DepositAccumulateRoulette:Worker:{playerCode}:{promotionId}";
 
 		var subject = await _redisDatabase.StringGetAsync(redisKey).ConfigureAwait(false);
 
@@ -53,6 +53,7 @@ internal class RouletteHandleService : IRouletteHandleService
 
 		var bidRequest = new BidRequest
 		{
+			PromotionId = promotionId,
 			PlayerCode = playerCode
 		};
 

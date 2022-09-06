@@ -25,7 +25,9 @@ public class BidProcessor : IMessageProcessor
 	{
 		var request = BidRequest.Parser.ParseFrom(data.Span);
 
-		var redisKey = $"Promotion:DepositAccumulateRoulette:Worker:{request.PlayerCode}";
+		var promotionId = request.PromotionId.ToGuid();
+
+		var redisKey = $"Promotion:DepositAccumulateRoulette:Worker:{request.PlayerCode}:{promotionId}";
 
 		var isSet = await _redisDatabase.StringSetAsync(
 				redisKey,
@@ -44,7 +46,7 @@ public class BidProcessor : IMessageProcessor
 			response.Subject = subject;
 		}
 
-		_logger.LogInformation($"Subject of player({request.PlayerCode}): {response.Subject}");
+		_logger.LogInformation($"Subject of player({request.PlayerCode}) with promotion({promotionId}): {response.Subject}");
 
 		return response.ToByteArray();
 	}

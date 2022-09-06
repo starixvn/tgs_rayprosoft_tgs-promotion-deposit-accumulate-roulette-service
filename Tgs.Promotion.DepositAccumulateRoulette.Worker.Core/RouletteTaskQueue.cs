@@ -21,14 +21,19 @@ internal class RouletteTaskQueue : IDisposable
 
 	public string PlayerCode { get; }
 
+	public Guid PromotionId { get; }
+
 	public bool IsStartProcess { get; private set; }
 
 	public RouletteTaskQueue(
 		string playerCode,
+		Guid promotionId,
 		IServiceProvider serviceProvider,
 		ILogger<RouletteTaskQueue> logger)
 	{
 		PlayerCode = playerCode ?? throw new ArgumentNullException(nameof(playerCode));
+		PromotionId = promotionId;
+
 		_serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
 		_logger = logger ?? throw new ArgumentNullException(nameof(logger));
 	}
