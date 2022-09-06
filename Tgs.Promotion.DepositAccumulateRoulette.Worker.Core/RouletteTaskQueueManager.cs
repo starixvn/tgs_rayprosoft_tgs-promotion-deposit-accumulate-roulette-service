@@ -32,7 +32,7 @@ internal class RouletteTaskQueueManager
 		if (!queue.IsStartProcess)
 			queue.StartProcess(_cancellationTokenSource.Token);
 
-		var task = new RouletteTask(request, new TaskCompletionSource<RouletteResult>());
+		var task = new RouletteTask(new TaskCompletionSource<RouletteResult>());
 		queue.Enqueue(task);
 
 		return task.Promise.Task;

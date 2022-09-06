@@ -5,16 +5,13 @@ namespace Tgs.Promotion.DepositAccumulateRoulette.Worker.ApplicationServices;
 internal class GetAvailableRouletteCountEventQueryService : IGetService<GetAvailableRouletteCountEventQuery, RouletteEventCountInfo?>
 {
 	private readonly IDepositAccumulateRouletteEventService _eventService;
-	private readonly ITgsRepository _tgsRepository;
 	private readonly IStoreRepository _storeRepository;
 
 	public GetAvailableRouletteCountEventQueryService(
 		IDepositAccumulateRouletteEventService eventService,
-		ITgsRepository tgsRepository,
 		IStoreRepository storeRepository)
 	{
 		_eventService = eventService ?? throw new ArgumentNullException(nameof(eventService));
-		_tgsRepository = tgsRepository ?? throw new ArgumentNullException(nameof(tgsRepository));
 		_storeRepository = storeRepository ?? throw new ArgumentNullException(nameof(storeRepository));
 	}
 
