@@ -9,7 +9,6 @@ internal class ShuffleService : IShuffleService
 	public ValueTask<int[]> ShuffleAsync(Guid promotionId, IEnumerable<RouletteItem> items)
 	{
 		var proportions = items
-			.Where(item => item.WinningProbability > 0)
 			.Select((item, index) => new
 			{
 				ItemIndex = index,

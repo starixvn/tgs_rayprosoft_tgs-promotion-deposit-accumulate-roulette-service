@@ -56,7 +56,7 @@ internal class DepositAccumulateRouletteTests
 					.AddSingleton<ICommandService<DistributeBonusCommand>, DistributeBonusCommandService>()
 					.AddSingleton<IGetService<GetPromotionDistributePlanQuery, PromotionDistributePlanInfo>,
 						GetPromotionDistributePlanQueryService>()
-					.AddSingleton<IGetService<RouletteCommand, RouletteResult>, RouletteCommandService>();
+					.AddSingleton<IGetService<PlayRouletteCommand, PlayRouletteResult?>, PlayRouletteCommandService>();
 
 				_ = services
 					.AddSingleton<RouletteTaskQueueManager>()

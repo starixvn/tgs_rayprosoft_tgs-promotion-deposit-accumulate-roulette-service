@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Tgs.PlayerService.Client;
@@ -15,7 +14,7 @@ internal class RouletteTaskQueue : IDisposable
 	private readonly IServiceProvider _serviceProvider;
 	private readonly ILogger<RouletteTaskQueue> _logger;
 	private readonly BlockingCollection<RouletteTask> _rouletteTasks = new();
-	private readonly Dictionary<DateOnly, int> _rouletteUsedCounts = new();
+	private readonly ConcurrentDictionary<DateOnly, int> _rouletteUsedCounts = new();
 
 	private CancellationTokenSource? _cancellationTokenSource;
 	private Task? _backgroundTask;
@@ -107,8 +106,6 @@ internal class RouletteTaskQueue : IDisposable
 				_rouletteTasks.CompleteAdding();
 			}
 
-			// TODO: free unmanaged resources (unmanaged objects) and override finalizer
-			// TODO: set large fields to null
 			_disposedValue = true;
 		}
 	}
@@ -177,25 +174,7 @@ internal class RouletteTaskQueue : IDisposable
 
 			var usedCount = IncreaseUsedCount(useEventInfo.Date);
 
-			_ = Task.Run(async () =>
-			{
-				var promotionServiceClient = scope.ServiceProvider
-					.GetRequiredService<IPromotionServiceClient>();
-				await promotionServiceClient.UpdatePromotionUsedAmountAsync(
-					PromotionId,
-					playResult.TotalAmount,
-					playResult.RecordId).ConfigureAwait(false);
-
-				var distributeService = scope.ServiceProvider
-					.GetRequiredService<ICommandService<DistributeBonusCommand>>();
-				await distributeService.ExecuteAsync(new DistributeBonusCommand(
-					PromotionId,
-					PlayerCode,
-					useEventInfo.Date,
-					usedCount,
-					playResult.Bonus,
-					playResult.Bucket)).ConfigureAwait(false);
-			});
+			DistributeBonus(playResult, useEventInfo, usedCount);
 
 			var rouletteResult = new RouletteResult(playResult.RouletteId, playResult.ItemIndex);
 			rouletteTask.Promise.SetResult(rouletteResult);
@@ -212,6 +191,34 @@ internal class RouletteTaskQueue : IDisposable
 		}
 	}
 
+	private void DistributeBonus(
+		PlayRouletteResult playResult,
+		RouletteEventCountInfo useEventInfo, int usedCount)
+	{
+		_ = Task.Run(async () =>
+		{
+			await using var scope = _serviceProvider.CreateAsyncScope();
+
+			var promotionServiceClient = scope.ServiceProvider
+				.GetRequiredService<IPromotionServiceClient>();
+
+			await promotionServiceClient.UpdatePromotionUsedAmountAsync(
+				PromotionId,
+				playResult.TotalAmount,
+				playResult.RecordId).ConfigureAwait(false);
+
+			var distributeService = scope.ServiceProvider
+				.GetRequiredService<ICommandService<DistributeBonusCommand>>();
+			await distributeService.ExecuteAsync(new DistributeBonusCommand(
+				PromotionId,
+				PlayerCode,
+				useEventInfo.Date,
+				usedCount,
+				playResult.Bonus,
+				playResult.Bucket)).ConfigureAwait(false);
+		});
+	}
+
 	private async Task InitUsedCountAsync(DateOnly date, IServiceProvider serviceProvider, CancellationToken cancellationToken)
 	{
 		var tgsRepository = serviceProvider.GetRequiredService<ITgsRepository>();
@@ -219,22 +226,15 @@ internal class RouletteTaskQueue : IDisposable
 			.GetRouletteUsedCountAsync(PromotionId, PlayerCode, date, cancellationToken)
 			.ConfigureAwait(false);
 
-		lock (_rouletteUsedCounts)
-		{
-			_rouletteUsedCounts.TryAdd(date, usedCount);
-		}
+		_ = _rouletteUsedCounts.TryAdd(date, usedCount);
 	}
 
 	private int IncreaseUsedCount(DateOnly date)
 	{
-		lock (_rouletteUsedCounts)
-		{
-			var lastCount = _rouletteUsedCounts[date];
-			var usedCount = lastCount + 1;
+		var lastCount = _rouletteUsedCounts[date];
+		var usedCount = lastCount + 1;
 
-			_rouletteUsedCounts[date] = usedCount;
-
-			return usedCount;
-		}
+		return _rouletteUsedCounts.TryUpdate(date, usedCount, lastCount)
+			? usedCount : lastCount;
 	}
 }
