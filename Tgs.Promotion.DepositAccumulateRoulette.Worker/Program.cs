@@ -1,3 +1,5 @@
+using Hangfire;
+using Hangfire.MemoryStorage;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Npgsql;
@@ -89,6 +91,10 @@ builder.Services
 		var config = sp.GetRequiredService<IConfiguration>();
 		options.BaseUrl = config.GetValue<Uri>("DepositAccumulateRouletteWorker:PlayerBaseUrl");
 	});
+
+builder.Services
+	.AddHangfire((_, configuration) => configuration.UseMemoryStorage())
+	.AddHangfireServer();
 
 builder.Services
 	.AddSingleton<IConfigureOptions<OtlpExporterOptions>>(
