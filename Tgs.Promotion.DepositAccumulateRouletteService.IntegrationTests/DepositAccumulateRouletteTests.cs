@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Hangfire;
+using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 using Tgs.DepositAccumulateRoulette.Clients;
 using Tgs.MessageQueue;
@@ -12,8 +13,6 @@ using Tgs.Promotion.DepositAccumulateRoulette.Worker.Clients;
 using Tgs.Promotion.DepositAccumulateRouletteService.ApplicationServices;
 using Tgs.Promotion.DepositAccumulateRouletteService.MessageQueue;
 using Tgs.ServiceUtility;
-
-using RouletteResult = Tgs.Promotion.DepositAccumulateRoulette.Common.RouletteResult;
 
 namespace Tgs.Promotion.DepositAccumulateRouletteService.IntegrationTests;
 
@@ -31,6 +30,7 @@ internal class DepositAccumulateRouletteTests
 		var fakeStoreRepository = Substitute.For<IStoreRepository>();
 		var fakeSystemClock = Substitute.For<ISystemClock>();
 		var fakeRouletteServiceClient = Substitute.For<IDepositAccumulateRouletteServiceClient>();
+		var fakeBackgroundJobClient = Substitute.For<IBackgroundJobClient>();
 
 		await using var web = new TestDepositAccumulateRouletteServiceApplication(builder => builder
 			.ConfigureServices(services =>
@@ -42,7 +42,8 @@ internal class DepositAccumulateRouletteTests
 					.AddSingleton(fakeTgsRepository)
 					.AddSingleton(fakeRedisConnectionManager)
 					.AddSingleton(fakeSystemClock)
-					.AddSingleton(fakeRouletteServiceClient);
+					.AddSingleton(fakeRouletteServiceClient)
+					.AddSingleton(fakeBackgroundJobClient);
 
 				_ = services
 					.AddSingleton<IShuffleService, ShuffleService>()

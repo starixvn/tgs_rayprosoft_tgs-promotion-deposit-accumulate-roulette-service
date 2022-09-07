@@ -1,4 +1,7 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Hangfire;
+using Hangfire.Common;
+using Hangfire.States;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
 using NSubstitute;
 using Tgs.PlayerService.Client;
@@ -21,9 +24,9 @@ internal class RouletteQueueTests
 		var fakeGetRouletteEventCountService = Substitute.For<
 			IGetService<GetAvailableRouletteCountEventQuery, RouletteEventCountInfo?>>();
 		var fakePlayRouletteCommandService = Substitute.For<IGetService<PlayRouletteCommand, PlayRouletteResult?>>();
-		var fakeDistributeService = Substitute.For<ICommandService<DistributeBonusCommand>>();
 		var fakePromotionServiceClient = Substitute.For<IPromotionServiceClient>();
 		var fakePlayerServiceClient = Substitute.For<IPlayerServiceClient>();
+		var fakeBackgroundJobClient = Substitute.For<IBackgroundJobClient>();
 
 		var services = new ServiceCollection();
 		_ = services
@@ -33,7 +36,7 @@ internal class RouletteQueueTests
 			.AddSingleton(fakePlayerServiceClient)
 			.AddSingleton(fakeGetRouletteEventCountService)
 			.AddSingleton(fakePlayRouletteCommandService)
-			.AddSingleton(fakeDistributeService);
+			.AddSingleton(fakeBackgroundJobClient);
 
 		var depositItems = new DepositAccumulateItem[]
 		{
@@ -145,6 +148,7 @@ internal class RouletteQueueTests
 		var fakeDistributeService = Substitute.For<ICommandService<DistributeBonusCommand>>();
 		var fakePromotionServiceClient = Substitute.For<IPromotionServiceClient>();
 		var fakePlayerServiceClient = Substitute.For<IPlayerServiceClient>();
+		var fakeBackgroundJobClient = Substitute.For<IBackgroundJobClient>();
 
 		var services = new ServiceCollection();
 		_ = services
@@ -154,7 +158,8 @@ internal class RouletteQueueTests
 			.AddSingleton(fakePlayerServiceClient)
 			.AddSingleton(fakeGetRouletteEventCountService)
 			.AddSingleton(fakePlayRouletteCommandService)
-			.AddSingleton(fakeDistributeService);
+			.AddSingleton(fakeDistributeService)
+			.AddSingleton(fakeBackgroundJobClient);
 
 		var promotionId = Guid.NewGuid();
 		var brandId = Guid.NewGuid();
@@ -201,6 +206,7 @@ internal class RouletteQueueTests
 		var fakeDistributeService = Substitute.For<ICommandService<DistributeBonusCommand>>();
 		var fakePromotionServiceClient = Substitute.For<IPromotionServiceClient>();
 		var fakePlayerServiceClient = Substitute.For<IPlayerServiceClient>();
+		var fakeBackgroundJobClient = Substitute.For<IBackgroundJobClient>();
 
 		var services = new ServiceCollection();
 		_ = services
@@ -210,7 +216,8 @@ internal class RouletteQueueTests
 			.AddSingleton(fakePlayerServiceClient)
 			.AddSingleton(fakeGetRouletteEventCountService)
 			.AddSingleton(fakePlayRouletteCommandService)
-			.AddSingleton(fakeDistributeService);
+			.AddSingleton(fakeDistributeService)
+			.AddSingleton(fakeBackgroundJobClient);
 
 		var promotionId = Guid.NewGuid();
 		var brandId = Guid.NewGuid();
@@ -247,6 +254,7 @@ internal class RouletteQueueTests
 		var fakeDistributeService = Substitute.For<ICommandService<DistributeBonusCommand>>();
 		var fakePromotionServiceClient = Substitute.For<IPromotionServiceClient>();
 		var fakePlayerServiceClient = Substitute.For<IPlayerServiceClient>();
+		var fakeBackgroundJobClient = Substitute.For<IBackgroundJobClient>();
 
 		var services = new ServiceCollection();
 		_ = services
@@ -256,7 +264,8 @@ internal class RouletteQueueTests
 			.AddSingleton(fakePlayerServiceClient)
 			.AddSingleton(fakeGetRouletteEventCountService)
 			.AddSingleton(fakePlayRouletteCommandService)
-			.AddSingleton(fakeDistributeService);
+			.AddSingleton(fakeDistributeService)
+			.AddSingleton(fakeBackgroundJobClient);
 
 		var depositItems = new DepositAccumulateItem[]
 		{
@@ -364,6 +373,7 @@ internal class RouletteQueueTests
 		var fakeDistributeService = Substitute.For<ICommandService<DistributeBonusCommand>>();
 		var fakePromotionServiceClient = Substitute.For<IPromotionServiceClient>();
 		var fakePlayerServiceClient = Substitute.For<IPlayerServiceClient>();
+		var fakeBackgroundJobClient = Substitute.For<IBackgroundJobClient>();
 
 		var services = new ServiceCollection();
 		_ = services
@@ -373,7 +383,8 @@ internal class RouletteQueueTests
 			.AddSingleton(fakePlayerServiceClient)
 			.AddSingleton(fakeGetRouletteEventCountService)
 			.AddSingleton(fakePlayRouletteCommandService)
-			.AddSingleton(fakeDistributeService);
+			.AddSingleton(fakeDistributeService)
+			.AddSingleton(fakeBackgroundJobClient);
 
 		var depositItems = new DepositAccumulateItem[]
 		{
@@ -467,19 +478,25 @@ internal class RouletteQueueTests
 		var sut = new RouletteTask(new TaskCompletionSource<RouletteResult>());
 		queue.Enqueue(sut);
 
+		var scheduleInfo = new DistributeBonusScheduleInfo(
+			promotionId,
+			playerCode,
+			eventInfo.Date,
+			2,
+			playRouletteResult);
+
 		var actual = await sut.Promise.Task.ConfigureAwait(false);
 
 		Assert.IsNotNull(actual);
 		Assert.AreEqual(expected, actual);
 
-		_ = fakeDistributeService
+		_ = fakeBackgroundJobClient
 			.Received(1)
-			.ExecuteAsync(
-				Arg.Is<DistributeBonusCommand>(x =>
-					x.PromotionId == promotionId &&
-					x.PlayerCode == playerCode &&
-					x.EventDate == eventInfo.Date &&
-					x.CurrentRouletteCount == 2),
-				Arg.Any<CancellationToken>());
+			.Create(
+				Arg.Is<Job>(job
+					=> job.Type == typeof(DistributeBonusBackgroundJob) &&
+					   job.Method.Name == "ExecuteAsync"
+					   && (DistributeBonusScheduleInfo)job.Args[0] == scheduleInfo),
+				Arg.Is<EnqueuedState>(p => p.Name == "Enqueued"));
 	}
 }
