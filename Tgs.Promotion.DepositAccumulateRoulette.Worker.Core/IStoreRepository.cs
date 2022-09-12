@@ -7,20 +7,22 @@ public interface IStoreRepository
 		decimal amount,
 		CancellationToken cancellationToken = default);
 
-	ValueTask<int?> GetRouletteCountAsync(Guid promotionId, string playerCode, DateOnly date);
-
-	ValueTask<int> DecreaseRouletteCountAsync(Guid promotionId, string playerCode, DateOnly date);
-
-	ValueTask<int> IncreaseRouletteCountAsync(Guid promotionId, string playerCode, DateOnly date);
-
-	ValueTask<bool> SetRouletteCountAsync(Guid promotionId, string playerCode, DateOnly date, int rouletteCount);
-
 	IAsyncEnumerable<DepositAccumulateRouletteEventInfo> GetDepositAccumulateRouletteEventInfosAsync(
 		Guid promotionId,
 		string playerCode,
 		DateTimeOffset queryDate);
 
-	ValueTask<bool> SetDepositAccumulateRouletteEventInfoAsync(Guid promotionId, string playerCode, DateTimeOffset expireDate, DepositAccumulateRouletteEventInfo eventInfo);
+	ValueTask<bool> SetDepositAccumulateRouletteEventInfoAsync(
+		Guid promotionId,
+		string playerCode,
+		DateTimeOffset expireDate,
+		DepositAccumulateRouletteEventInfo eventInfo);
 
 	ValueTask ClearExpiredDepositAccumulateRouletteEventsAsync(Guid promotionId, string playerCode);
+
+	ValueTask<int?> GetRouletteUsedCountAsync(Guid promotionId, string playerCode, DateOnly date);
+
+	ValueTask<bool> SetRouletteUsedCountAsync(Guid promotionId, string playerCode, DateOnly date, int rouletteUsedCount);
+
+	ValueTask<int> IncreaseRouletteUsedCountAsync(Guid promotionId, string playerCode, DateOnly date);
 }

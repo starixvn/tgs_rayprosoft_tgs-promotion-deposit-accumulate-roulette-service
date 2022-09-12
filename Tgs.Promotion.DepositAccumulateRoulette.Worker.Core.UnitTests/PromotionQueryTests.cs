@@ -73,14 +73,14 @@ internal class PromotionQueryTests
 				.Returns(new[] { secondEventInfo }.ToAsyncEnumerable());
 
 		_ = fakeStoreRepository
-			.GetRouletteCountAsync(
+			.GetRouletteUsedCountAsync(
 				Arg.Is(firstEventInfo.PromotionId),
 				Arg.Is(firstEventInfo.PlayerCode),
 				Arg.Is(firstEventInfo.Date))
-			.Returns(4);
+			.Returns(1);
 
 		_ = fakeStoreRepository
-			.GetRouletteCountAsync(
+			.GetRouletteUsedCountAsync(
 				Arg.Is(secondEventInfo.PromotionId),
 				Arg.Is(secondEventInfo.PlayerCode),
 				Arg.Is(secondEventInfo.Date))
@@ -121,6 +121,8 @@ internal class PromotionQueryTests
 			5,
 			4800);
 
+		var usedCount = 2;
+
 		var expected = new[]
 		{
 			new RouletteCountItemInfo(promotionId, 3)
@@ -143,7 +145,7 @@ internal class PromotionQueryTests
 			.Returns(new[] { eventInfo }.ToAsyncEnumerable());
 
 		_ = fakeStoreRepository
-			.GetRouletteCountAsync(
+			.GetRouletteUsedCountAsync(
 				Arg.Is(eventInfo.PromotionId),
 				Arg.Is(eventInfo.PlayerCode),
 				Arg.Is(eventInfo.Date))
@@ -154,16 +156,16 @@ internal class PromotionQueryTests
 				Arg.Is(eventInfo.PromotionId),
 				Arg.Is(eventInfo.PlayerCode),
 				Arg.Is(eventInfo.Date))
-			.Returns(2);
+			.Returns(usedCount);
 
 		var actual = await sut.QueryAsync(query).ToArrayAsync();
 
 		CollectionAssert.AreEqual(expected, actual);
 
 		_ = fakeStoreRepository
-			.SetRouletteCountAsync(Arg.Is(eventInfo.PromotionId),
+			.SetRouletteUsedCountAsync(Arg.Is(eventInfo.PromotionId),
 			Arg.Is(eventInfo.PlayerCode),
 			Arg.Is(eventInfo.Date),
-			Arg.Is(expected[0].RouletteCount));
+			Arg.Is(usedCount));
 	}
 }

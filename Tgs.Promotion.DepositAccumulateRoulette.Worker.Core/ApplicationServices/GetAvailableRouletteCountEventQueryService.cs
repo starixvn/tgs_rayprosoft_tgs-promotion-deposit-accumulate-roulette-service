@@ -24,28 +24,22 @@ internal class GetAvailableRouletteCountEventQueryService : IGetService<GetAvail
 				query.PromotionId,
 				query.PlayerCode,
 				cancellationToken)
+			.OrderBy(evt => evt.Date)
 			.ToArrayAsync(cancellationToken);
 
 		foreach (var info in eventInfos)
 		{
 			var count = await _storeRepository
-				.GetRouletteCountAsync(info.PromotionId, info.PlayerCode, info.Date)
+				.GetRouletteUsedCountAsync(info.PromotionId, info.PlayerCode, info.Date)
 				.ConfigureAwait(false);
 
-			switch (count)
-			{
-				// assume share storage should keep the count already
-				case null:
-					return null;
-
-				case > 0:
-					return new RouletteEventCountInfo(
+			if (info.RouletteCount >= count)
+				return new RouletteEventCountInfo(
 						info.PlayerCode,
 						info.PromotionId,
 						info.Date,
 						info.RouletteCount,
 						count.Value);
-			}
 		}
 
 		return null;

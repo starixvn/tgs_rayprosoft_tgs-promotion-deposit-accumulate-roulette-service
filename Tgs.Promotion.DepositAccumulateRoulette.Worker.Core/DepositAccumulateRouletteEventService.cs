@@ -66,7 +66,8 @@ internal class DepositAccumulateRouletteEventService : IDepositAccumulateRoulett
 				promotionId,
 				playerCode,
 				queryDate)
-			.ToArrayAsync(cancellationToken);
+			.ToArrayAsync(cancellationToken)
+			.ConfigureAwait(false);
 
 		if (events.Length == 0)
 		{

@@ -5,7 +5,7 @@ using Tgs.ServiceUtility;
 
 namespace Tgs.Promotion.DepositAccumulateRoulette.Worker.ApplicationServices;
 
-internal class PlayRouletteCommandService : IGetService<PlayRouletteCommand, PlayRouletteResult?>
+internal class PlayRouletteCommandService : IGetService<PlayRouletteCommand, PlayRouletteResult>
 {
 	private readonly IShuffleService _shuffleService;
 	private readonly IStatisticsService _statisticsService;
@@ -21,47 +21,37 @@ internal class PlayRouletteCommandService : IGetService<PlayRouletteCommand, Pla
 		_tgsRepository = tgsRepository ?? throw new ArgumentNullException(nameof(tgsRepository));
 	}
 
-	public async ValueTask<PlayRouletteResult?> GetAsync(
+	public async ValueTask<PlayRouletteResult> GetAsync(
 		PlayRouletteCommand command,
 		CancellationToken cancellationToken = default)
 	{
-		var (success, _) = await _statisticsService.DecreaseRouletteCountAsync(
+		var (success, usedCount) = await _statisticsService.IncreaseRouletteUsedCountAsync(
 			command.EventInfo.PromotionId,
 			command.EventInfo.PlayerCode,
 			command.EventInfo.Date,
 			cancellationToken);
 
 		if (!success)
-			return null;
+			return new PlayRouletteResult(null, 0);
 
-		try
-		{
-			var rouletteItems = command.RouletteItems.ToImmutableArray();
+		if (command.EventInfo.DistributeCount < usedCount)
+			return new PlayRouletteResult(null, usedCount);
 
-			var itemIndex = await PlayRouletteAsync(command.EventInfo.PromotionId, rouletteItems).ConfigureAwait(false);
+		var rouletteItems = command.RouletteItems.ToImmutableArray();
 
-			var result = await ProcessRouletteResultAsync(
-				command.EventInfo,
-				rouletteItems,
-				command.PlayerInfo.BrandId,
-				itemIndex,
-				cancellationToken).ConfigureAwait(false);
+		var itemIndex = await PlayRouletteAsync(command.EventInfo.PromotionId, rouletteItems).ConfigureAwait(false);
 
-			return result;
-		}
-		catch
-		{
-			_ = await _statisticsService.IncreaseRouletteCountAsync(
-				command.EventInfo.PromotionId,
-				command.EventInfo.PlayerCode,
-				command.EventInfo.Date,
-				cancellationToken);
+		var result = await ProcessRouletteResultAsync(
+			command.EventInfo,
+			rouletteItems,
+			command.PlayerInfo.BrandId,
+			itemIndex,
+			cancellationToken).ConfigureAwait(false);
 
-			throw;
-		}
+		return new PlayRouletteResult(result, usedCount);
 	}
 
-	private async ValueTask<PlayRouletteResult> ProcessRouletteResultAsync(
+	private async ValueTask<PlayRouletteResult.RouletteResult> ProcessRouletteResultAsync(
 		RouletteEventCountInfo eventInfo,
 		IReadOnlyList<RouletteItem> rouletteItems,
 		Guid brandId,
@@ -90,7 +80,7 @@ internal class PlayRouletteCommandService : IGetService<PlayRouletteCommand, Pla
 
 		var bucket = rouletteItem.Bonus * rouletteItem.TurnoverRate;
 
-		return new PlayRouletteResult(
+		return new PlayRouletteResult.RouletteResult(
 			recordId,
 			totalAmount,
 			rouletteItem.Bonus,

@@ -1,12 +1,7 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging.Abstractions;
-using NSubstitute;
+﻿using NSubstitute;
 using Tgs.PlayerService.Client;
-using Tgs.Promotion.Clients;
 using Tgs.Promotion.DepositAccumulateRoulette.Common;
 using Tgs.Promotion.DepositAccumulateRoulette.Worker.ApplicationServices;
-using Tgs.Promotion.DepositAccumulateRoulette.Worker.Clients;
-using Tgs.ServiceUtility;
 
 namespace Tgs.Promotion.DepositAccumulateRoulette.Worker.Core.UnitTests;
 
@@ -60,17 +55,17 @@ internal class RouletteServiceTests
 				Arg.Any<IEnumerable<RouletteItem>>())
 			.Returns(new[] { 0, 1, 2 });
 
-		_ = fakeStatisticsService.DecreaseRouletteCountAsync(
+		_ = fakeStatisticsService.IncreaseRouletteUsedCountAsync(
 				Arg.Is(command.EventInfo.PromotionId),
 				Arg.Is(command.EventInfo.PlayerCode),
 				Arg.Is(command.EventInfo.Date),
 				Arg.Any<CancellationToken>())
-			.Returns((true, 2));
+			.Returns((true, 1));
 
 		var actual = await sut.GetAsync(command);
 
 		Assert.IsNotNull(actual);
-		Assert.AreNotEqual(-1, actual!.ItemIndex);
+		Assert.AreNotEqual(-1, actual.Result!.ItemIndex);
 
 		_ = fakeTgsRepository
 			.Received(1)
@@ -127,16 +122,16 @@ internal class RouletteServiceTests
 			rouletteEventCountInfo,
 			rouletteItems);
 
-		_ = fakeStatisticsService.DecreaseRouletteCountAsync(
+		_ = fakeStatisticsService.IncreaseRouletteUsedCountAsync(
 				Arg.Is(command.EventInfo.PromotionId),
 				Arg.Is(command.EventInfo.PlayerCode),
 				Arg.Is(command.EventInfo.Date),
 				Arg.Any<CancellationToken>())
-			.Returns((false, 0));
+			.Returns((true, 5));
 
 		var actual = await sut.GetAsync(command);
 
-		Assert.IsNull(actual);
+		Assert.IsNull(actual.Result);
 
 		_ = fakeTgsRepository
 			.DidNotReceive()
@@ -181,7 +176,7 @@ internal class RouletteServiceTests
 			.Returns(eventInfos.ToAsyncEnumerable());
 
 		_ = fakeStoreRepository
-			.GetRouletteCountAsync(
+			.GetRouletteUsedCountAsync(
 				Arg.Is(promotionId),
 				Arg.Is(playerCode),
 				Arg.Is(eventInfos[0].Date))
@@ -192,7 +187,7 @@ internal class RouletteServiceTests
 			eventInfos[0].PromotionId,
 			eventInfos[0].Date,
 			eventInfos[0].RouletteCount,
-			AvailableCount: 2);
+			UsedCount: 2);
 
 		var sut = new GetAvailableRouletteCountEventQueryService(
 			fakeEventService,
@@ -217,28 +212,31 @@ internal class RouletteServiceTests
 		var promotionId = Guid.NewGuid();
 		var playerCode = "player1";
 
-		var eventInfos = new[]
-		{
-			new DepositAccumulateRouletteEventInfo(
-				playerCode,
-				promotionId,
-				DateOnly.Parse("2022-08-11"),
-				4,
-				3000)
-		};
+		var eventInfo = new DepositAccumulateRouletteEventInfo(
+			playerCode,
+			promotionId,
+			DateOnly.Parse("2022-08-11"),
+			4,
+			3000);
+
+		var expected = new RouletteEventCountInfo(
+			playerCode,
+			promotionId,
+			eventInfo.Date,
+			eventInfo.RouletteCount, eventInfo.RouletteCount);
 
 		_ = fakeEventService.GetDepositAccumulateRouletteEventInfosAsync(
 				Arg.Is(promotionId),
 				Arg.Is(playerCode),
 				Arg.Any<CancellationToken>())
-			.Returns(eventInfos.ToAsyncEnumerable());
+			.Returns(new[] { eventInfo }.ToAsyncEnumerable());
 
 		_ = fakeStoreRepository
-			.GetRouletteCountAsync(
+			.GetRouletteUsedCountAsync(
 				Arg.Is(promotionId),
 				Arg.Is(playerCode),
-				Arg.Is(eventInfos[0].Date))
-			.Returns(0);
+				Arg.Is(eventInfo.Date))
+			.Returns(eventInfo.RouletteCount);
 
 		var sut = new GetAvailableRouletteCountEventQueryService(
 			fakeEventService,
@@ -250,7 +248,7 @@ internal class RouletteServiceTests
 
 		var actual = await sut.GetAsync(query);
 
-		Assert.IsNull(actual);
+		Assert.AreEqual(expected, actual);
 	}
 
 	[Test]
@@ -279,7 +277,7 @@ internal class RouletteServiceTests
 			.Returns(eventInfos.ToAsyncEnumerable());
 
 		_ = fakeStoreRepository
-			.GetRouletteCountAsync(
+			.GetRouletteUsedCountAsync(
 				Arg.Is(promotionId),
 				Arg.Is(playerCode),
 				Arg.Is(eventInfos[0].Date))

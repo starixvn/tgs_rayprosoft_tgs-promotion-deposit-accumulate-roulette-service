@@ -5,4 +5,4 @@ internal record DistributeBonusScheduleInfo(
 	string PlayerCode,
 	DateOnly EventDate,
 	int UsedCount,
-	PlayRouletteResult PlayResult);
+	PlayRouletteResult.RouletteResult PlayResult);

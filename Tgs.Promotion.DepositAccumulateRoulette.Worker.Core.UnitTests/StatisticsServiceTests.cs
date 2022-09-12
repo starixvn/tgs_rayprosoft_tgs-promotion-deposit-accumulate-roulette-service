@@ -27,7 +27,7 @@ internal class StatisticsServiceTests
 	}
 
 	[Test]
-	public async Task Decrease_RouletteCount_If_Returns_Is_Not_Negative()
+	public async Task Increase_RouletteUsedCount_If_Count_Is_Stored()
 	{
 		var fakeStoreRepository = Substitute.For<IStoreRepository>();
 
@@ -35,72 +35,46 @@ internal class StatisticsServiceTests
 		var playerCode = "player1";
 		var date = DateOnly.Parse("2022-08-11");
 
-		_ = fakeStoreRepository.DecreaseRouletteCountAsync(
-				Arg.Is(promotionId),
-				Arg.Is(playerCode),
-				Arg.Is(date))
-			.Returns(2);
+		_ = fakeStoreRepository
+			.GetRouletteUsedCountAsync(promotionId, playerCode, date)
+			.Returns(1);
 
 		var sut = new StatisticsService(fakeStoreRepository);
 
-		var actual = await sut.DecreaseRouletteCountAsync(promotionId, playerCode, date).ConfigureAwait(false);
+		var actual = await sut.IncreaseRouletteUsedCountAsync(promotionId, playerCode, date).ConfigureAwait(false);
 
-		Assert.AreEqual(true, actual.Success);
-		Assert.AreEqual(2, actual.AvailableCount);
+		Assert.IsTrue(actual.Success);
+
+		_ = fakeStoreRepository
+			.Received(1)
+			.IncreaseRouletteUsedCountAsync(
+				Arg.Is(promotionId),
+				Arg.Is(playerCode),
+				Arg.Is(date));
+	}
+
+	[Test]
+	public async Task Increase_RouletteUsedCount_If_Count_Is_Not_Stored()
+	{
+		var fakeStoreRepository = Substitute.For<IStoreRepository>();
+
+		var promotionId = Guid.NewGuid();
+		var playerCode = "player1";
+		var date = DateOnly.Parse("2022-08-11");
+
+		_ = fakeStoreRepository
+			.GetRouletteUsedCountAsync(promotionId, playerCode, date)
+			.Returns((int?)null);
+
+		var sut = new StatisticsService(fakeStoreRepository);
+
+		var actual = await sut.IncreaseRouletteUsedCountAsync(promotionId, playerCode, date).ConfigureAwait(false);
+
+		Assert.IsFalse(actual.Success);
 
 		_ = fakeStoreRepository
 			.DidNotReceive()
-			.IncreaseRouletteCountAsync(
-				Arg.Is(promotionId),
-				Arg.Is(playerCode),
-				Arg.Is(date));
-	}
-
-	[Test]
-	public async Task Decrease_RouletteCount_If_Returns_Is_Negative()
-	{
-		var fakeStoreRepository = Substitute.For<IStoreRepository>();
-
-		var promotionId = Guid.NewGuid();
-		var playerCode = "player1";
-		var date = DateOnly.Parse("2022-08-11");
-
-		_ = fakeStoreRepository.DecreaseRouletteCountAsync(
-				Arg.Is(promotionId),
-				Arg.Is(playerCode),
-				Arg.Is(date))
-			.Returns(-1);
-
-		var sut = new StatisticsService(fakeStoreRepository);
-
-		var actual = await sut.DecreaseRouletteCountAsync(promotionId, playerCode, date).ConfigureAwait(false);
-
-		Assert.AreEqual(false, actual.Success);
-
-		_ = fakeStoreRepository
-			.Received(1)
-			.IncreaseRouletteCountAsync(
-				Arg.Is(promotionId),
-				Arg.Is(playerCode),
-				Arg.Is(date));
-	}
-
-	[Test]
-	public async Task Increase_RouletteCount()
-	{
-		var fakeStoreRepository = Substitute.For<IStoreRepository>();
-
-		var promotionId = Guid.NewGuid();
-		var playerCode = "player1";
-		var date = DateOnly.Parse("2022-08-11");
-
-		var sut = new StatisticsService(fakeStoreRepository);
-
-		await sut.IncreaseRouletteCountAsync(promotionId, playerCode, date).ConfigureAwait(false);
-
-		_ = fakeStoreRepository
-			.Received(1)
-			.IncreaseRouletteCountAsync(
+			.IncreaseRouletteUsedCountAsync(
 				Arg.Is(promotionId),
 				Arg.Is(playerCode),
 				Arg.Is(date));

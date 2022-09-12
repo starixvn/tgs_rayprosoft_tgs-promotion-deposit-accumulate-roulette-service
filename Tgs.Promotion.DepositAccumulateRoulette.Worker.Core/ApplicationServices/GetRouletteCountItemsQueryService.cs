@@ -55,10 +55,12 @@ internal class GetRouletteCountItemsQueryService
 
 			foreach (var info in infos)
 			{
-				var count = await GetRouletteCountAsync(promotionId, player.PlayerCode, info, cancellationToken)
+				var usedCount = await GetRouletteUsedCountAsync(promotionId, player.PlayerCode, info, cancellationToken)
 					.ConfigureAwait(false);
 
-				totalCount += count;
+				var availableCount = info.RouletteCount < usedCount ? 0 : info.RouletteCount - usedCount;
+
+				totalCount += availableCount;
 			}
 
 			if (totalCount > 0)
@@ -66,29 +68,27 @@ internal class GetRouletteCountItemsQueryService
 		}
 	}
 
-	private async ValueTask<int> GetRouletteCountAsync(
+	private async ValueTask<int> GetRouletteUsedCountAsync(
 		Guid promotionId,
 		string playerCode,
 		DepositAccumulateRouletteEventInfo info,
 		CancellationToken cancellationToken)
 	{
-		var cachedCount = await _storeRepository
-			.GetRouletteCountAsync(promotionId, playerCode, info.Date)
+		var keptUsedCount = await _storeRepository
+			.GetRouletteUsedCountAsync(promotionId, playerCode, info.Date)
 			.ConfigureAwait(false);
 
-		if (cachedCount.HasValue)
-			return (int)cachedCount;
+		if (keptUsedCount.HasValue)
+			return (int)keptUsedCount;
 
 		var usedCount = await _tgsRepository
 			.GetRouletteUsedCountAsync(promotionId, playerCode, info.Date, cancellationToken)
 			.ConfigureAwait(false);
 
-		var count = info.RouletteCount >= usedCount ? info.RouletteCount - usedCount : 0;
-
 		_ = await _storeRepository
-			.SetRouletteCountAsync(promotionId, playerCode, info.Date, count)
+			.SetRouletteUsedCountAsync(promotionId, playerCode, info.Date, usedCount)
 			.ConfigureAwait(false);
 
-		return count;
+		return usedCount;
 	}
 }

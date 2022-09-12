@@ -57,7 +57,7 @@ internal class DepositAccumulateRouletteTests
 					.AddSingleton<ICommandService<DistributeBonusCommand>, DistributeBonusCommandService>()
 					.AddSingleton<IGetService<GetPromotionDistributePlanQuery, PromotionDistributePlanInfo>,
 						GetPromotionDistributePlanQueryService>()
-					.AddSingleton<IGetService<PlayRouletteCommand, PlayRouletteResult?>, PlayRouletteCommandService>();
+					.AddSingleton<IGetService<PlayRouletteCommand, PlayRouletteResult>, PlayRouletteCommandService>();
 
 				_ = services
 					.AddSingleton<RouletteTaskQueueManager>()
@@ -134,17 +134,17 @@ internal class DepositAccumulateRouletteTests
 				Arg.Any<DateTimeOffset>())
 			.Returns(new[] { eventInfo }.ToAsyncEnumerable());
 
-		_ = fakeStoreRepository.GetRouletteCountAsync(
+		_ = fakeStoreRepository.GetRouletteUsedCountAsync(
 				Arg.Is(promotionId),
 				Arg.Is(playerCode),
 				Arg.Any<DateOnly>())
-			.Returns(eventInfo.RouletteCount);
+			.Returns(0);
 
-		_ = fakeStoreRepository.DecreaseRouletteCountAsync(
+		_ = fakeStoreRepository.IncreaseRouletteUsedCountAsync(
 				Arg.Is(promotionId),
 				Arg.Is(playerCode),
 				Arg.Any<DateOnly>())
-			.Returns(3);
+			.Returns(1);
 
 		_ = fakePlayerServiceClient.GetPlayerInfoAsync(
 				Arg.Is(playerCode),

@@ -6,7 +6,7 @@ using Tgs.ServiceUtility;
 
 using Protos = Tgs.Promotion.DepositAccumulateRoulette.Common.Protos;
 
-using RouletteCountItemInfo = Tgs.Promotion.DepositAccumulateRoulette.Worker.RouletteCountItemInfo;
+namespace Tgs.Promotion.DepositAccumulateRoulette.Worker.MessageQueue;
 
 public class RouletteCountItemsQueryProcessor : IMessageProcessor
 {

@@ -7,13 +7,7 @@ internal interface IStatisticsService
 		decimal amount,
 		CancellationToken cancellationToken = default);
 
-	ValueTask<(bool Success, int AvailableCount)> DecreaseRouletteCountAsync(
-		Guid promotionId,
-		string playerCode,
-		DateOnly countDistributeDate,
-		CancellationToken cancellationToken = default);
-
-	ValueTask<int> IncreaseRouletteCountAsync(
+	ValueTask<(bool Success, int UsedCount)> IncreaseRouletteUsedCountAsync(
 		Guid promotionId,
 		string playerCode,
 		DateOnly countDistributeDate,

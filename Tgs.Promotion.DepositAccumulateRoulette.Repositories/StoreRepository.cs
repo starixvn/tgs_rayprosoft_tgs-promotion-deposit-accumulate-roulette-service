@@ -1,5 +1,5 @@
-﻿using DateOnlyTimeOnly.AspNet.Converters;
-using System.Text.Json;
+﻿using System.Text.Json;
+using DateOnlyTimeOnly.AspNet.Converters;
 using StackExchange.Redis;
 using Tgs.Promotion.DepositAccumulateRoulette.Worker;
 
@@ -35,51 +35,6 @@ internal class StoreRepository : IStoreRepository
 			.ConfigureAwait(false);
 
 		return returnAmount / _ExchangeRate;
-	}
-
-	public async ValueTask<int?> GetRouletteCountAsync(
-		Guid promotionId,
-		string playerCode,
-		DateOnly date)
-	{
-		var redisKey = $"{_KeyPrefix}:RouletteCount:{promotionId}:{playerCode}:{date:O}";
-
-		var value = await _redisDatabase.StringGetAsync(redisKey).ConfigureAwait(false);
-
-		return value.HasValue ? (int)value! : null;
-	}
-
-	public async ValueTask<int> DecreaseRouletteCountAsync(
-		Guid promotionId,
-		string playerCode,
-		DateOnly date)
-	{
-		var redisKey = $"{_KeyPrefix}:RouletteCount:{promotionId}:{playerCode}:{date:O}";
-
-		return (int)await _redisDatabase.StringDecrementAsync(redisKey).ConfigureAwait(false);
-	}
-
-	public async ValueTask<int> IncreaseRouletteCountAsync(
-		Guid promotionId,
-		string playerCode,
-		DateOnly date)
-	{
-		var redisKey = $"{_KeyPrefix}:RouletteCount:{promotionId}:{playerCode}:{date:O}";
-
-		return (int)await _redisDatabase.StringIncrementAsync(redisKey).ConfigureAwait(false);
-	}
-
-	public async ValueTask<bool> SetRouletteCountAsync(
-		Guid promotionId,
-		string playerCode,
-		DateOnly date,
-		int rouletteCount)
-	{
-		var redisKey = $"{_KeyPrefix}:RouletteCount:{promotionId}:{playerCode}:{date:O}";
-
-		return await _redisDatabase
-			.StringSetAsync(redisKey, rouletteCount, TimeSpan.FromDays(2))
-			.ConfigureAwait(false);
 	}
 
 	public async IAsyncEnumerable<DepositAccumulateRouletteEventInfo> GetDepositAccumulateRouletteEventInfosAsync(
@@ -132,7 +87,37 @@ internal class StoreRepository : IStoreRepository
 
 		var score = DateTimeOffset.UtcNow.ToOffset(TimeSpan.FromHours(8D)).Ticks;
 
-		_ = await _redisDatabase.SortedSetRemoveRangeByScoreAsync(redisKey, start: 0, stop: score, exclude: Exclude.Stop)
+		_ = await _redisDatabase
+			.SortedSetRemoveRangeByScoreAsync(redisKey, start: 0, stop: score, exclude: Exclude.Stop)
 			.ConfigureAwait(false);
+	}
+
+	public async ValueTask<int?> GetRouletteUsedCountAsync(Guid promotionId, string playerCode, DateOnly date)
+	{
+		var redisKey = $"{_KeyPrefix}:RouletteUsedCount:{promotionId}:{playerCode}:{date:O}";
+
+		var value = await _redisDatabase.StringGetAsync(redisKey).ConfigureAwait(false);
+
+		return value.HasValue ? (int)value! : null;
+	}
+
+	public async ValueTask<bool> SetRouletteUsedCountAsync(
+		Guid promotionId,
+		string playerCode,
+		DateOnly date,
+		int rouletteUsedCount)
+	{
+		var redisKey = $"{_KeyPrefix}:RouletteUsedCount:{promotionId}:{playerCode}:{date:O}";
+
+		return await _redisDatabase
+			.StringSetAsync(redisKey, rouletteUsedCount, TimeSpan.FromDays(2))
+			.ConfigureAwait(false);
+	}
+
+	public async ValueTask<int> IncreaseRouletteUsedCountAsync(Guid promotionId, string playerCode, DateOnly date)
+	{
+		var redisKey = $"{_KeyPrefix}:RouletteUsedCount:{promotionId}:{playerCode}:{date:O}";
+
+		return (int)await _redisDatabase.StringIncrementAsync(redisKey).ConfigureAwait(false);
 	}
 }

@@ -18,7 +18,6 @@ internal class RouletteQueueTests
 	[Test]
 	public async Task Play_Roulette()
 	{
-		var fakeTgsRepository = Substitute.For<ITgsRepository>();
 		var fakeRouletteServiceClient = Substitute.For<IDepositAccumulateRouletteServiceClient>();
 
 		var fakeGetRouletteEventCountService = Substitute.For<
@@ -27,16 +26,15 @@ internal class RouletteQueueTests
 		var fakePromotionServiceClient = Substitute.For<IPromotionServiceClient>();
 		var fakePlayerServiceClient = Substitute.For<IPlayerServiceClient>();
 		var fakeBackgroundJobClient = Substitute.For<IBackgroundJobClient>();
+		var fakeSystemClock = Substitute.For<ISystemClock>();
 
 		var services = new ServiceCollection();
 		_ = services
-			.AddSingleton(fakeTgsRepository)
 			.AddSingleton(fakeRouletteServiceClient)
 			.AddSingleton(fakePromotionServiceClient)
 			.AddSingleton(fakePlayerServiceClient)
 			.AddSingleton(fakeGetRouletteEventCountService)
-			.AddSingleton(fakePlayRouletteCommandService)
-			.AddSingleton(fakeBackgroundJobClient);
+			.AddSingleton(fakePlayRouletteCommandService);
 
 		var depositItems = new DepositAccumulateItem[]
 		{
@@ -71,17 +69,19 @@ internal class RouletteQueueTests
 			eventInfo.PromotionId,
 			eventInfo.Date,
 			eventInfo.RouletteCount,
-			AvailableCount: 3);
+			UsedCount: 1);
 
 		var playRouletteResult = new PlayRouletteResult(
-			Guid.NewGuid(),
-			100M,
-			10M,
-			30M,
-			Guid.NewGuid(),
-			1);
+			new PlayRouletteResult.RouletteResult(
+				Guid.NewGuid(),
+				100M,
+				10M,
+				30M,
+				Guid.NewGuid(),
+				1),
+			UsedCount: 2);
 
-		var expected = new RouletteResult(playRouletteResult.RouletteId, playRouletteResult.ItemIndex);
+		var expected = new RouletteResult(playRouletteResult.Result!.RouletteId, playRouletteResult.Result.ItemIndex);
 
 		_ = fakePlayerServiceClient
 			.GetPlayerInfoAsync(
@@ -111,18 +111,19 @@ internal class RouletteQueueTests
 			Arg.Any<CancellationToken>())
 			.Returns(playRouletteResult);
 
-		_ = fakeTgsRepository
-			.GetRouletteUsedCountAsync(
-				Arg.Is(promotionId),
-				Arg.Is(playerCode),
-				Arg.Is(eventInfo.Date),
-				Arg.Any<CancellationToken>())
-			.Returns(1);
+		var scheduleInfo = new DistributeBonusScheduleInfo(
+			promotionId,
+			playerCode,
+			eventInfo.Date,
+			2,
+			playRouletteResult.Result);
 
 		var queue = new RouletteTaskQueue(
 			playerCode,
 			promotionId,
 			services.BuildServiceProvider(),
+			fakeBackgroundJobClient,
+			fakeSystemClock,
 			NullLogger<RouletteTaskQueue>.Instance);
 
 		queue.StartProcess(CancellationToken.None);
@@ -134,6 +135,15 @@ internal class RouletteQueueTests
 
 		Assert.IsNotNull(actual);
 		Assert.AreEqual(expected, actual);
+
+		_ = fakeBackgroundJobClient
+			.Received(1)
+			.Create(
+				Arg.Is<Job>(job
+					=> job.Type == typeof(DistributeBonusBackgroundJob) &&
+					   job.Method.Name == "ExecuteAsync"
+					   && (DistributeBonusScheduleInfo)job.Args[0] == scheduleInfo),
+				Arg.Is<EnqueuedState>(p => p.Name == "Enqueued"));
 	}
 
 	[Test]
@@ -149,6 +159,7 @@ internal class RouletteQueueTests
 		var fakePromotionServiceClient = Substitute.For<IPromotionServiceClient>();
 		var fakePlayerServiceClient = Substitute.For<IPlayerServiceClient>();
 		var fakeBackgroundJobClient = Substitute.For<IBackgroundJobClient>();
+		var fakeSystemClock = Substitute.For<ISystemClock>();
 
 		var services = new ServiceCollection();
 		_ = services
@@ -158,8 +169,7 @@ internal class RouletteQueueTests
 			.AddSingleton(fakePlayerServiceClient)
 			.AddSingleton(fakeGetRouletteEventCountService)
 			.AddSingleton(fakePlayRouletteCommandService)
-			.AddSingleton(fakeDistributeService)
-			.AddSingleton(fakeBackgroundJobClient);
+			.AddSingleton(fakeDistributeService);
 
 		var promotionId = Guid.NewGuid();
 		var brandId = Guid.NewGuid();
@@ -184,6 +194,8 @@ internal class RouletteQueueTests
 			playerCode,
 			promotionId,
 			services.BuildServiceProvider(),
+			fakeBackgroundJobClient,
+			fakeSystemClock,
 			NullLogger<RouletteTaskQueue>.Instance);
 
 		queue.StartProcess(CancellationToken.None);
@@ -207,6 +219,7 @@ internal class RouletteQueueTests
 		var fakePromotionServiceClient = Substitute.For<IPromotionServiceClient>();
 		var fakePlayerServiceClient = Substitute.For<IPlayerServiceClient>();
 		var fakeBackgroundJobClient = Substitute.For<IBackgroundJobClient>();
+		var fakeSystemClock = Substitute.For<ISystemClock>();
 
 		var services = new ServiceCollection();
 		_ = services
@@ -216,8 +229,7 @@ internal class RouletteQueueTests
 			.AddSingleton(fakePlayerServiceClient)
 			.AddSingleton(fakeGetRouletteEventCountService)
 			.AddSingleton(fakePlayRouletteCommandService)
-			.AddSingleton(fakeDistributeService)
-			.AddSingleton(fakeBackgroundJobClient);
+			.AddSingleton(fakeDistributeService);
 
 		var promotionId = Guid.NewGuid();
 		var brandId = Guid.NewGuid();
@@ -232,6 +244,8 @@ internal class RouletteQueueTests
 			playerCode,
 			promotionId,
 			services.BuildServiceProvider(),
+			fakeBackgroundJobClient,
+			fakeSystemClock,
 			NullLogger<RouletteTaskQueue>.Instance);
 
 		queue.StartProcess(CancellationToken.None);
@@ -255,6 +269,7 @@ internal class RouletteQueueTests
 		var fakePromotionServiceClient = Substitute.For<IPromotionServiceClient>();
 		var fakePlayerServiceClient = Substitute.For<IPlayerServiceClient>();
 		var fakeBackgroundJobClient = Substitute.For<IBackgroundJobClient>();
+		var fakeSystemClock = Substitute.For<ISystemClock>();
 
 		var services = new ServiceCollection();
 		_ = services
@@ -264,8 +279,7 @@ internal class RouletteQueueTests
 			.AddSingleton(fakePlayerServiceClient)
 			.AddSingleton(fakeGetRouletteEventCountService)
 			.AddSingleton(fakePlayRouletteCommandService)
-			.AddSingleton(fakeDistributeService)
-			.AddSingleton(fakeBackgroundJobClient);
+			.AddSingleton(fakeDistributeService);
 
 		var depositItems = new DepositAccumulateItem[]
 		{
@@ -304,7 +318,7 @@ internal class RouletteQueueTests
 			eventInfo.PromotionId,
 			eventInfo.Date,
 			eventInfo.RouletteCount,
-			AvailableCount: 0);
+			UsedCount: 0);
 
 		var expected = new RouletteResult(null, -1);
 
@@ -334,7 +348,7 @@ internal class RouletteQueueTests
 					&& x.EventInfo == rouletteCountInfo
 					&& x.RouletteItems.Count() == rouletteItems.Length),
 				Arg.Any<CancellationToken>())
-			.Returns((PlayRouletteResult?)null);
+			.Returns(new PlayRouletteResult(null, 0));
 
 		_ = fakeTgsRepository
 			.GetRouletteUsedCountAsync(
@@ -348,6 +362,8 @@ internal class RouletteQueueTests
 			playerCode,
 			promotionId,
 			services.BuildServiceProvider(),
+			fakeBackgroundJobClient,
+			fakeSystemClock,
 			NullLogger<RouletteTaskQueue>.Instance);
 
 		queue.StartProcess(CancellationToken.None);
@@ -364,7 +380,6 @@ internal class RouletteQueueTests
 	[Test]
 	public async Task Play_Roulette_Set_Current_Count_To_Distribution_Plan()
 	{
-		var fakeTgsRepository = Substitute.For<ITgsRepository>();
 		var fakeRouletteServiceClient = Substitute.For<IDepositAccumulateRouletteServiceClient>();
 
 		var fakeGetRouletteEventCountService = Substitute.For<
@@ -374,17 +389,16 @@ internal class RouletteQueueTests
 		var fakePromotionServiceClient = Substitute.For<IPromotionServiceClient>();
 		var fakePlayerServiceClient = Substitute.For<IPlayerServiceClient>();
 		var fakeBackgroundJobClient = Substitute.For<IBackgroundJobClient>();
+		var fakeSystemClock = Substitute.For<ISystemClock>();
 
 		var services = new ServiceCollection();
 		_ = services
-			.AddSingleton(fakeTgsRepository)
 			.AddSingleton(fakeRouletteServiceClient)
 			.AddSingleton(fakePromotionServiceClient)
 			.AddSingleton(fakePlayerServiceClient)
 			.AddSingleton(fakeGetRouletteEventCountService)
 			.AddSingleton(fakePlayRouletteCommandService)
-			.AddSingleton(fakeDistributeService)
-			.AddSingleton(fakeBackgroundJobClient);
+			.AddSingleton(fakeDistributeService);
 
 		var depositItems = new DepositAccumulateItem[]
 		{
@@ -419,17 +433,19 @@ internal class RouletteQueueTests
 			eventInfo.PromotionId,
 			eventInfo.Date,
 			eventInfo.RouletteCount,
-			AvailableCount: 3);
+			UsedCount: 0);
 
 		var playRouletteResult = new PlayRouletteResult(
-			Guid.NewGuid(),
-			100M,
-			10M,
-			30M,
-			Guid.NewGuid(),
-			1);
+			new PlayRouletteResult.RouletteResult(
+				Guid.NewGuid(),
+				100M,
+				10M,
+				30M,
+				Guid.NewGuid(),
+				1),
+			UsedCount: 2);
 
-		var expected = new RouletteResult(playRouletteResult.RouletteId, playRouletteResult.ItemIndex);
+		var expected = new RouletteResult(playRouletteResult.Result!.RouletteId, playRouletteResult.Result.ItemIndex);
 
 		_ = fakePlayerServiceClient
 			.GetPlayerInfoAsync(
@@ -459,18 +475,12 @@ internal class RouletteQueueTests
 			Arg.Any<CancellationToken>())
 			.Returns(playRouletteResult);
 
-		_ = fakeTgsRepository
-			.GetRouletteUsedCountAsync(
-				Arg.Is(promotionId),
-				Arg.Is(playerCode),
-				Arg.Is(eventInfo.Date),
-				Arg.Any<CancellationToken>())
-			.Returns(1);
-
 		var queue = new RouletteTaskQueue(
 			playerCode,
 			promotionId,
 			services.BuildServiceProvider(),
+			fakeBackgroundJobClient,
+			fakeSystemClock,
 			NullLogger<RouletteTaskQueue>.Instance);
 
 		queue.StartProcess(CancellationToken.None);
@@ -483,7 +493,7 @@ internal class RouletteQueueTests
 			playerCode,
 			eventInfo.Date,
 			2,
-			playRouletteResult);
+			playRouletteResult.Result);
 
 		var actual = await sut.Promise.Task.ConfigureAwait(false);
 

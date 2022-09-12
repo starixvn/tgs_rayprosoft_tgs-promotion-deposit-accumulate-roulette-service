@@ -13,11 +13,13 @@ namespace Tgs.Promotion.DepositAccumulateRoulette.Worker;
 internal class RouletteTaskQueue : IDisposable
 {
 	private readonly IServiceProvider _serviceProvider;
+	private readonly IBackgroundJobClient _backgroundJobClient;
 	private readonly ILogger<RouletteTaskQueue> _logger;
 	private readonly BlockingCollection<RouletteTask> _rouletteTasks = new();
 
-	private DateOnly? _eventDate;
-	private int _usedCount;
+	private readonly DateOnly _today;
+
+	private RouletteEventCountInfo? _useEvent;
 
 	private PlayerInfo? _player;
 	private DepositAccumulateRoulettePromotion? _promotion;
@@ -38,13 +40,21 @@ internal class RouletteTaskQueue : IDisposable
 		string playerCode,
 		Guid promotionId,
 		IServiceProvider serviceProvider,
+		IBackgroundJobClient backgroundJobClient,
+		ISystemClock systemClock,
 		ILogger<RouletteTaskQueue> logger)
 	{
 		PlayerCode = playerCode ?? throw new ArgumentNullException(nameof(playerCode));
 		PromotionId = promotionId;
 
 		_serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
+		_backgroundJobClient = backgroundJobClient;
 		_logger = logger ?? throw new ArgumentNullException(nameof(logger));
+
+		if (systemClock is null)
+			throw new ArgumentNullException(nameof(systemClock));
+
+		_today = DateOnly.FromDateTime(systemClock.UtcNow.ToOffset(TimeSpan.FromHours(8)).DateTime);
 	}
 
 	public void Enqueue(RouletteTask task)
@@ -131,7 +141,8 @@ internal class RouletteTaskQueue : IDisposable
 			if (_player is null)
 			{
 				var playerServiceClient = scope.ServiceProvider.GetRequiredService<IPlayerServiceClient>();
-				_player = await playerServiceClient.GetPlayerInfoAsync(PlayerCode, cancellationToken)
+				_player = await playerServiceClient
+					.GetPlayerInfoAsync(PlayerCode, cancellationToken)
 					.ConfigureAwait(false);
 			}
 
@@ -141,67 +152,54 @@ internal class RouletteTaskQueue : IDisposable
 					scope.ServiceProvider.GetRequiredService<IDepositAccumulateRouletteServiceClient>();
 
 				_promotion = await rouletteServiceClient
-					.GetDepositAccumulateRoulettePromotionAsync(PromotionId, cancellationToken)
+					.GetDepositAccumulateRoulettePromotionAsync(
+						PromotionId,
+						cancellationToken)
 					.ConfigureAwait(false);
 			}
 
 			var rouletteItems = _promotion!.CampaignDetail.RouletteItems.ToArray();
 
-			var getAvailableRouletteEventService = scope.ServiceProvider
-				.GetRequiredService<IGetService<GetAvailableRouletteCountEventQuery, RouletteEventCountInfo?>>();
+			if (_useEvent is null || _useEvent.Date != _today && _useEvent.AvailableCount <= 0)
+			{
+				_useEvent = await GetAvailableEventWithUsedCountAsync(scope.ServiceProvider, cancellationToken)
+					.ConfigureAwait(false);
+			}
 
-			var useEventInfo = await getAvailableRouletteEventService
-				.GetAsync(
-					new GetAvailableRouletteCountEventQuery(PromotionId, PlayerCode),
-					cancellationToken)
-				.ConfigureAwait(false);
-
-			if (useEventInfo is null)
+			if (_useEvent.DistributeCount == 0 || _useEvent.AvailableCount <= 0)
 			{
 				var result = new RouletteResult(null, -1);
 				rouletteTask.Promise.SetResult(result);
 				return;
-			}
-
-			if (!_eventDate.HasValue || useEventInfo.Date != _eventDate)
-			{
-				var tgsRepository = scope.ServiceProvider.GetRequiredService<ITgsRepository>();
-				var count = await tgsRepository
-					.GetRouletteUsedCountAsync(PromotionId, PlayerCode, useEventInfo.Date, cancellationToken)
-					.ConfigureAwait(false);
-
-				_eventDate = useEventInfo.Date;
-				_usedCount = count;
 			}
 
 			var playRouletteCommandService = scope.ServiceProvider
-				.GetRequiredService<IGetService<PlayRouletteCommand, PlayRouletteResult?>>();
+				.GetRequiredService<IGetService<PlayRouletteCommand, PlayRouletteResult>>();
 
-			var playResult = await playRouletteCommandService.GetAsync(
-					new PlayRouletteCommand(_player!, useEventInfo, rouletteItems),
+			var playRouletteResult = await playRouletteCommandService.GetAsync(
+					new PlayRouletteCommand(_player!, _useEvent, rouletteItems),
 					cancellationToken)
 				.ConfigureAwait(false);
 
-			if (playResult is null)
+			if (playRouletteResult.Result is null)
 			{
 				var result = new RouletteResult(null, -1);
 				rouletteTask.Promise.SetResult(result);
 				return;
 			}
 
-			_usedCount += 1;
+			_useEvent = _useEvent with { UsedCount = playRouletteResult.UsedCount };
 
-			var jobClient = scope.ServiceProvider.GetRequiredService<IBackgroundJobClient>();
-			_ = jobClient.Enqueue<DistributeBonusBackgroundJob>(job
+			_ = _backgroundJobClient.Enqueue<DistributeBonusBackgroundJob>(job
 				=> job.ExecuteAsync(
 					new DistributeBonusScheduleInfo(
 						PromotionId,
 						PlayerCode,
-						useEventInfo.Date,
-						_usedCount,
-						playResult)));
+						_useEvent.Date,
+						playRouletteResult.UsedCount,
+						playRouletteResult.Result)));
 
-			var rouletteResult = new RouletteResult(playResult.RouletteId, playResult.ItemIndex);
+			var rouletteResult = new RouletteResult(playRouletteResult.Result.RouletteId, playRouletteResult.Result.ItemIndex);
 			rouletteTask.Promise.SetResult(rouletteResult);
 		}
 		catch (Exception ex)
@@ -214,5 +212,27 @@ internal class RouletteTaskQueue : IDisposable
 
 			rouletteTask.Promise.SetException(ex);
 		}
+	}
+
+	private async ValueTask<RouletteEventCountInfo> GetAvailableEventWithUsedCountAsync(
+		IServiceProvider serviceProvider,
+		CancellationToken cancellationToken)
+	{
+		var getAvailableRouletteEventService = serviceProvider
+			.GetRequiredService<IGetService<GetAvailableRouletteCountEventQuery, RouletteEventCountInfo?>>();
+
+		var eventInfo = await getAvailableRouletteEventService
+			.GetAsync(
+				new GetAvailableRouletteCountEventQuery(PromotionId, PlayerCode),
+				cancellationToken)
+			.ConfigureAwait(false);
+
+		return eventInfo ??
+			   new RouletteEventCountInfo(
+				   PlayerCode,
+				   PromotionId,
+				   _today,
+				   0,
+				   0);
 	}
 }
