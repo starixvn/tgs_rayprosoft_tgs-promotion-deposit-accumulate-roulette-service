@@ -1,5 +1,4 @@
 ﻿using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace Tgs.Promotion.DepositAccumulateRoulette.Common;
 
@@ -9,7 +8,6 @@ public class DepositAccumulateRouletteSerializer
 	{
 		PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
 		WriteIndented = false,
-		DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault,
 		Converters =
 		{
 			new DepositAccumulateItemJsonConverter(),
