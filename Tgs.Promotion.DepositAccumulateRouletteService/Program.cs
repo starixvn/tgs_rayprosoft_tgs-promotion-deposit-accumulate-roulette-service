@@ -50,6 +50,7 @@ builder.Services
 	.AddNatsGlobPatternExchange("*");
 
 builder.Services
+	.AddMemoryCache()
 	.AddSingleton<IRedisConnectionManager>(sp =>
 	{
 		var config = sp.GetRequiredService<IConfiguration>();
@@ -71,6 +72,10 @@ builder.Services
 		var config = sp.GetRequiredService<IConfiguration>();
 		options.BaseUrl = config.GetValue<Uri>("DepositAccumulateRoulette:PlayerBaseUrl");
 	});
+
+builder.Services
+	.AddRouting(options => options.LowercaseUrls = true)
+	.AddControllers();
 
 builder.Services
 	.AddSingleton<IConfigureOptions<OtlpExporterOptions>>(
@@ -110,9 +115,16 @@ builder.Services
 	.AddInterceptionService()
 	.AddServiceUtiltiyInterceptors();
 
+builder.Services.AddSwaggerGen();
+
 builder.Services.AddHealthChecks();
 
 var app = builder.Build();
+
+app.MapControllers();
+app.MapProfileViewer();
+app.MapSwagger();
+app.UseSwaggerUI();
 
 app.MapHealthChecks("/healthz");
 

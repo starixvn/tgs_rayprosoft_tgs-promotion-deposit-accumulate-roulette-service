@@ -1,3 +1,5 @@
+using Hangfire;
+using Hangfire.MemoryStorage;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Npgsql;
@@ -62,7 +64,7 @@ builder.Services
 	.AddMemoryCache()
 	.AddDepositAccumulateRouletteCommon()
 	.AddDepositAccumulateRouletteWorkerCore()
-	.AddDepositAccumulateRouletteCache()
+	.AddDepositAccumulateRouletteWorkerCache()
 	.AddDepositAccumulateRouletteRepositories(
 		dbOptionsConfigure: (sp, dbOptions) =>
 		{
@@ -74,6 +76,11 @@ builder.Services
 			var redisConnectionManager = sp.GetRequiredService<IRedisConnectionManager>();
 			return redisConnectionManager.Database;
 		})
+	.AddDepositAccumulateRouletteServiceClient((options, sp) =>
+	{
+		var config = sp.GetRequiredService<IConfiguration>();
+		options.BaseUrl = config.GetValue<Uri>("DepositAccumulateRouletteWorker:DepositAccumulateRouletteServiceBaseUrl");
+	})
 	.AddPromotionClientServices((options, sp) =>
 	{
 		var config = sp.GetRequiredService<IConfiguration>();
@@ -84,6 +91,10 @@ builder.Services
 		var config = sp.GetRequiredService<IConfiguration>();
 		options.BaseUrl = config.GetValue<Uri>("DepositAccumulateRouletteWorker:PlayerBaseUrl");
 	});
+
+builder.Services
+	.AddHangfire((_, configuration) => configuration.UseMemoryStorage())
+	.AddHangfireServer();
 
 builder.Services
 	.AddSingleton<IConfigureOptions<OtlpExporterOptions>>(

@@ -13,13 +13,15 @@ public class ScheduleBackgroundJob
 		_messageSender = messageSender ?? throw new ArgumentNullException(nameof(messageSender));
 	}
 
-	public ValueTask ExecuteAsync(DateOnly processDate, string subject)
+	public Task ExecuteAsync(DateOnly processDate, string subject)
 	{
 		var request = new ProcessRequest
 		{
 			ProcessDate = processDate
 		};
 
-		return _messageSender.SendAsync(subject, request.ToByteArray());
+		return _messageSender
+			.SendAsync(subject, request.ToByteArray())
+			.AsTask();
 	}
 }

@@ -1,10 +1,11 @@
 ﻿using Tgs.Promotion.Clients;
 using Tgs.Promotion.DepositAccumulateRoulette.Common;
 
-namespace Tgs.Promotion.DepositAccumulateRoulette.Worker;
+namespace Tgs.Promotion.DepositAccumulateRouletteService;
 
-public record DepositAccumulateRoulettePromotion(
+public record DepositAccumulateRoulettePromotionInfo(
 	Guid Id,
 	During EventDuring,
 	decimal? PromotionLimitAmount,
+	bool IsAutoSent,
 	DepositAccumulateRouletteSettings CampaignDetail);

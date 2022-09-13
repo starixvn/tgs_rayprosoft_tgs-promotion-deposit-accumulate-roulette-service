@@ -5,4 +5,7 @@ internal record RouletteEventCountInfo(
 	Guid PromotionId,
 	DateOnly Date,
 	int DistributeCount,
-	int AvailableCount);
+	int UsedCount)
+{
+	public int AvailableCount => DistributeCount - UsedCount;
+}

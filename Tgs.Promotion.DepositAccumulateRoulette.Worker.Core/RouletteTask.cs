@@ -2,6 +2,4 @@
 
 namespace Tgs.Promotion.DepositAccumulateRoulette.Worker;
 
-internal record RouletteTask(
-	RouletteTaskQueueRequest Request,
-	TaskCompletionSource<RouletteResult> Promise);
+internal record RouletteTask(TaskCompletionSource<RouletteResult> Promise);

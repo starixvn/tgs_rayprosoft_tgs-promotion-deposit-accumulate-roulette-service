@@ -2,10 +2,10 @@
 using Tgs.Promotion.DepositAccumulateRoulette.Common;
 using Tgs.ServiceUtility;
 
-namespace Tgs.Promotion.DepositAccumulateRoulette.Worker.ApplicationServices;
+namespace Tgs.Promotion.DepositAccumulateRouletteService.ApplicationServices;
 
 internal class GetDepositAccumulateRoulettePromotionQueryService
-	: IGetService<GetDepositAccumulateRoulettePromotionQuery, DepositAccumulateRoulettePromotion?>
+	: IGetService<GetDepositAccumulateRoulettePromotionQuery, DepositAccumulateRoulettePromotionInfo?>
 {
 	private readonly IPromotionServiceClient _promotionServiceClient;
 
@@ -15,7 +15,7 @@ internal class GetDepositAccumulateRoulettePromotionQueryService
 		_promotionServiceClient = promotionServiceClient ?? throw new ArgumentNullException(nameof(promotionServiceClient));
 	}
 
-	public async ValueTask<DepositAccumulateRoulettePromotion?> GetAsync(GetDepositAccumulateRoulettePromotionQuery query,
+	public async ValueTask<DepositAccumulateRoulettePromotionInfo?> GetAsync(GetDepositAccumulateRoulettePromotionQuery query,
 		CancellationToken cancellationToken = default)
 	{
 		var mainInfo = await _promotionServiceClient
@@ -35,10 +35,11 @@ internal class GetDepositAccumulateRoulettePromotionQueryService
 		if (rule is null)
 			throw new InvalidOperationException("DepositAccumulateRoulette setting is null");
 
-		return new DepositAccumulateRoulettePromotion(
+		return new DepositAccumulateRoulettePromotionInfo(
 			mainInfo.Id,
 			mainInfo.EventDuring,
 			mainInfo.PromotionLimitAmount,
+			mainInfo.IsAutoSent,
 			rule.CompaignDetail);
 	}
 

@@ -1,5 +1,5 @@
 ﻿namespace Tgs.Promotion.DepositAccumulateRoulette.Worker.ApplicationServices;
 
-internal record GetRouletteEventCountQuery(
+internal record GetAvailableRouletteCountEventQuery(
 	Guid PromotionId,
 	string PlayerCode);

@@ -1,5 +1,7 @@
 ﻿using System.Reflection;
+using Microsoft.Extensions.Options;
 using Tgs.Promotion.DepositAccumulateRoulette.Worker;
+using Tgs.Promotion.DepositAccumulateRoulette.Worker.Clients;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
@@ -26,4 +28,18 @@ public static class ServiceCollectionExtensions
 
 		return services;
 	}
+
+	public static IServiceCollection AddDepositAccumulateRouletteServiceClient(
+		this IServiceCollection services,
+		Action<ServiceClientOptions, IServiceProvider> configure)
+		=> services.AddOptions<ServiceClientOptions>()
+			.Configure(configure)
+			.Services
+			.AddHttpClient<IDepositAccumulateRouletteServiceClient, DepositAccumulateRouletteServiceClient>()
+			.ConfigureHttpClient((sp, httpClient) =>
+			{
+				var options = sp.GetRequiredService<IOptions<ServiceClientOptions>>().Value;
+				httpClient.BaseAddress = options.BaseUrl;
+			})
+			.Services;
 }

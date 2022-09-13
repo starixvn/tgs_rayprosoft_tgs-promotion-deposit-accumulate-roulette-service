@@ -15,11 +15,11 @@ public static class ServiceCollectionExtensions
 		=> services
 			.AddDbContext<TgsContext>(dbOptionsConfigure)
 			.AddTransient<ITgsRepository, TgsRepository>()
-			.AddTransient<IRedisRepository>(sp =>
+			.AddTransient<IStoreRepository>(sp =>
 			{
 				var redisDatabase = resolveRedisDatabase(sp);
 
-				return ActivatorUtilities.CreateInstance<RedisRepository>(sp, redisDatabase);
+				return ActivatorUtilities.CreateInstance<StoreRepository>(sp, redisDatabase);
 			})
 			.AddSerialNumberGenerator();
 }

@@ -27,10 +27,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tgs.Promotion.DepositAccumu
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tgs.Promotion.DepositAccumulateRoulette.Repositories", "Tgs.Promotion.DepositAccumulateRoulette.Repositories\Tgs.Promotion.DepositAccumulateRoulette.Repositories.csproj", "{8ADB1798-F0EF-42B5-80F6-6DD437139FB8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tgs.Promotion.DepositAccumulateRoulette.Cache", "Tgs.Promotion.DepositAccumulateRoulette.Cache\Tgs.Promotion.DepositAccumulateRoulette.Cache.csproj", "{4E0566DD-FDE2-4DFE-BBBA-8D0A732C1881}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tgs.Promotion.DepositAccumulateRoulette.Cache.UnitTests", "Tgs.Promotion.DepositAccumulateRoulette.Cache.UnitTests\Tgs.Promotion.DepositAccumulateRoulette.Cache.UnitTests.csproj", "{627AEACD-DAD8-41E6-9616-5F1DAFDDBC50}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{699C0BCB-037C-4748-A101-8F4D67B26BA3}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
@@ -42,6 +38,14 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tgs.Promotion.DepositAccumulateRoulette.Worker.Core", "Tgs.Promotion.DepositAccumulateRoulette.Worker.Core\Tgs.Promotion.DepositAccumulateRoulette.Worker.Core.csproj", "{E27D3ACE-2E7B-4255-A72A-26BC94111EF2}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tgs.Promotion.DepositAccumulateRoulette.Worker.Core.UnitTests", "Tgs.Promotion.DepositAccumulateRoulette.Worker.Core.UnitTests\Tgs.Promotion.DepositAccumulateRoulette.Worker.Core.UnitTests.csproj", "{65F102E6-163F-4E57-89F1-F4AB2246AF42}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tgs.Promotion.DepositAccumulateRoulette.Worker.Cache", "Tgs.Promotion.DepositAccumulateRoulette.Worker.Cache\Tgs.Promotion.DepositAccumulateRoulette.Worker.Cache.csproj", "{1EFF0209-5D46-4879-B76D-B2112883462B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tgs.Promotion.DepositAccumulateRoulette.Worker.Cache.UnitTests", "Tgs.Promotion.DepositAccumulateRoulette.Worker.Cache.UnitTests\Tgs.Promotion.DepositAccumulateRoulette.Worker.Cache.UnitTests.csproj", "{F5F5ABE5-1E99-4BD6-9C4E-A5D8111B2F47}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tgs.Promotion.DepositAccumulateRoulette.Core", "Tgs.Promotion.DepositAccumulateRoulette.Core\Tgs.Promotion.DepositAccumulateRoulette.Core.csproj", "{CA5015EA-6210-4AA0-81C5-E326B1392775}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tgs.Promotion.DepositAccumulateRoulette.Core.UnitTests", "Tgs.Promotion.DepositAccumulateRoulette.Core.UnitTests\Tgs.Promotion.DepositAccumulateRoulette.Core.UnitTests.csproj", "{3661DF3D-0CB4-491C-90F7-87648A30C08A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -97,14 +101,6 @@ Global
 		{8ADB1798-F0EF-42B5-80F6-6DD437139FB8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8ADB1798-F0EF-42B5-80F6-6DD437139FB8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8ADB1798-F0EF-42B5-80F6-6DD437139FB8}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4E0566DD-FDE2-4DFE-BBBA-8D0A732C1881}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4E0566DD-FDE2-4DFE-BBBA-8D0A732C1881}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4E0566DD-FDE2-4DFE-BBBA-8D0A732C1881}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4E0566DD-FDE2-4DFE-BBBA-8D0A732C1881}.Release|Any CPU.Build.0 = Release|Any CPU
-		{627AEACD-DAD8-41E6-9616-5F1DAFDDBC50}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{627AEACD-DAD8-41E6-9616-5F1DAFDDBC50}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{627AEACD-DAD8-41E6-9616-5F1DAFDDBC50}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{627AEACD-DAD8-41E6-9616-5F1DAFDDBC50}.Release|Any CPU.Build.0 = Release|Any CPU
 		{28A32211-9FCA-48B8-9BB1-831F6C5A5321}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{28A32211-9FCA-48B8-9BB1-831F6C5A5321}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{28A32211-9FCA-48B8-9BB1-831F6C5A5321}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -117,6 +113,22 @@ Global
 		{65F102E6-163F-4E57-89F1-F4AB2246AF42}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{65F102E6-163F-4E57-89F1-F4AB2246AF42}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{65F102E6-163F-4E57-89F1-F4AB2246AF42}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1EFF0209-5D46-4879-B76D-B2112883462B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1EFF0209-5D46-4879-B76D-B2112883462B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1EFF0209-5D46-4879-B76D-B2112883462B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1EFF0209-5D46-4879-B76D-B2112883462B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F5F5ABE5-1E99-4BD6-9C4E-A5D8111B2F47}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F5F5ABE5-1E99-4BD6-9C4E-A5D8111B2F47}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F5F5ABE5-1E99-4BD6-9C4E-A5D8111B2F47}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F5F5ABE5-1E99-4BD6-9C4E-A5D8111B2F47}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CA5015EA-6210-4AA0-81C5-E326B1392775}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CA5015EA-6210-4AA0-81C5-E326B1392775}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CA5015EA-6210-4AA0-81C5-E326B1392775}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CA5015EA-6210-4AA0-81C5-E326B1392775}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3661DF3D-0CB4-491C-90F7-87648A30C08A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3661DF3D-0CB4-491C-90F7-87648A30C08A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3661DF3D-0CB4-491C-90F7-87648A30C08A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3661DF3D-0CB4-491C-90F7-87648A30C08A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

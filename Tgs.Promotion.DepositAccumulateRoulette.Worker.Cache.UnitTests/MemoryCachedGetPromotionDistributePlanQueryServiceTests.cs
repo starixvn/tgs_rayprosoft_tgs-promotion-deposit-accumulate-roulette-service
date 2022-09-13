@@ -5,7 +5,7 @@ using Tgs.Promotion.Clients;
 using Tgs.Promotion.DepositAccumulateRoulette.Worker.ApplicationServices;
 using Tgs.ServiceUtility;
 
-namespace Tgs.Promotion.DepositAccumulateRoulette.Cache.UnitTests;
+namespace Tgs.Promotion.DepositAccumulateRoulette.Worker.Cache.UnitTests;
 
 internal class MemoryCachedGetPromotionDistributePlanQueryServiceTests
 {

@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <PackageReference Include="FluentdForward.OpenTelemetry.MessagePack" Version="0.1.3" />
+    <PackageReference Include="Hangfire.MemoryStorage" Version="1.7.0" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.15.1" />
     <PackageReference Include="Npgsql.OpenTelemetry" Version="6.0.6" />
     <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.3.0" />
@@ -27,8 +28,8 @@
 
 
   <ItemGroup>
-    <ProjectReference Include="..\Tgs.Promotion.DepositAccumulateRoulette.Cache\Tgs.Promotion.DepositAccumulateRoulette.Cache.csproj" />
     <ProjectReference Include="..\Tgs.Promotion.DepositAccumulateRoulette.Repositories\Tgs.Promotion.DepositAccumulateRoulette.Repositories.csproj" />
+    <ProjectReference Include="..\Tgs.Promotion.DepositAccumulateRoulette.Worker.Cache\Tgs.Promotion.DepositAccumulateRoulette.Worker.Cache.csproj" />
     <ProjectReference Include="..\Tgs.Promotion.DepositAccumulateRoulette.Worker.Core\Tgs.Promotion.DepositAccumulateRoulette.Worker.Core.csproj" />
   </ItemGroup>
 

@@ -2,9 +2,8 @@
 using Microsoft.Extensions.Options;
 using NSubstitute;
 using Tgs.Promotion.DepositAccumulateRoulette.Common;
-using Tgs.Promotion.DepositAccumulateRoulette.Worker;
 
-namespace Tgs.Promotion.DepositAccumulateRoulette.Cache.UnitTests;
+namespace Tgs.Promotion.DepositAccumulateRoulette.Worker.Cache.UnitTests;
 
 internal class MemoryCachedShuffleServiceTests
 {
@@ -34,7 +33,7 @@ internal class MemoryCachedShuffleServiceTests
 
 		var expected = await new ShuffleService().ShuffleAsync(promotionId, rouletteItems).ConfigureAwait(false);
 
-		_ = fakeMemoryCache.Set($"Deck:{promotionId}", expected);
+		_ = fakeMemoryCache.Set<int[]>($"Deck:{promotionId}", expected);
 
 		var sut = new MemoryCachedShuffleService(fakeMemoryCache, fakeShuffleService);
 

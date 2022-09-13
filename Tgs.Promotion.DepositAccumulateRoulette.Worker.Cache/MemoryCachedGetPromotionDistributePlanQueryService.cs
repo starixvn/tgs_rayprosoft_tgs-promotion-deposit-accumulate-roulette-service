@@ -3,7 +3,7 @@ using Tgs.Promotion.Clients;
 using Tgs.Promotion.DepositAccumulateRoulette.Worker.ApplicationServices;
 using Tgs.ServiceUtility;
 
-namespace Tgs.Promotion.DepositAccumulateRoulette.Cache;
+namespace Tgs.Promotion.DepositAccumulateRoulette.Worker.Cache;
 
 internal class MemoryCachedGetPromotionDistributePlanQueryService : IGetService<GetPromotionDistributePlanQuery, PromotionDistributePlanInfo>
 {
