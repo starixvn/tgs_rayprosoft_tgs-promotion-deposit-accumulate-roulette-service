@@ -48,6 +48,7 @@ Selector labels
 {{- define "deposit-accumulate-roulette-worker.selectorLabels" -}}
 app.kubernetes.io/name: {{ include "deposit-accumulate-roulette-worker.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
+tgs.kind: promotion
 {{- end }}
 
 {{/*
