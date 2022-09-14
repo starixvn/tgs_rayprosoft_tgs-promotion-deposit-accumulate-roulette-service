@@ -162,7 +162,7 @@ internal class RouletteTaskQueue : IDisposable
 
 			if (_useEvent is null || _useEvent.Date != _today && _useEvent.AvailableCount <= 0)
 			{
-				_useEvent = await GetAvailableEventWithUsedCountAsync(scope.ServiceProvider, cancellationToken)
+				_useEvent = await GetAvailableEventAsync(scope.ServiceProvider, cancellationToken)
 					.ConfigureAwait(false);
 			}
 
@@ -214,7 +214,7 @@ internal class RouletteTaskQueue : IDisposable
 		}
 	}
 
-	private async ValueTask<RouletteEventCountInfo> GetAvailableEventWithUsedCountAsync(
+	private async ValueTask<RouletteEventCountInfo> GetAvailableEventAsync(
 		IServiceProvider serviceProvider,
 		CancellationToken cancellationToken)
 	{

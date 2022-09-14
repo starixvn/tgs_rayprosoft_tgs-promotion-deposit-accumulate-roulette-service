@@ -219,12 +219,6 @@ internal class RouletteServiceTests
 			4,
 			3000);
 
-		var expected = new RouletteEventCountInfo(
-			playerCode,
-			promotionId,
-			eventInfo.Date,
-			eventInfo.RouletteCount, eventInfo.RouletteCount);
-
 		_ = fakeEventService.GetDepositAccumulateRouletteEventInfosAsync(
 				Arg.Is(promotionId),
 				Arg.Is(playerCode),
@@ -248,7 +242,7 @@ internal class RouletteServiceTests
 
 		var actual = await sut.GetAsync(query);
 
-		Assert.AreEqual(expected, actual);
+		Assert.IsNull(actual);
 	}
 
 	[Test]

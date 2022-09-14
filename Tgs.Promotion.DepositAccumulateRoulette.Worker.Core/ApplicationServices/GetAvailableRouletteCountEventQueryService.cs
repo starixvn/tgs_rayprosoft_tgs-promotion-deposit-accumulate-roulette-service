@@ -33,7 +33,7 @@ internal class GetAvailableRouletteCountEventQueryService : IGetService<GetAvail
 				.GetRouletteUsedCountAsync(info.PromotionId, info.PlayerCode, info.Date)
 				.ConfigureAwait(false);
 
-			if (info.RouletteCount >= count)
+			if (info.RouletteCount > count)
 				return new RouletteEventCountInfo(
 						info.PlayerCode,
 						info.PromotionId,
