@@ -141,6 +141,7 @@ deploy-service-dev:
     - export resources=$(kubectl get cm resources-setting -o jsonpath={.data.$TgsSettingKey})
     - export dedicated=$(kubectl get cm tgs-settings -o jsonpath={.data.dedicated})
     - export node_selector=$(kubectl get cm tgs-settings -o jsonpath={.data.node-selector})
+    - export autoscaling=$(kubectl get cm autoscaling-setting -o jsonpath={.data.$TgsSettingKey})
     - |
       cat << EOF | yq e -P | helm template artifacts/k8s/$HelmTemplateFolderName \
         -n $namespace \
@@ -149,7 +150,8 @@ deploy-service-dev:
       {
         "nodeSelector": $node_selector,
         "tolerations": [$dedicated],
-        "resources": $resources
+        "resources": $resources,
+        "autoscaling": $autoscaling
       }
       EOF
     - |
@@ -161,7 +163,8 @@ deploy-service-dev:
       {
         "nodeSelector": $node_selector,
         "tolerations": [$dedicated],
-        "resources": $resources
+        "resources": $resources,
+        "autoscaling": $autoscaling
       }
       EOF
 
@@ -187,6 +190,7 @@ deploy-worker-dev:
     - export resources=$(kubectl get cm resources-setting -o jsonpath={.data.$TgsSettingKey})
     - export dedicated=$(kubectl get cm tgs-settings -o jsonpath={.data.dedicated})
     - export node_selector=$(kubectl get cm tgs-settings -o jsonpath={.data.node-selector})
+    - export autoscaling=$(kubectl get cm autoscaling-setting -o jsonpath={.data.$TgsSettingKey})
     - |
       cat << EOF | yq e -P | helm template artifacts/k8s/$HelmTemplateFolderName \
         -n $namespace \
@@ -195,7 +199,8 @@ deploy-worker-dev:
       {
         "nodeSelector": $node_selector,
         "tolerations": [$dedicated],
-        "resources": $resources
+        "resources": $resources,
+        "autoscaling": $autoscaling
       }
       EOF
     - |
@@ -207,7 +212,8 @@ deploy-worker-dev:
       {
         "nodeSelector": $node_selector,
         "tolerations": [$dedicated],
-        "resources": $resources
+        "resources": $resources,
+        "autoscaling": $autoscaling
       }
       EOF
 
@@ -233,6 +239,7 @@ deploy-background-dev:
     - export resources=$(kubectl get cm resources-setting -o jsonpath={.data.$TgsSettingKey})
     - export dedicated=$(kubectl get cm tgs-settings -o jsonpath={.data.dedicated})
     - export node_selector=$(kubectl get cm tgs-settings -o jsonpath={.data.node-selector})
+    - export autoscaling=$(kubectl get cm autoscaling-setting -o jsonpath={.data.$TgsSettingKey})
     - |
       cat << EOF | yq e -P | helm template artifacts/k8s/$HelmTemplateFolderName \
         -n $namespace \
@@ -241,7 +248,8 @@ deploy-background-dev:
       {
         "nodeSelector": $node_selector,
         "tolerations": [$dedicated],
-        "resources": $resources
+        "resources": $resources,
+        "autoscaling": $autoscaling
       }
       EOF
     - |
@@ -253,7 +261,8 @@ deploy-background-dev:
       {
         "nodeSelector": $node_selector,
         "tolerations": [$dedicated],
-        "resources": $resources
+        "resources": $resources,
+        "autoscaling": $autoscaling
       }
       EOF
   
@@ -279,6 +288,7 @@ deploy-service-staging:
     - export resources=$(kubectl get cm resources-setting -o jsonpath={.data.$TgsSettingKey})
     - export dedicated=$(kubectl get cm tgs-settings -o jsonpath={.data.dedicated})
     - export node_selector=$(kubectl get cm tgs-settings -o jsonpath={.data.node-selector})
+    - export autoscaling=$(kubectl get cm autoscaling-setting -o jsonpath={.data.$TgsSettingKey})
     - |
       cat << EOF | yq e -P | helm template artifacts/k8s/$HelmTemplateFolderName \
         -n $namespace \
@@ -287,7 +297,8 @@ deploy-service-staging:
       {
         "nodeSelector": $node_selector,
         "tolerations": [$dedicated],
-        "resources": $resources
+        "resources": $resources,
+        "autoscaling": $autoscaling
       }
       EOF
     - |
@@ -299,7 +310,8 @@ deploy-service-staging:
       {
         "nodeSelector": $node_selector,
         "tolerations": [$dedicated],
-        "resources": $resources
+        "resources": $resources,
+        "autoscaling": $autoscaling
       }
       EOF
 
@@ -325,6 +337,7 @@ deploy-worker-staging:
     - export resources=$(kubectl get cm resources-setting -o jsonpath={.data.$TgsSettingKey})
     - export dedicated=$(kubectl get cm tgs-settings -o jsonpath={.data.dedicated})
     - export node_selector=$(kubectl get cm tgs-settings -o jsonpath={.data.node-selector})
+    - export autoscaling=$(kubectl get cm autoscaling-setting -o jsonpath={.data.$TgsSettingKey})
     - |
       cat << EOF | yq e -P | helm template artifacts/k8s/$HelmTemplateFolderName \
         -n $namespace \
@@ -333,7 +346,8 @@ deploy-worker-staging:
       {
         "nodeSelector": $node_selector,
         "tolerations": [$dedicated],
-        "resources": $resources
+        "resources": $resources,
+        "autoscaling": $autoscaling
       }
       EOF
     - |
@@ -345,7 +359,8 @@ deploy-worker-staging:
       {
         "nodeSelector": $node_selector,
         "tolerations": [$dedicated],
-        "resources": $resources
+        "resources": $resources,
+        "autoscaling": $autoscaling
       }
       EOF
 
@@ -371,6 +386,7 @@ deploy-background-staging:
     - export resources=$(kubectl get cm resources-setting -o jsonpath={.data.$TgsSettingKey})
     - export dedicated=$(kubectl get cm tgs-settings -o jsonpath={.data.dedicated})
     - export node_selector=$(kubectl get cm tgs-settings -o jsonpath={.data.node-selector})
+    - export autoscaling=$(kubectl get cm autoscaling-setting -o jsonpath={.data.$TgsSettingKey})
     - |
       cat << EOF | yq e -P | helm template artifacts/k8s/$HelmTemplateFolderName \
         -n $namespace \
@@ -379,7 +395,8 @@ deploy-background-staging:
       {
         "nodeSelector": $node_selector,
         "tolerations": [$dedicated],
-        "resources": $resources
+        "resources": $resources,
+        "autoscaling": $autoscaling
       }
       EOF
     - |
@@ -391,7 +408,8 @@ deploy-background-staging:
       {
         "nodeSelector": $node_selector,
         "tolerations": [$dedicated],
-        "resources": $resources
+        "resources": $resources,
+        "autoscaling": $autoscaling
       }
       EOF  
 
@@ -417,6 +435,7 @@ deploy-service-prod:
     - export resources=$(kubectl get cm resources-setting -o jsonpath={.data.$TgsSettingKey})
     - export dedicated=$(kubectl get cm tgs-settings -o jsonpath={.data.dedicated})
     - export node_selector=$(kubectl get cm tgs-settings -o jsonpath={.data.node-selector})
+    - export autoscaling=$(kubectl get cm autoscaling-setting -o jsonpath={.data.$TgsSettingKey})
     - |
       cat << EOF | yq e -P | helm template artifacts/k8s/$HelmTemplateFolderName \
         -n $namespace \
@@ -425,7 +444,8 @@ deploy-service-prod:
       {
         "nodeSelector": $node_selector,
         "tolerations": [$dedicated],
-        "resources": $resources
+        "resources": $resources,
+        "autoscaling": $autoscaling
       }
       EOF
     - |
@@ -437,7 +457,8 @@ deploy-service-prod:
       {
         "nodeSelector": $node_selector,
         "tolerations": [$dedicated],
-        "resources": $resources
+        "resources": $resources,
+        "autoscaling": $autoscaling
       }
       EOF
 
@@ -463,6 +484,7 @@ deploy-worker-prod:
     - export resources=$(kubectl get cm resources-setting -o jsonpath={.data.$TgsSettingKey})
     - export dedicated=$(kubectl get cm tgs-settings -o jsonpath={.data.dedicated})
     - export node_selector=$(kubectl get cm tgs-settings -o jsonpath={.data.node-selector})
+    - export autoscaling=$(kubectl get cm autoscaling-setting -o jsonpath={.data.$TgsSettingKey})
     - |
       cat << EOF | yq e -P | helm template artifacts/k8s/$HelmTemplateFolderName \
         -n $namespace \
@@ -471,7 +493,8 @@ deploy-worker-prod:
       {
         "nodeSelector": $node_selector,
         "tolerations": [$dedicated],
-        "resources": $resources
+        "resources": $resources,
+        "autoscaling": $autoscaling
       }
       EOF
     - |
@@ -483,7 +506,8 @@ deploy-worker-prod:
       {
         "nodeSelector": $node_selector,
         "tolerations": [$dedicated],
-        "resources": $resources
+        "resources": $resources,
+        "autoscaling": $autoscaling
       }
       EOF
 
@@ -509,6 +533,7 @@ deploy-background-prod:
     - export resources=$(kubectl get cm resources-setting -o jsonpath={.data.$TgsSettingKey})
     - export dedicated=$(kubectl get cm tgs-settings -o jsonpath={.data.dedicated})
     - export node_selector=$(kubectl get cm tgs-settings -o jsonpath={.data.node-selector})
+    - export autoscaling=$(kubectl get cm autoscaling-setting -o jsonpath={.data.$TgsSettingKey})
     - |
       cat << EOF | yq e -P | helm template artifacts/k8s/$HelmTemplateFolderName \
         -n $namespace \
@@ -517,7 +542,8 @@ deploy-background-prod:
       {
         "nodeSelector": $node_selector,
         "tolerations": [$dedicated],
-        "resources": $resources
+        "resources": $resources,
+        "autoscaling": $autoscaling
       }
       EOF
     - |
@@ -529,6 +555,7 @@ deploy-background-prod:
       {
         "nodeSelector": $node_selector,
         "tolerations": [$dedicated],
-        "resources": $resources
+        "resources": $resources,
+        "autoscaling": $autoscaling
       }
       EOF  
