@@ -40,7 +40,7 @@ internal class DepositAccumulateRouletteEventService : IDepositAccumulateRoulett
 		}
 		else
 		{
-			var eventInfos = QueryAndSetDepositAccumulateRouletteEventInfosQueryAndSetEventsAsync(
+			var eventInfos = QueryDepositAccumulateRouletteEventInfosAsync(
 				promotionId,
 				playerCode,
 				queryDate,
@@ -53,7 +53,7 @@ internal class DepositAccumulateRouletteEventService : IDepositAccumulateRoulett
 		}
 	}
 
-	private async IAsyncEnumerable<DepositAccumulateRouletteEventInfo> QueryAndSetDepositAccumulateRouletteEventInfosQueryAndSetEventsAsync(
+	private async IAsyncEnumerable<DepositAccumulateRouletteEventInfo> QueryDepositAccumulateRouletteEventInfosAsync(
 		Guid promotionId,
 		string playerCode,
 		DateOnly queryDate,
