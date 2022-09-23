@@ -15,7 +15,6 @@ internal class PromotionQueryTests
 		var fakeEventService = Substitute.For<IDepositAccumulateRouletteEventService>();
 
 		var sut = new GetRouletteCountItemsQueryService(
-			fakePlayerServiceClient,
 			fakeEventService,
 			fakeTgsRepository,
 			fakeStoreRepository);
@@ -100,7 +99,6 @@ internal class PromotionQueryTests
 		var fakeEventService = Substitute.For<IDepositAccumulateRouletteEventService>();
 
 		var sut = new GetRouletteCountItemsQueryService(
-			fakePlayerServiceClient,
 			fakeEventService,
 			fakeTgsRepository,
 			fakeStoreRepository);
