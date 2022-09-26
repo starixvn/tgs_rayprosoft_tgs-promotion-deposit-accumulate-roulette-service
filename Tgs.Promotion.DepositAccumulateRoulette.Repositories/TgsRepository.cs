@@ -23,8 +23,7 @@ internal class TgsRepository : ITgsRepository
 		Guid promotionId,
 		string playerCode,
 		DateOnly eventDate)
-	{
-		return _context.DepositAccumulateRouletteEvents
+		=> _context.DepositAccumulateRouletteEvents
 			.Where(evt => evt.PlayerCode == playerCode
 						  && evt.PromotionId == promotionId
 						  && evt.Date >= eventDate)
@@ -36,7 +35,16 @@ internal class TgsRepository : ITgsRepository
 					evt.RouletteCount,
 					evt.TotalDepositAmount))
 			.AsAsyncEnumerable();
-	}
+
+	public IAsyncEnumerable<Guid> GetPlayerAvailablePromotionIdsAsync(
+		string playerCode,
+		DateOnly queryDate)
+		=> _context.DepositAccumulateRouletteEvents
+			.Where(evt => evt.PlayerCode == playerCode
+						  && evt.Date >= queryDate)
+			.Select(evt => evt.PromotionId)
+			.Distinct()
+			.AsAsyncEnumerable();
 
 	public async ValueTask<int> GetRouletteUsedCountAsync(
 		Guid promotionId,
@@ -83,30 +91,5 @@ internal class TgsRepository : ITgsRepository
 		await _context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
 		return recordId;
-	}
-
-	public async IAsyncEnumerable<Guid> GetAvailablePromotionIdsAsync(
-		string playerCode,
-		[EnumeratorCancellation] CancellationToken cancellationToken)
-	{
-		var date = DateOnly.FromDateTime(DateTimeOffset.UtcNow.ToOffset(TimeSpan.FromHours(8D - 8D)).DateTime);
-
-		var queryIds = await _context.DepositAccumulateRouletteEvents
-			.Where(evt =>
-				evt.PlayerCode == playerCode &&
-				evt.Date >= date)
-			.Select(evt => evt.PromotionId)
-			.Distinct()
-			.ToArrayAsync(cancellationToken)
-			.ConfigureAwait(false);
-
-		var promotionIds = await _context.Promotions
-			.Where(p => queryIds.Contains(p.Id) && p.Status == 0)
-			.Select(p => p.Id)
-			.ToArrayAsync(cancellationToken)
-			.ConfigureAwait(false);
-
-		foreach (var promotionId in promotionIds)
-			yield return promotionId;
 	}
 }

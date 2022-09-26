@@ -15,6 +15,7 @@ public static class ServiceCollectionExtensions
 
 		_ = services
 			.AddTransient<IStatisticsService, StatisticsService>()
+			.AddTransient<IPromotionService, PromotionService>()
 			.AddTransient<IDepositAccumulateRouletteEventService, DepositAccumulateRouletteEventService>();
 
 		_ = services

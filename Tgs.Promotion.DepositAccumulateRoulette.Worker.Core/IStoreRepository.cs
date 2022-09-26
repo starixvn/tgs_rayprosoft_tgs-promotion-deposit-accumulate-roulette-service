@@ -25,4 +25,14 @@ public interface IStoreRepository
 	ValueTask<bool> SetRouletteUsedCountAsync(Guid promotionId, string playerCode, DateOnly date, int rouletteUsedCount);
 
 	ValueTask<int> IncreaseRouletteUsedCountAsync(Guid promotionId, string playerCode, DateOnly date);
+
+	IAsyncEnumerable<Guid> GetPlayerAvailablePromotionIdsAsync(
+		string playerCode,
+		DateOnly date);
+
+	ValueTask SetPlayerAvailablePromotionIdsAsync(
+		string playerCode,
+		DateOnly date,
+		IEnumerable<Guid> promotionIds,
+		TimeSpan expiry);
 }
