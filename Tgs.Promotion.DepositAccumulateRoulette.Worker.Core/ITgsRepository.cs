@@ -7,6 +7,10 @@ public interface ITgsRepository
 		string playerCode,
 		DateOnly eventDate);
 
+	IAsyncEnumerable<Guid> GetPlayerAvailablePromotionIdsAsync(
+		string playerCode,
+		DateOnly queryDate);
+
 	ValueTask<int> GetRouletteUsedCountAsync(
 		Guid promotionId,
 		string playerCode,
@@ -21,8 +25,4 @@ public interface ITgsRepository
 		decimal bonus,
 		int itemIndex,
 		CancellationToken cancellationToken = default);
-
-	IAsyncEnumerable<Guid> GetAvailablePromotionIdsAsync(
-		string playerCode,
-		CancellationToken cancellationToken);
 }

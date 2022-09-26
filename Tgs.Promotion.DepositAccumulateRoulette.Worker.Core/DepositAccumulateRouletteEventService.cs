@@ -69,6 +69,13 @@ internal class DepositAccumulateRouletteEventService : IDepositAccumulateRoulett
 			.ToArrayAsync(cancellationToken)
 			.ConfigureAwait(false);
 
+		// expire time 計算:
+		// 1. 排程起始時間: 每日 07:00 UTC+8, 預期排程最多執行時間為 1 小時 (08:00 UTC+8 結束)
+		// 2. 查詢日期: 以每日 8:00 UTC+8 為準
+		// 3. 每筆 event 資料存放於 redis sorted list, 並以保存時間作為該 event 的 score
+		// 4. 若查詢時間與當日日期相同, event 資料保存至隔日 08:00 UTC+8
+		// 5. 若查詢時間與當日日期不同 (發生於排程執行時間中), 則資料保存時間為 5 分鐘
+
 		if (events.Length == 0)
 		{
 			var expired = currentDate == queryDate

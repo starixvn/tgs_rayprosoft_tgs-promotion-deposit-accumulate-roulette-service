@@ -1,4 +1,5 @@
-﻿using NSubstitute;
+﻿using ExpectedObjects;
+using NSubstitute;
 using Tgs.PlayerService.Client;
 using Tgs.Promotion.DepositAccumulateRoulette.Worker.ApplicationServices;
 
@@ -13,8 +14,10 @@ internal class PromotionQueryTests
 		var fakeTgsRepository = Substitute.For<ITgsRepository>();
 		var fakeStoreRepository = Substitute.For<IStoreRepository>();
 		var fakeEventService = Substitute.For<IDepositAccumulateRouletteEventService>();
+		var fakePromotionService = Substitute.For<IPromotionService>();
 
 		var sut = new GetRouletteCountItemsQueryService(
+			fakePromotionService,
 			fakeEventService,
 			fakeTgsRepository,
 			fakeStoreRepository);
@@ -54,7 +57,7 @@ internal class PromotionQueryTests
 		_ = fakePlayerServiceClient.GetPlayerInfoAsync(Arg.Is(query.PlayerCode))
 			.Returns(playerInfo);
 
-		_ = fakeTgsRepository.GetAvailablePromotionIdsAsync(Arg.Is(playerInfo.PlayerCode),
+		_ = fakePromotionService.GetPlayerAvailablePromotionIdsAsync(Arg.Is(playerInfo.PlayerCode),
 				Arg.Any<CancellationToken>())
 			.Returns(new[] { firstPromotionId, secondPromotionId }.ToAsyncEnumerable());
 
@@ -97,8 +100,10 @@ internal class PromotionQueryTests
 		var fakeTgsRepository = Substitute.For<ITgsRepository>();
 		var fakeStoreRepository = Substitute.For<IStoreRepository>();
 		var fakeEventService = Substitute.For<IDepositAccumulateRouletteEventService>();
+		var fakePromotionService = Substitute.For<IPromotionService>();
 
 		var sut = new GetRouletteCountItemsQueryService(
+			fakePromotionService,
 			fakeEventService,
 			fakeTgsRepository,
 			fakeStoreRepository);
@@ -131,7 +136,8 @@ internal class PromotionQueryTests
 		_ = fakePlayerServiceClient.GetPlayerInfoAsync(Arg.Is(query.PlayerCode))
 			.Returns(playerInfo);
 
-		_ = fakeTgsRepository.GetAvailablePromotionIdsAsync(Arg.Is(playerInfo.PlayerCode),
+		_ = fakePromotionService.GetPlayerAvailablePromotionIdsAsync(
+				Arg.Is(playerInfo.PlayerCode),
 				Arg.Any<CancellationToken>())
 			.Returns(new[] { promotionId }.ToAsyncEnumerable());
 
@@ -165,5 +171,93 @@ internal class PromotionQueryTests
 			Arg.Is(eventInfo.PlayerCode),
 			Arg.Is(eventInfo.Date),
 			Arg.Is(usedCount));
+	}
+
+	[Test]
+	public async Task Get_Player_Available_Promotions_When_Promotion_Is_Stored()
+	{
+		var fakeSystemClock = Substitute.For<ISystemClock>();
+		var fakeTgsRepository = Substitute.For<ITgsRepository>();
+		var fakeStoreRepository = Substitute.For<IStoreRepository>();
+
+		var playerCode = "player1";
+
+		var now = new DateTimeOffset(2022, 9, 1, 8, 0, 0, TimeSpan.FromHours(8));
+		var date = DateOnly.FromDateTime(now.DateTime);
+
+		var firstPromotionId = Guid.NewGuid();
+		var secondPromotionId = Guid.NewGuid();
+
+		var expected = new[] { firstPromotionId, secondPromotionId };
+
+		var sut = new PromotionService(
+			fakeSystemClock,
+			fakeTgsRepository,
+			fakeStoreRepository);
+
+		_ = fakeSystemClock.UtcNow.Returns(now.ToUniversalTime());
+
+		_ = fakeStoreRepository.GetPlayerAvailablePromotionIdsAsync(
+			Arg.Is(playerCode),
+			Arg.Is(date))
+			.Returns(expected.ToAsyncEnumerable());
+
+		var actual = await sut.GetPlayerAvailablePromotionIdsAsync(playerCode).ToArrayAsync();
+
+		CollectionAssert.AreEqual(expected, actual);
+
+		_ = fakeTgsRepository
+			.DidNotReceive()
+			.GetPlayerAvailablePromotionIdsAsync(
+				Arg.Is(playerCode),
+				Arg.Is(date));
+	}
+
+	[Test]
+	public async Task Get_Player_Available_Promotions_When_Promotion_Is_Not_Stored()
+	{
+		var fakeSystemClock = Substitute.For<ISystemClock>();
+		var fakeTgsRepository = Substitute.For<ITgsRepository>();
+		var fakeStoreRepository = Substitute.For<IStoreRepository>();
+
+		var playerCode = "player1";
+
+		var now = new DateTimeOffset(2022, 9, 1, 8, 0, 0, TimeSpan.FromHours(8));
+		var date = DateOnly.FromDateTime(now.DateTime);
+
+		var firstPromotionId = Guid.NewGuid();
+		var secondPromotionId = Guid.NewGuid();
+
+		var expected = new[] { firstPromotionId, secondPromotionId };
+
+		var sut = new PromotionService(
+			fakeSystemClock,
+			fakeTgsRepository,
+			fakeStoreRepository);
+
+		_ = fakeSystemClock.UtcNow.Returns(now.ToUniversalTime());
+
+		_ = fakeStoreRepository.GetPlayerAvailablePromotionIdsAsync(
+				Arg.Is(playerCode),
+				Arg.Is(date))
+			.Returns(Array.Empty<Guid>().ToAsyncEnumerable());
+
+		_ = fakeTgsRepository.GetPlayerAvailablePromotionIdsAsync(
+				Arg.Is(playerCode),
+				Arg.Is(date))
+			.Returns(expected.ToAsyncEnumerable());
+
+		var actual = await sut.GetPlayerAvailablePromotionIdsAsync(playerCode).ToArrayAsync();
+
+		CollectionAssert.AreEqual(expected, actual);
+
+		_ = fakeStoreRepository
+			.Received(1)
+			.SetPlayerAvailablePromotionIdsAsync(
+				Arg.Is(playerCode),
+				Arg.Is(date),
+				Arg.Is<IEnumerable<Guid>>(x
+					=> expected.ToExpectedObject().Matches(x)),
+				Arg.Any<TimeSpan>());
 	}
 }

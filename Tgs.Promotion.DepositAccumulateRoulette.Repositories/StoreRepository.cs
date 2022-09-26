@@ -120,4 +120,35 @@ internal class StoreRepository : IStoreRepository
 
 		return (int)await _redisDatabase.StringIncrementAsync(redisKey).ConfigureAwait(false);
 	}
+
+	public async IAsyncEnumerable<Guid> GetPlayerAvailablePromotionIdsAsync(
+		string playerCode,
+		DateOnly date)
+	{
+		var redisKey = $"{_KeyPrefix}:AvailableDepositEvents:{playerCode}:{date:O}";
+
+		var value = await _redisDatabase.StringGetAsync(redisKey).ConfigureAwait(false);
+
+		if (!value.HasValue)
+			yield break;
+
+		var promotionIds = JsonSerializer.Deserialize<IEnumerable<Guid>>(value!)!;
+
+		foreach (var id in promotionIds)
+			yield return id;
+	}
+
+	public async ValueTask SetPlayerAvailablePromotionIdsAsync(
+		string playerCode,
+		DateOnly date,
+		IEnumerable<Guid> promotionIds,
+		TimeSpan expiry)
+	{
+		var redisKey = $"{_KeyPrefix}:AvailableDepositEvents:{playerCode}:{date:O}";
+
+		var value = JsonSerializer.Serialize(promotionIds);
+
+		_ = await _redisDatabase.StringSetAsync(redisKey, value, expiry, When.NotExists)
+				.ConfigureAwait(false);
+	}
 }

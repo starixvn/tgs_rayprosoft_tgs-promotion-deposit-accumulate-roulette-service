@@ -6,15 +6,18 @@ namespace Tgs.Promotion.DepositAccumulateRoulette.Worker.ApplicationServices;
 internal class GetRouletteCountItemsQueryService
 	: IQueryService<GetRouletteCountItemsQuery, RouletteCountItemInfo>
 {
+	private readonly IPromotionService _promotionService;
 	private readonly ITgsRepository _tgsRepository;
 	private readonly IStoreRepository _storeRepository;
 	private readonly IDepositAccumulateRouletteEventService _eventService;
 
 	public GetRouletteCountItemsQueryService(
+		IPromotionService promotionService,
 		IDepositAccumulateRouletteEventService eventService,
 		ITgsRepository tgsRepository,
 		IStoreRepository storeRepository)
 	{
+		_promotionService = promotionService ?? throw new ArgumentNullException(nameof(promotionService));
 		_tgsRepository = tgsRepository ?? throw new ArgumentNullException(nameof(tgsRepository));
 		_storeRepository = storeRepository ?? throw new ArgumentNullException(nameof(storeRepository));
 		_eventService = eventService ?? throw new ArgumentNullException(nameof(eventService));
@@ -24,14 +27,12 @@ internal class GetRouletteCountItemsQueryService
 		GetRouletteCountItemsQuery query,
 		[EnumeratorCancellation] CancellationToken cancellationToken = default)
 	{
-		var promotionIds = await _tgsRepository
-			.GetAvailablePromotionIdsAsync(
+		var promotionIds = _promotionService
+			.GetPlayerAvailablePromotionIdsAsync(
 				query.PlayerCode,
-				cancellationToken)
-			.ToArrayAsync(cancellationToken)
-			.ConfigureAwait(false);
+				cancellationToken);
 
-		foreach (var promotionId in promotionIds)
+		await foreach (var promotionId in promotionIds.WithCancellation(cancellationToken))
 		{
 			var infos = await _eventService
 				.GetDepositAccumulateRouletteEventInfosAsync(
