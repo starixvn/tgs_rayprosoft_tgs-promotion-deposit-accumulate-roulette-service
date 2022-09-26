@@ -125,7 +125,7 @@ internal class StoreRepository : IStoreRepository
 		string playerCode,
 		DateOnly date)
 	{
-		var redisKey = $"{_KeyPrefix}:AvailableDepositEvents:{playerCode}:{date:O}";
+		var redisKey = $"{_KeyPrefix}:AvailablePromotionIds:{playerCode}:{date:O}";
 
 		var value = await _redisDatabase.StringGetAsync(redisKey).ConfigureAwait(false);
 
@@ -144,7 +144,7 @@ internal class StoreRepository : IStoreRepository
 		IEnumerable<Guid> promotionIds,
 		TimeSpan expiry)
 	{
-		var redisKey = $"{_KeyPrefix}:AvailableDepositEvents:{playerCode}:{date:O}";
+		var redisKey = $"{_KeyPrefix}:AvailablePromotionIds:{playerCode}:{date:O}";
 
 		var value = JsonSerializer.Serialize(promotionIds);
 
