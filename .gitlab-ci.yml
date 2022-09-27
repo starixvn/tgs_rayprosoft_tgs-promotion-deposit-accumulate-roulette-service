@@ -108,6 +108,7 @@ push-k8s-template:
         .image.repository = strenv(BackgroundImageName) |
         .image.tag = strenv(Tag)
       ' artifacts/k8s/$HelmTemplateBackgroundFolderName/values.yaml
+    - cp -R deployment/k8s/cronjob.yaml artifacts/k8s/      
   needs: 
     - unit-test
   only:
@@ -265,7 +266,8 @@ deploy-background-dev:
         "autoscaling": $autoscaling
       }
       EOF
-  
+    - kubectl -n $namespace apply -f artifacts/k8s/cronjob.yaml
+      
 deploy-service-staging:
   stage: deploy-staging
   variables: 
@@ -412,6 +414,7 @@ deploy-background-staging:
         "autoscaling": $autoscaling
       }
       EOF  
+    - kubectl -n $namespace apply -f artifacts/k8s/cronjob.yaml
 
 deploy-service-prod:
   stage: deploy-prod
@@ -559,3 +562,4 @@ deploy-background-prod:
         "autoscaling": $autoscaling
       }
       EOF  
+    - kubectl -n $namespace apply -f artifacts/k8s/cronjob.yaml
