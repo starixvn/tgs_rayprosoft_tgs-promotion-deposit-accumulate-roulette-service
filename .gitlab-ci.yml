@@ -108,7 +108,7 @@ push-k8s-template:
         .image.repository = strenv(BackgroundImageName) |
         .image.tag = strenv(Tag)
       ' artifacts/k8s/$HelmTemplateBackgroundFolderName/values.yaml
-    - cp -R deployment/k8s/cronjob.yaml artifacts/k8s/      
+    - cp deployment/k8s/cronjob.yaml artifacts/k8s/      
   needs: 
     - unit-test
   only:
