@@ -72,33 +72,29 @@ internal class DepositAccumulateRouletteEventService : IDepositAccumulateRoulett
 		// expire time 計算:
 		// 1. 排程起始時間: 每日 07:00 UTC+8, 預期排程最多執行時間為 1 小時 (08:00 UTC+8 結束)
 		// 2. 查詢日期: 以每日 8:00 UTC+8 為準
-		// 3. 每筆 event 資料存放於 redis sorted list, 並以保存時間作為該 event 的 score
-		// 4. 若查詢時間與當日日期相同, event 資料保存至隔日 08:00 UTC+8
+		// 3. 每筆 event 資料存放於 redis sorted list, 並以保存時間 (unix milliseconds) 作為該 event 的 score
+		// 4. 若查詢時間與當日日期相同, event 資料保存至 event 日期的隔日 08:00 UTC+8
 		// 5. 若查詢時間與當日日期不同 (發生於排程執行時間中), 則資料保存時間為 5 分鐘
+		// 6. 若查詢不到 event 資料, 則補一個沒次數的 event 儲存
 
-		if (events.Length == 0)
+		var eventInfos = events.Length == 0
+			? new[]
+			{
+				new DepositAccumulateRouletteEventInfo(
+					playerCode, promotionId, currentDate, 0, 0)
+			}
+			: events;
+
+		foreach (var evt in eventInfos)
 		{
-			var expired = currentDate == queryDate
-				? new DateTimeOffset(currentDate.Year, currentDate.Month, currentDate.Day + 1, 8, 0, 0,
-					TimeSpan.FromHours(8D))
-				: now.AddMinutes(5D);
+			var expired = now.AddMinutes(5D);
 
-			var info = new DepositAccumulateRouletteEventInfo(
-				playerCode, promotionId, currentDate, 0, 0);
-
-			_ = await _storeRepository
-				.SetDepositAccumulateRouletteEventInfoAsync(promotionId, playerCode, expired, info)
-				.ConfigureAwait(false);
-
-			yield break;
-		}
-
-		foreach (var evt in events)
-		{
-			var expired = currentDate == queryDate
-				? new DateTimeOffset(evt.Date.Year, evt.Date.Month, evt.Date.Day + 1, 8, 0, 0,
-					TimeSpan.FromHours(8D))
-				: now.AddMinutes(5D);
+			if (currentDate == queryDate)
+			{
+				var nextDate = evt.Date.AddDays(1);
+				expired = new DateTimeOffset(nextDate.Year, nextDate.Month, nextDate.Day, 8, 0, 0,
+					TimeSpan.FromHours(8D));
+			}
 
 			_ = await _storeRepository
 				.SetDepositAccumulateRouletteEventInfoAsync(promotionId, playerCode, expired, evt)

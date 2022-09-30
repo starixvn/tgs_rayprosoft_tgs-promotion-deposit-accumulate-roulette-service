@@ -1,5 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Tgs.Promotion.DepositAccumulateRoulette.Repositories.Entities;
 using Tgs.Promotion.DepositAccumulateRoulette.Worker;
 using Tgs.SerialNumberGenerator;
