@@ -1,3 +1,3 @@
 using System.Runtime.CompilerServices;
 
-[assembly: InternalsVisibleTo("Tgs.Promotion.DepositAccumulateRoulette.Background.IntegrationTests")]
+[assembly: InternalsVisibleTo("DepositAccumulateRoulette.Background.IntegrationTests")]

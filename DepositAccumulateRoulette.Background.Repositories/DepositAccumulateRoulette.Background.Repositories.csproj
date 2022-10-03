@@ -4,6 +4,7 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <RootNamespace>Tgs.Promotion.DepositAccumulateRoulette.Background.Repositories</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
@@ -11,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\DepositAccumulateRoulette.Background.Core\Tgs.Promotion.DepositAccumulateRoulette.Background.Core.csproj" />
+    <ProjectReference Include="..\DepositAccumulateRoulette.Background.Core\DepositAccumulateRoulette.Background.Core.csproj" />
   </ItemGroup>
 
 </Project>

@@ -15,7 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\DepositAccumulateRoulette.Common\Tgs.Promotion.DepositAccumulateRoulette.Common.csproj" />
+    <ProjectReference Include="..\DepositAccumulateRoulette.Common\DepositAccumulateRoulette.Common.csproj" />
   </ItemGroup>
 
 </Project>

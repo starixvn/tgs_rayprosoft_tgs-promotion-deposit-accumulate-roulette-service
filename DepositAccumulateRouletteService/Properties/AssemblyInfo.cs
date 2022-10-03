@@ -1,4 +1,4 @@
 ﻿using System.Runtime.CompilerServices;
 
-[assembly: InternalsVisibleTo("Tgs.Promotion.DepositAccumulateRouletteService.UnitTests")]
-[assembly: InternalsVisibleTo("Tgs.Promotion.DepositAccumulateRouletteService.IntegrationTests")]
+[assembly: InternalsVisibleTo("DepositAccumulateRouletteService.UnitTests")]
+[assembly: InternalsVisibleTo("DepositAccumulateRouletteService.IntegrationTests")]

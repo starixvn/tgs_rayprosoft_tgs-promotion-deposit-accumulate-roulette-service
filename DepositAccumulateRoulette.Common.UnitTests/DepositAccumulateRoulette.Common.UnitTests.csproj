@@ -4,14 +4,8 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-
     <IsPackable>false</IsPackable>
-
-    <EnableNETAnalyzers>True</EnableNETAnalyzers>
-
-    <RunAnalyzersDuringBuild>True</RunAnalyzersDuringBuild>
-
-    <RunAnalyzersDuringLiveAnalysis>True</RunAnalyzersDuringLiveAnalysis>
+    <RootNamespace>Tgs.Promotion.DepositAccumulateRoulette.Common.UnitTests</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
@@ -23,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\DepositAccumulateRoulette.Common\Tgs.Promotion.DepositAccumulateRoulette.Common.csproj" />
+    <ProjectReference Include="..\DepositAccumulateRoulette.Common\DepositAccumulateRoulette.Common.csproj" />
   </ItemGroup>
 
 </Project>

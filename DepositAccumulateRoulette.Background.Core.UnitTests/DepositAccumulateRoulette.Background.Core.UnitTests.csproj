@@ -1,11 +1,11 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-
     <IsPackable>false</IsPackable>
+    <RootNamespace>Tgs.Promotion.DepositAccumulateRoulette.Background.Core.UnitTests</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
@@ -18,7 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\DepositAccumulateRoulette.Background\Tgs.Promotion.DepositAccumulateRoulette.Background.csproj" />
+    <ProjectReference Include="..\DepositAccumulateRoulette.Background.Core\DepositAccumulateRoulette.Background.Core.csproj" />
   </ItemGroup>
 
 </Project>

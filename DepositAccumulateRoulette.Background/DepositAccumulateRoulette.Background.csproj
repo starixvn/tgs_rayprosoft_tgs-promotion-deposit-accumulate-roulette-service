@@ -4,35 +4,46 @@
     <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <UserSecretsId>e7ef8328-a199-4f5b-8b54-571e18959fa0</UserSecretsId>
+    <RootNamespace>Tgs.Promotion.DepositAccumulateRoulette.Background</RootNamespace>
+    <UserSecretsId>64f4d364-06e4-4873-96b0-665f082ae6ba</UserSecretsId>
     <GlobalNugetConfig>$(UserProfile)\AppData\Roaming\NuGet\NuGet.Config</GlobalNugetConfig>
     <GlobalNugetConfig Condition="'$(UserProfile)'==''">$(HOME)/.nuget/NuGet/NuGet.Config</GlobalNugetConfig>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <DockerfileBuildArguments>--build-arg "BuildConfiguration=$(Configuration)" --secret id=nuget,src="$(GlobalNugetConfig)"</DockerfileBuildArguments>
-    <DockerfileTag Condition="$(DockerfileTag) == ''">deposit-accumulate-roulette-worker</DockerfileTag>
+    <DockerfileTag Condition="$(DockerfileTag) == ''">deposit-accumulate-roulette-background</DockerfileTag>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="DateOnlyTimeOnly.AspNet" Version="1.0.3" />
+    <PackageReference Include="DateOnlyTimeOnly.AspNet.Swashbuckle" Version="1.0.3" />
     <PackageReference Include="FluentdForward.OpenTelemetry.MessagePack" Version="0.1.3" />
+    <PackageReference Include="Fluxera.Extensions.Hosting.Modules.OpenTelemetry" Version="6.1.7" />
+    <PackageReference Include="Google.Protobuf" Version="3.21.5" />
+    <PackageReference Include="Grpc.Tools" Version="2.47.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Hangfire.AspNetCore" Version="1.7.31" />
     <PackageReference Include="Hangfire.MemoryStorage" Version="1.7.0" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.15.1" />
     <PackageReference Include="Npgsql.OpenTelemetry" Version="6.0.6" />
     <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.3.1" />
-    <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.0.0-rc9.5" />
     <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.0.0-rc9.5" />
     <PackageReference Include="OpenTelemetry.Instrumentation.Http" Version="1.0.0-rc9.5" />
     <PackageReference Include="PhoenixToolkits.Protobuf.ExtendTypes" Version="0.0.6" />
     <PackageReference Include="ProfileViewer.OpenTelemetry.Exporter" Version="0.2.1" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
-    <PackageReference Include="Tgs.Interceptors" Version="0.2.1" />
     <PackageReference Include="Tgs.MessageQueue.Nats" Version="2.1.6" />
+    <PackageReference Include="Tgs.WebApi.Toolkits" Version="0.0.13" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\DepositAccumulateRoulette.Background.Core\DepositAccumulateRoulette.Background.Core.csproj" />
+    <ProjectReference Include="..\DepositAccumulateRoulette.Background.Repositories\DepositAccumulateRoulette.Background.Repositories.csproj" />
+  </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\DepositAccumulateRoulette.Repositories\Tgs.Promotion.DepositAccumulateRoulette.Repositories.csproj" />
-    <ProjectReference Include="..\DepositAccumulateRoulette.Worker.Cache\Tgs.Promotion.DepositAccumulateRoulette.Worker.Cache.csproj" />
-    <ProjectReference Include="..\DepositAccumulateRoulette.Worker.Core\Tgs.Promotion.DepositAccumulateRoulette.Worker.Core.csproj" />
+    <Protobuf Include="Protos\Protos.proto" GrpcServices="None" Access="Internal" />
   </ItemGroup>
 
 </Project>

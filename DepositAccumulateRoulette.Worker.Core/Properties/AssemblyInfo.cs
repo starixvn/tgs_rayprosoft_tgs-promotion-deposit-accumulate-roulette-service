@@ -1,6 +1,6 @@
 using System.Runtime.CompilerServices;
 
-[assembly: InternalsVisibleTo("Tgs.Promotion.DepositAccumulateRoulette.Worker.Core.UnitTests")]
-[assembly: InternalsVisibleTo("Tgs.Promotion.DepositAccumulateRoulette.Worker.Cache.UnitTests")]
-[assembly: InternalsVisibleTo("Tgs.Promotion.DepositAccumulateRouletteService.IntegrationTests")]
+[assembly: InternalsVisibleTo("DepositAccumulateRoulette.Worker.Core.UnitTests")]
+[assembly: InternalsVisibleTo("DepositAccumulateRoulette.Worker.Cache.UnitTests")]
+[assembly: InternalsVisibleTo("DepositAccumulateRouletteService.IntegrationTests")]
 [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]

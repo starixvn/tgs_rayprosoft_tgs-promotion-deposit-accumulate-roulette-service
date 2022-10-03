@@ -4,6 +4,7 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <RootNamespace>Tgs.Promotion.DepositAccumulateRoulette.Worker.Cache</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
@@ -13,7 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\DepositAccumulateRoulette.Worker.Core\Tgs.Promotion.DepositAccumulateRoulette.Worker.Core.csproj" />
+    <ProjectReference Include="..\DepositAccumulateRoulette.Worker.Core\DepositAccumulateRoulette.Worker.Core.csproj" />
   </ItemGroup>
 
 </Project>
