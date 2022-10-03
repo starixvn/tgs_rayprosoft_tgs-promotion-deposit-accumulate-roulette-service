@@ -6,21 +6,21 @@ EXPOSE 80
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 ARG BuildConfiguration=Release
-RUN --mount=type=secret,id=nuget,dst=/pat cp /pat ~/.nuget/NuGet/NuGet.Config
 WORKDIR /src
 COPY ["nuget.config", "."]
-COPY ["Tgs.Promotion.DepositAccumulateRouletteService/Tgs.Promotion.DepositAccumulateRouletteService.csproj", "Tgs.Promotion.DepositAccumulateRouletteService/"]
-COPY ["Tgs.Promotion.DepositAccumulateRoulette.Common/Tgs.Promotion.DepositAccumulateRoulette.Common.csproj", "Tgs.Promotion.DepositAccumulateRoulette.Common/"]
-RUN dotnet restore "Tgs.Promotion.DepositAccumulateRouletteService/Tgs.Promotion.DepositAccumulateRouletteService.csproj"
+COPY ["DepositAccumulateRouletteService/DepositAccumulateRouletteService.csproj", "DepositAccumulateRouletteService/"]
+COPY ["DepositAccumulateRoulette.Common/DepositAccumulateRoulette.Common.csproj", "DepositAccumulateRoulette.Common/"]
+COPY ["DepositAccumulateRoulette.Core/DepositAccumulateRoulette.Core.csproj", "DepositAccumulateRoulette.Core/"]
+RUN dotnet restore "DepositAccumulateRouletteService/DepositAccumulateRouletteService.csproj"
 COPY . .
-WORKDIR "/src/Tgs.Promotion.DepositAccumulateRouletteService"
-RUN dotnet build "Tgs.Promotion.DepositAccumulateRouletteService.csproj" -c $BuildConfiguration -o /app/build
+WORKDIR "/src/DepositAccumulateRouletteService"
+RUN dotnet build "DepositAccumulateRouletteService.csproj" -c $BuildConfiguration -o /app/build
 
 FROM build AS publish
 ARG BuildConfiguration
-RUN dotnet publish "Tgs.Promotion.DepositAccumulateRouletteService.csproj" -c $BuildConfiguration -o /app/publish
+RUN dotnet publish "DepositAccumulateRouletteService.csproj" -c $BuildConfiguration -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "Tgs.Promotion.DepositAccumulateRouletteService.dll"]
+ENTRYPOINT ["dotnet", "DepositAccumulateRouletteService.dll"]

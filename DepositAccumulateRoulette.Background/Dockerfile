@@ -6,23 +6,22 @@ EXPOSE 80
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 ARG BuildConfiguration=Release
-RUN --mount=type=secret,id=nuget,dst=/pat cp /pat ~/.nuget/NuGet/NuGet.Config
 WORKDIR /src
 COPY ["nuget.config", "."]
-COPY ["Tgs.Promotion.DepositAccumulateRoulette.Background/Tgs.Promotion.DepositAccumulateRoulette.Background.csproj", "Tgs.Promotion.DepositAccumulateRoulette.Background/"]
-COPY ["Tgs.Promotion.DepositAccumulateRoulette.Background.Repositories/Tgs.Promotion.DepositAccumulateRoulette.Background.Repositories.csproj", "Tgs.Promotion.DepositAccumulateRoulette.Background.Repositories/"]
-COPY ["Tgs.Promotion.DepositAccumulateRoulette.Background.Core/Tgs.Promotion.DepositAccumulateRoulette.Background.Core.csproj", "Tgs.Promotion.DepositAccumulateRoulette.Background.Core/"]
-COPY ["Tgs.Promotion.DepositAccumulateRoulette.Common/Tgs.Promotion.DepositAccumulateRoulette.Common.csproj", "Tgs.Promotion.DepositAccumulateRoulette.Common/"]
-RUN dotnet restore "Tgs.Promotion.DepositAccumulateRoulette.Background/Tgs.Promotion.DepositAccumulateRoulette.Background.csproj"
+COPY ["DepositAccumulateRoulette.Background/DepositAccumulateRoulette.Background.csproj", "DepositAccumulateRoulette.Background/"]
+COPY ["DepositAccumulateRoulette.Background.Core/DepositAccumulateRoulette.Background.Core.csproj", "DepositAccumulateRoulette.Background.Core/"]
+COPY ["DepositAccumulateRoulette.Common/DepositAccumulateRoulette.Common.csproj", "DepositAccumulateRoulette.Common/"]
+COPY ["DepositAccumulateRoulette.Background.Repositories/DepositAccumulateRoulette.Background.Repositories.csproj", "DepositAccumulateRoulette.Background.Repositories/"]
+RUN dotnet restore "DepositAccumulateRoulette.Background/DepositAccumulateRoulette.Background.csproj"
 COPY . .
-WORKDIR "/src/Tgs.Promotion.DepositAccumulateRoulette.Background"
-RUN dotnet build "Tgs.Promotion.DepositAccumulateRoulette.Background.csproj" -c $BuildConfiguration -o /app/build
+WORKDIR "/src/DepositAccumulateRoulette.Background"
+RUN dotnet build "DepositAccumulateRoulette.Background.csproj" -c $BuildConfiguration -o /app/build
 
 FROM build AS publish
 ARG BuildConfiguration
-RUN dotnet publish "Tgs.Promotion.DepositAccumulateRoulette.Background.csproj" -c $BuildConfiguration -o /app/publish
+RUN dotnet publish "DepositAccumulateRoulette.Background.csproj" -c $BuildConfiguration -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "Tgs.Promotion.DepositAccumulateRoulette.Background.dll"]
+ENTRYPOINT ["dotnet", "DepositAccumulateRoulette.Background.dll"]
