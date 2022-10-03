@@ -49,8 +49,8 @@ unit-test:
 push-nuget:
   stage: publish
   script:
-    - dotnet pack -c $BuildConfiguration "Tgs.Promotion.DepositAccumulateRoulette.Client/Tgs.Promotion.DepositAccumulateRoulette.Client.csproj" --no-build --no-restore
-    - dotnet nuget push "Tgs.Promotion.DepositAccumulateRoulette.Client/bin/$BuildConfiguration/*.nupkg" -s raypro-baget -k $NugetApiKey --skip-duplicate
+    - dotnet pack -c $BuildConfiguration "DepositAccumulateRoulette.Client/DepositAccumulateRoulette.Client.csproj" --no-build --no-restore
+    - dotnet nuget push "DepositAccumulateRoulette.Client/bin/$BuildConfiguration/*.nupkg" -s raypro-baget -k $NugetApiKey --skip-duplicate
   needs: 
     - unit-test
   only:
@@ -64,17 +64,17 @@ push-nuget:
     untracked: false
     expire_in: "30 days"
     paths:
-      - Tgs.Promotion.DepositAccumulateRoulette.Client/bin/$BuildConfiguration/*.nupkg
+      - DepositAccumulateRoulette.Client/bin/$BuildConfiguration/*.nupkg
 
 push-docker-image:
   stage: publish
   script:
     - export Tag="$(date -d $CI_PIPELINE_CREATED_AT +%Y%m%d%H%M).$CI_PIPELINE_IID"
-    - dotnet build "Tgs.Promotion.DepositAccumulateRouletteService/Tgs.Promotion.DepositAccumulateRouletteService.csproj" -c $BuildConfiguration -t:ContainerBuild -p:DockerfileTag="$ServiceImageName:$Tag" --no-restore
+    - dotnet build "DepositAccumulateRouletteService/DepositAccumulateRouletteService.csproj" -c $BuildConfiguration -t:ContainerBuild -p:DockerfileTag="$ServiceImageName:$Tag" --no-restore
     - docker push $ServiceImageName:$Tag
-    - dotnet build "Tgs.Promotion.DepositAccumulateRoulette.Worker/Tgs.Promotion.DepositAccumulateRoulette.Worker.csproj" -c $BuildConfiguration -t:ContainerBuild -p:DockerfileTag="$WorkerImageName:$Tag" --no-restore
+    - dotnet build "DepositAccumulateRoulette.Worker/DepositAccumulateRoulette.Worker.csproj" -c $BuildConfiguration -t:ContainerBuild -p:DockerfileTag="$WorkerImageName:$Tag" --no-restore
     - docker push $WorkerImageName:$Tag
-    - dotnet build "Tgs.Promotion.DepositAccumulateRoulette.Background/Tgs.Promotion.DepositAccumulateRoulette.Background.csproj" -c $BuildConfiguration -t:ContainerBuild -p:DockerfileTag="$BackgroundImageName:$Tag" --no-restore
+    - dotnet build "DepositAccumulateRoulette.Background/DepositAccumulateRoulette.Background.csproj" -c $BuildConfiguration -t:ContainerBuild -p:DockerfileTag="$BackgroundImageName:$Tag" --no-restore
     - docker push $BackgroundImageName:$Tag
   needs: 
     - unit-test
