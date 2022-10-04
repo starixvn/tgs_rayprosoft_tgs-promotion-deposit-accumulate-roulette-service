@@ -16,4 +16,27 @@ internal class DistributePlanHasherTests
 
 		Assert.AreEqual(expected, actual);
 	}
+
+	[Test]
+	public void Hash_Code_Duplicate()
+	{
+		var item1 = new
+		{
+			Date = new DateOnly(2022, 12, 16),
+			RouletteCount = 79
+		};
+
+		var item2 = new
+		{
+			Date = new DateOnly(2026, 7, 16),
+			RouletteCount = 38
+		};
+
+		var sut = new DistributePlanHasher();
+
+		var hash1 = sut.GetHashCode(item1.Date, item1.RouletteCount);
+		var hash2 = sut.GetHashCode(item2.Date, item2.RouletteCount);
+
+		Assert.AreEqual(hash1, hash2);
+	}
 }
