@@ -1,6 +1,6 @@
 ﻿namespace Tgs.Promotion.DepositAccumulateRoulette.Worker;
 
-internal interface IDistributePlanHasher
+public interface IDistributePlanHasher
 {
 	int GetHashCode(DateOnly eventDate, int currentRouletteCount);
 }
