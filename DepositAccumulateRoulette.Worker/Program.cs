@@ -160,4 +160,6 @@ app.UseSwaggerUI();
 
 app.MapHealthChecks("/healthz");
 
+app.MapHangfireDashboard();
+
 app.Run();

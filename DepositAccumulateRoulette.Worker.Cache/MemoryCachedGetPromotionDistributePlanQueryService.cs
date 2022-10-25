@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging;
 using Tgs.Promotion.Clients;
 using Tgs.Promotion.DepositAccumulateRoulette.Worker.ApplicationServices;
 using Tgs.ServiceUtility;
@@ -9,13 +10,16 @@ internal class MemoryCachedGetPromotionDistributePlanQueryService : IGetService<
 {
 	private readonly IGetService<GetPromotionDistributePlanQuery, PromotionDistributePlanInfo> _sourceService;
 	private readonly IMemoryCache _memoryCache;
+	private readonly ILogger<MemoryCachedGetPromotionDistributePlanQueryService> _logger;
 
 	public MemoryCachedGetPromotionDistributePlanQueryService(
 		IGetService<GetPromotionDistributePlanQuery, PromotionDistributePlanInfo> sourceService,
-		IMemoryCache memoryCache)
+		IMemoryCache memoryCache,
+		ILogger<MemoryCachedGetPromotionDistributePlanQueryService> logger)
 	{
 		_sourceService = sourceService ?? throw new ArgumentNullException(nameof(sourceService));
 		_memoryCache = memoryCache ?? throw new ArgumentNullException(nameof(memoryCache));
+		_logger = logger ?? throw new ArgumentNullException(nameof(logger));
 	}
 
 	public async ValueTask<PromotionDistributePlanInfo> GetAsync(
@@ -30,6 +34,8 @@ internal class MemoryCachedGetPromotionDistributePlanQueryService : IGetService<
 
 			return await _sourceService.GetAsync(query, cancellationToken).ConfigureAwait(false);
 		}).ConfigureAwait(false);
+
+		_logger.LogInformation("Query Promotion Distribution Plan by Key: {key}, planId: {planId}", cacheKey, plan.Id);
 
 		return plan;
 	}

@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using NSubstitute;
 using Tgs.Promotion.Clients;
@@ -14,10 +15,12 @@ internal class MemoryCachedGetPromotionDistributePlanQueryServiceTests
 	{
 		var fakeMemoryCache = new MemoryCache(new OptionsWrapper<MemoryCacheOptions>(new MemoryCacheOptions()));
 		var fakePromotionDistributePlanService = Substitute.For<IGetService<GetPromotionDistributePlanQuery, PromotionDistributePlanInfo>>();
+		var fakeLogger = NullLogger<MemoryCachedGetPromotionDistributePlanQueryService>.Instance;
 
 		var sut = new MemoryCachedGetPromotionDistributePlanQueryService(
 			fakePromotionDistributePlanService,
-			fakeMemoryCache);
+			fakeMemoryCache,
+			fakeLogger);
 
 		var query = new GetPromotionDistributePlanQuery(Guid.NewGuid(), 12345L);
 
@@ -45,10 +48,12 @@ internal class MemoryCachedGetPromotionDistributePlanQueryServiceTests
 	{
 		var fakeMemoryCache = new MemoryCache(new OptionsWrapper<MemoryCacheOptions>(new MemoryCacheOptions()));
 		var fakePromotionDistributePlanService = Substitute.For<IGetService<GetPromotionDistributePlanQuery, PromotionDistributePlanInfo>>();
+		var fakeLogger = NullLogger<MemoryCachedGetPromotionDistributePlanQueryService>.Instance;
 
 		var sut = new MemoryCachedGetPromotionDistributePlanQueryService(
 			fakePromotionDistributePlanService,
-			fakeMemoryCache);
+			fakeMemoryCache,
+			fakeLogger);
 
 		var query = new GetPromotionDistributePlanQuery(Guid.NewGuid(), 12345L);
 
