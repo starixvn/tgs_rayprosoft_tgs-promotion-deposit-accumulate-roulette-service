@@ -131,12 +131,32 @@ builder.Services
 				   ext => httpContext.Request.Path.Value.EndsWith($".{ext}")));
 
 builder.Services
+	.AddRouting(options => options.LowercaseUrls = true)
+	.AddControllers()
+	.AddMvcOptions(mvcOptions =>
+	{
+		mvcOptions
+			.UseDateOnlyTimeOnlyStringConverters();
+	})
+	.AddJsonOptions(jsonOptions => jsonOptions.UseDateOnlyTimeOnlyStringConverters());
+
+builder.Services.AddSwaggerGen(c =>
+{
+	c.UseDateOnlyTimeOnlyStringConverters();
+});
+
+builder.Services
 	.AddInterceptionService()
 	.AddServiceUtiltiyInterceptors();
 
 builder.Services.AddHealthChecks();
 
 var app = builder.Build();
+
+app.MapControllers();
+app.MapProfileViewer();
+app.MapSwagger();
+app.UseSwaggerUI();
 
 app.MapHealthChecks("/healthz");
 

@@ -1,4 +1,5 @@
-﻿using Tgs.Promotion.Clients;
+﻿using Microsoft.Extensions.Logging;
+using Tgs.Promotion.Clients;
 using Tgs.ServiceUtility;
 
 namespace Tgs.Promotion.DepositAccumulateRoulette.Worker.ApplicationServices;
@@ -8,15 +9,18 @@ internal class DistributeBonusCommandService : ICommandService<DistributeBonusCo
 	private readonly IPromotionServiceClient _promotionServiceClient;
 	private readonly IGetService<GetPromotionDistributePlanQuery, PromotionDistributePlanInfo> _getDistributePlanService;
 	private readonly IDistributePlanHasher _hasher;
+	private readonly ILogger<DistributeBonusCommandService> _logger;
 
 	public DistributeBonusCommandService(
 		IPromotionServiceClient promotionServiceClient,
 		IGetService<GetPromotionDistributePlanQuery, PromotionDistributePlanInfo> getDistributePlanService,
-		IDistributePlanHasher hasher)
+		IDistributePlanHasher hasher,
+		ILogger<DistributeBonusCommandService> logger)
 	{
 		_promotionServiceClient = promotionServiceClient ?? throw new ArgumentNullException(nameof(promotionServiceClient));
 		_getDistributePlanService = getDistributePlanService ?? throw new ArgumentNullException(nameof(getDistributePlanService));
 		_hasher = hasher ?? throw new ArgumentNullException(nameof(hasher));
+		_logger = logger ?? throw new ArgumentNullException(nameof(logger));
 	}
 
 	public async ValueTask ExecuteAsync(
@@ -24,6 +28,10 @@ internal class DistributeBonusCommandService : ICommandService<DistributeBonusCo
 		CancellationToken cancellationToken = default)
 	{
 		var hash = _hasher.GetHashCode(command.EventDate, command.CurrentRouletteCount);
+
+		_logger.LogInformation(
+			"Hash generate with Date: {date}, Count: {count}; Hash: {hash}",
+			command.EventDate, command.CurrentRouletteCount, hash);
 
 		var plan = await _getDistributePlanService.GetAsync(
 			new GetPromotionDistributePlanQuery(

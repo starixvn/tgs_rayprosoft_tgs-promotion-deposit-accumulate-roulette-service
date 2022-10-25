@@ -1,4 +1,6 @@
-﻿using NSubstitute;
+﻿using Microsoft.Extensions.Logging.Abstractions;
+using NSubstitute;
+using NUnit.Framework.Internal;
 using Tgs.Promotion.Clients;
 using Tgs.Promotion.DepositAccumulateRoulette.Worker.ApplicationServices;
 using Tgs.ServiceUtility;
@@ -30,11 +32,13 @@ internal class DistributeBonusTests
 		var fakePromotionServiceClient = Substitute.For<IPromotionServiceClient>();
 		var fakeGetDistributeService = Substitute.For<IGetService<GetPromotionDistributePlanQuery, PromotionDistributePlanInfo>>();
 		var fakeDistributePlanHasher = Substitute.For<IDistributePlanHasher>();
+		var fakeLogger = NullLogger<DistributeBonusCommandService>.Instance;
 
 		var sut = new DistributeBonusCommandService(
 			fakePromotionServiceClient,
 			fakeGetDistributeService,
-			fakeDistributePlanHasher);
+			fakeDistributePlanHasher,
+			fakeLogger);
 
 		var distributeDate = DateOnly.FromDateTime(DateTime.Now);
 		var command = new DistributeBonusCommand(
