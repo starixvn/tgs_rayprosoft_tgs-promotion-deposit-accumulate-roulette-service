@@ -18,7 +18,7 @@ internal class DistributeBonusBackgroundJob
 		_distributeService = distributeService ?? throw new ArgumentNullException(nameof(distributeService));
 	}
 
-	[AutomaticRetry(Attempts = 3, DelaysInSeconds = new[] { 5, 10, 15 }, OnAttemptsExceeded = AttemptsExceededAction.Fail)]
+	[AutomaticRetry(Attempts = 0)]
 	public async Task ExecuteAsync(DistributeBonusScheduleInfo scheduleInfo)
 	{
 		await _promotionServiceClient.UpdatePromotionUsedAmountAsync(
