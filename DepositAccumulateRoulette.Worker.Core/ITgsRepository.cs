@@ -25,4 +25,13 @@ public interface ITgsRepository
 		decimal bonus,
 		int itemIndex,
 		CancellationToken cancellationToken = default);
+
+	ValueTask<RouletteRecordInfo?> GetRouletteRecordInfoAsync(
+		Guid rouletteRecordId,
+		CancellationToken cancellationToken = default);
+
+	IAsyncEnumerable<RouletteRecordInfo> GetRouletteRecordInfosAsync(
+		Guid promotionId,
+		string playerCode,
+		DateOnly eventDate);
 }

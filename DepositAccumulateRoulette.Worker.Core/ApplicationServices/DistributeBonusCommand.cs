@@ -1,6 +1,6 @@
 ﻿namespace Tgs.Promotion.DepositAccumulateRoulette.Worker.ApplicationServices;
 
-internal record DistributeBonusCommand(
+public record DistributeBonusCommand(
 	Guid PromotionId,
 	string PlayerCode,
 	DateOnly EventDate,
