@@ -1,6 +1,8 @@
-﻿using Microsoft.Extensions.Logging.Abstractions;
+﻿using Hangfire;
+using Hangfire.Common;
+using Hangfire.States;
+using Microsoft.Extensions.Logging.Abstractions;
 using NSubstitute;
-using NUnit.Framework.Internal;
 using Tgs.Promotion.Clients;
 using Tgs.Promotion.DepositAccumulateRoulette.Worker.ApplicationServices;
 using Tgs.ServiceUtility;
@@ -31,32 +33,29 @@ internal class DistributeBonusTests
 	{
 		var fakePromotionServiceClient = Substitute.For<IPromotionServiceClient>();
 		var fakeGetDistributeService = Substitute.For<IGetService<GetPromotionDistributePlanQuery, PromotionDistributePlanInfo>>();
-		var fakeDistributePlanHasher = Substitute.For<IDistributePlanHasher>();
 		var fakeLogger = NullLogger<DistributeBonusCommandService>.Instance;
 
 		var sut = new DistributeBonusCommandService(
 			fakePromotionServiceClient,
 			fakeGetDistributeService,
-			fakeDistributePlanHasher,
 			fakeLogger);
 
-		var distributeDate = DateOnly.FromDateTime(DateTime.Now);
 		var command = new DistributeBonusCommand(
 			Guid.NewGuid(),
 			"player1",
-			distributeDate,
-			3,
+			123456,
 			100M,
 			100M);
 
 		var planId = Guid.NewGuid();
 		_ = fakeGetDistributeService
-			.GetAsync(Arg.Any<GetPromotionDistributePlanQuery>())
+			.GetAsync(Arg.Is<GetPromotionDistributePlanQuery>(x =>
+				x.PromotionId == command.PromotionId && x.ConditionHash == command.Hash))
 			.Returns(new PromotionDistributePlanInfo(
 				planId,
 				Guid.NewGuid(),
 				command.PromotionId,
-				distributeDate.DayNumber));
+				command.Hash));
 
 		await sut.ExecuteAsync(command);
 
@@ -67,5 +66,58 @@ internal class DistributeBonusTests
 				Arg.Is(command.Bonus),
 				Arg.Is(command.Bucket),
 				Arg.Any<string>());
+	}
+
+	[Test]
+	public async Task Enqueue_Distribute_Bonus_Job()
+	{
+		var fakeDistributePlanHasher = Substitute.For<IDistributePlanHasher>();
+		var fakeBackgroundJobClient = Substitute.For<IBackgroundJobClient>();
+		var fakeLogger = NullLogger<EnqueueDistributeBonusJobCommandService>.Instance;
+
+		var command = new EnqueueDistributeBonusJobCommand(
+			Guid.NewGuid(),
+			"player1",
+			DateOnly.Parse("2022-10-26"),
+			2,
+			new PlayRouletteResult.RouletteResult(
+				Guid.NewGuid(),
+				1000,
+				10,
+				30,
+				Guid.NewGuid(),
+				3));
+
+		var hash = 1459347545;
+
+		var scheduleInfo = new DistributeBonusScheduleInfo(
+			command.PromotionId,
+			command.PlayerCode,
+			command.EventDate,
+			command.UsedCount,
+			command.PlayResult,
+			hash
+		);
+
+		_ = fakeDistributePlanHasher.GetHashCode(
+				Arg.Is(command.EventDate),
+				Arg.Is(command.UsedCount))
+			.Returns(hash);
+
+		var sut = new EnqueueDistributeBonusJobCommandService(
+			fakeDistributePlanHasher,
+			fakeBackgroundJobClient,
+			fakeLogger);
+
+		await sut.ExecuteAsync(command);
+
+		_ = fakeBackgroundJobClient
+			.Received(1)
+			.Create(
+				Arg.Is<Job>(job
+					=> job.Type == typeof(DistributeBonusBackgroundJob) &&
+					   job.Method.Name == "ExecuteAsync"
+					   && (DistributeBonusScheduleInfo)job.Args[0] == scheduleInfo),
+				Arg.Is<EnqueuedState>(p => p.Name == "Enqueued"));
 	}
 }
