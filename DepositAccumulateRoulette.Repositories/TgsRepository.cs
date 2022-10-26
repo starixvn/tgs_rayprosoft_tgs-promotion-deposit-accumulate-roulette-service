@@ -91,4 +91,34 @@ internal class TgsRepository : ITgsRepository
 
 		return recordId;
 	}
+
+	public async ValueTask<RouletteRecordInfo?> GetRouletteRecordInfoAsync(
+		Guid rouletteRecordId,
+		CancellationToken cancellationToken = default)
+		=> await _context.DepositAccumulateRouletteGameEvents
+			.Where(evt => evt.Id == rouletteRecordId)
+			.Select(evt => new RouletteRecordInfo(
+				evt.Id,
+				evt.PlayerCode,
+				evt.PromotionId,
+				evt.Date,
+				evt.ItemIndex,
+				evt.Bonus,
+				evt.CreatedOn))
+			.FirstOrDefaultAsync(cancellationToken)
+			.ConfigureAwait(false);
+
+	public IAsyncEnumerable<RouletteRecordInfo> GetRouletteRecordInfosAsync(Guid promotionId, string playerCode, DateOnly eventDate) => _context.DepositAccumulateRouletteGameEvents
+			.Where(evt => evt.PromotionId == promotionId
+				&& evt.PlayerCode == playerCode
+				&& evt.Date == eventDate)
+			.Select(evt => new RouletteRecordInfo(
+				evt.Id,
+				evt.PlayerCode,
+				evt.PromotionId,
+				evt.Date,
+				evt.ItemIndex,
+				evt.Bonus,
+				evt.CreatedOn))
+			.AsAsyncEnumerable();
 }
