@@ -34,4 +34,8 @@ public interface ITgsRepository
 		Guid promotionId,
 		string playerCode,
 		DateOnly eventDate);
+
+	IAsyncEnumerable<RouletteRecordInfo> GetRouletteRecordInfosAsync(
+		Guid promotionId,
+		string playerCode);
 }

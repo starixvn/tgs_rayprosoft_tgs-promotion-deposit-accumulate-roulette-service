@@ -51,7 +51,7 @@ internal class RouletteTaskQueue : IDisposable
 		if (systemClock is null)
 			throw new ArgumentNullException(nameof(systemClock));
 
-		_today = DateOnly.FromDateTime(systemClock.UtcNow.ToOffset(TimeSpan.FromHours(8)).DateTime);
+		_today = DateOnly.FromDateTime(systemClock.UtcNow.ToOffset(TimeSpan.FromHours(8D)).DateTime);
 	}
 
 	public void Enqueue(RouletteTask task)

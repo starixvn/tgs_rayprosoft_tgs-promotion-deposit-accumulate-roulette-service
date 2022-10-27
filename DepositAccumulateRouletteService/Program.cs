@@ -44,7 +44,10 @@ builder.Services
 				"tgs.promotion.depositaccumulateroulette.roulettecountitems.query")
 			.AddProcessor<RouletteProcessor>(
 				"tgs.promotion.depositaccumulateroulette.roulette.play",
-				"tgs.promotion.depositaccumulateroulette.roulette.play");
+				"tgs.promotion.depositaccumulateroulette.roulette.play")
+			.AddProcessor<RouletteRecordsQueryProcessor>(
+				"tgs.promotion.depositaccumulateroulette.roulette.records.query",
+				"tgs.promotion.depositaccumulateroulette.roulette.records.query");
 	})
 	.ClearAllExchanges()
 	.AddNatsGlobPatternExchange("*");

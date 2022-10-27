@@ -22,7 +22,9 @@
   <ItemGroup>
     <ProjectReference Include="..\DepositAccumulateRoulette.Client\DepositAccumulateRoulette.Client.csproj" />
     <ProjectReference Include="..\DepositAccumulateRoulette.Worker\DepositAccumulateRoulette.Worker.csproj" />
-    <ProjectReference Include="..\DepositAccumulateRouletteService\DepositAccumulateRouletteService.csproj" />
+    <ProjectReference Include="..\DepositAccumulateRouletteService\DepositAccumulateRouletteService.csproj">
+      <Aliases>RouletteSvc</Aliases>
+    </ProjectReference>
   </ItemGroup>
 
 </Project>

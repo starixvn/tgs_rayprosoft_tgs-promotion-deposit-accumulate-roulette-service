@@ -1,5 +1,4 @@
-﻿using System.Reflection;
-using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
@@ -9,7 +8,9 @@ using Tgs.Promotion.DepositAccumulateRoulette.Repositories.Entities;
 
 namespace Tgs.Promotion.DepositAccumulateRouletteService.IntegrationTests;
 
-internal class TestDepositAccumulateRouletteServiceApplication : WebApplicationFactory<Program>
+extern alias RouletteSvc;
+
+internal class TestDepositAccumulateRouletteServiceApplication : WebApplicationFactory<RouletteSvc.Program>
 {
 	private readonly Action<IWebHostBuilder>? _webHostConfiguration;
 

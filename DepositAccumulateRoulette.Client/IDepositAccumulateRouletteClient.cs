@@ -6,4 +6,9 @@ public interface IDepositAccumulateRouletteClient
 		Guid promotionId,
 		string playerCode,
 		CancellationToken cancellationToken = default);
+
+	IAsyncEnumerable<RouletteRecord> GetRouletteRecordsAsync(
+		Guid promotionId,
+		string playerCode,
+		CancellationToken cancellationToken);
 }
