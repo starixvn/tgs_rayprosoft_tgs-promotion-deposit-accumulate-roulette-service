@@ -30,7 +30,8 @@ internal class DepositAccumulateRouletteTests
 		var fakeStoreRepository = Substitute.For<IStoreRepository>();
 		var fakeSystemClock = Substitute.For<ISystemClock>();
 		var fakeRouletteServiceClient = Substitute.For<IDepositAccumulateRouletteServiceClient>();
-		var fakeBackgroundJobClient = Substitute.For<IBackgroundJobClient>();
+		var fakeEnqueueDistributeBonusJobCommandService =
+			Substitute.For<ICommandService<EnqueueDistributeBonusJobCommand>>();
 
 		await using var web = new TestDepositAccumulateRouletteServiceApplication(builder => builder
 			.ConfigureServices(services =>
@@ -43,7 +44,7 @@ internal class DepositAccumulateRouletteTests
 					.AddSingleton(fakeRedisConnectionManager)
 					.AddSingleton(fakeSystemClock)
 					.AddSingleton(fakeRouletteServiceClient)
-					.AddSingleton(fakeBackgroundJobClient);
+					.AddSingleton(fakeEnqueueDistributeBonusJobCommandService);
 
 				_ = services
 					.AddSingleton<IShuffleService, ShuffleService>()
@@ -212,7 +213,8 @@ internal class DepositAccumulateRouletteTests
 		var fakeStoreRepository = Substitute.For<IStoreRepository>();
 		var fakeSystemClock = Substitute.For<ISystemClock>();
 		var fakeRouletteServiceClient = Substitute.For<IDepositAccumulateRouletteServiceClient>();
-		var fakeBackgroundJobClient = Substitute.For<IBackgroundJobClient>();
+		var fakeEnqueueDistributeBonusJobCommandService =
+			Substitute.For<ICommandService<EnqueueDistributeBonusJobCommand>>();
 
 		await using var web = new TestDepositAccumulateRouletteServiceApplication(builder => builder
 			.ConfigureServices(services =>
@@ -225,7 +227,7 @@ internal class DepositAccumulateRouletteTests
 					.AddSingleton(fakeRedisConnectionManager)
 					.AddSingleton(fakeSystemClock)
 					.AddSingleton(fakeRouletteServiceClient)
-					.AddSingleton(fakeBackgroundJobClient);
+					.AddSingleton(fakeEnqueueDistributeBonusJobCommandService);
 
 				_ = services
 					.AddSingleton<IShuffleService, ShuffleService>()
@@ -444,7 +446,8 @@ internal class DepositAccumulateRouletteTests
 		var fakeStoreRepository = Substitute.For<IStoreRepository>();
 		var fakeSystemClock = Substitute.For<ISystemClock>();
 		var fakeRouletteServiceClient = Substitute.For<IDepositAccumulateRouletteServiceClient>();
-		var fakeBackgroundJobClient = Substitute.For<IBackgroundJobClient>();
+		var fakeEnqueueDistributeBonusJobCommandService =
+			Substitute.For<ICommandService<EnqueueDistributeBonusJobCommand>>();
 
 		await using var web = new TestDepositAccumulateRouletteServiceApplication(builder => builder
 			.ConfigureServices(services =>
@@ -457,7 +460,7 @@ internal class DepositAccumulateRouletteTests
 					.AddSingleton(fakeRedisConnectionManager)
 					.AddSingleton(fakeSystemClock)
 					.AddSingleton(fakeRouletteServiceClient)
-					.AddSingleton(fakeBackgroundJobClient);
+					.AddSingleton(fakeEnqueueDistributeBonusJobCommandService);
 
 				_ = services
 					.AddSingleton<IShuffleService, ShuffleService>()

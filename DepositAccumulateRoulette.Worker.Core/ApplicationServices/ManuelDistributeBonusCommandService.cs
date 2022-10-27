@@ -1,4 +1,5 @@
-﻿using Tgs.ServiceUtility;
+﻿using Microsoft.Extensions.Logging;
+using Tgs.ServiceUtility;
 
 namespace Tgs.Promotion.DepositAccumulateRoulette.Worker.ApplicationServices;
 
@@ -6,16 +7,22 @@ internal class ManuelDistributeBonusCommandService : ICommandService<ManuelDistr
 {
 	private readonly ITgsRepository _tgsRepository;
 	private readonly IDepositAccumulateRouletteServiceClient _rouletteServiceClient;
+	private readonly IDistributePlanHasher _hasher;
 	private readonly ICommandService<DistributeBonusCommand> _distributeService;
+	private readonly ILogger<ManuelDistributeBonusCommandService> _logger;
 
 	public ManuelDistributeBonusCommandService(
 		ITgsRepository tgsRepository,
 		IDepositAccumulateRouletteServiceClient rouletteServiceClient,
-		ICommandService<DistributeBonusCommand> distributeService)
+		IDistributePlanHasher hasher,
+		ICommandService<DistributeBonusCommand> distributeService,
+		ILogger<ManuelDistributeBonusCommandService> logger)
 	{
 		_tgsRepository = tgsRepository ?? throw new ArgumentNullException(nameof(tgsRepository));
 		_rouletteServiceClient = rouletteServiceClient ?? throw new ArgumentNullException(nameof(rouletteServiceClient));
+		_hasher = hasher ?? throw new ArgumentNullException(nameof(hasher));
 		_distributeService = distributeService ?? throw new ArgumentNullException(nameof(distributeService));
+		_logger = logger ?? throw new ArgumentNullException(nameof(logger));
 	}
 
 	public async ValueTask ExecuteAsync(
@@ -55,13 +62,18 @@ internal class ManuelDistributeBonusCommandService : ICommandService<ManuelDistr
 
 		var usedCount = Array.IndexOf(allRecords, rouletteRecordInfo) + 1;
 
+		var hash = _hasher.GetHashCode(rouletteRecordInfo.EventDate, usedCount);
+
+		_logger.LogInformation(
+			"Hash generate with Date: {date}, Count: {count}; Hash: {hash}",
+			rouletteRecordInfo.EventDate, usedCount, hash);
+
 		await _distributeService
 			.ExecuteAsync(
 				new DistributeBonusCommand(
 					rouletteRecordInfo.PromotionId,
 					rouletteRecordInfo.PlayerCode,
-					rouletteRecordInfo.EventDate,
-					usedCount,
+					hash,
 					rouletteRecordInfo.BonusAmount,
 					bucket),
 				cancellationToken).ConfigureAwait(false);

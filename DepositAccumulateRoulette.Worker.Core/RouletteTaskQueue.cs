@@ -13,7 +13,6 @@ namespace Tgs.Promotion.DepositAccumulateRoulette.Worker;
 internal class RouletteTaskQueue : IDisposable
 {
 	private readonly IServiceProvider _serviceProvider;
-	private readonly IBackgroundJobClient _backgroundJobClient;
 	private readonly ILogger<RouletteTaskQueue> _logger;
 	private readonly BlockingCollection<RouletteTask> _rouletteTasks = new();
 
@@ -40,7 +39,6 @@ internal class RouletteTaskQueue : IDisposable
 		string playerCode,
 		Guid promotionId,
 		IServiceProvider serviceProvider,
-		IBackgroundJobClient backgroundJobClient,
 		ISystemClock systemClock,
 		ILogger<RouletteTaskQueue> logger)
 	{
@@ -48,7 +46,6 @@ internal class RouletteTaskQueue : IDisposable
 		PromotionId = promotionId;
 
 		_serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
-		_backgroundJobClient = backgroundJobClient;
 		_logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
 		if (systemClock is null)
@@ -190,14 +187,18 @@ internal class RouletteTaskQueue : IDisposable
 
 			_useEvent = _useEvent with { UsedCount = playRouletteResult.UsedCount };
 
-			_ = _backgroundJobClient.Enqueue<DistributeBonusBackgroundJob>(job
-				=> job.ExecuteAsync(
-					new DistributeBonusScheduleInfo(
+			var enqueueDistributeBonusJobCommandService = scope.ServiceProvider
+				.GetRequiredService<ICommandService<EnqueueDistributeBonusJobCommand>>();
+
+			await enqueueDistributeBonusJobCommandService.ExecuteAsync(
+					new EnqueueDistributeBonusJobCommand(
 						PromotionId,
 						PlayerCode,
 						_useEvent.Date,
 						playRouletteResult.UsedCount,
-						playRouletteResult.Result)));
+						playRouletteResult.Result),
+					cancellationToken)
+				.ConfigureAwait(false);
 
 			var rouletteResult = new RouletteResult(playRouletteResult.Result.RouletteId, playRouletteResult.Result.ItemIndex);
 			rouletteTask.Promise.SetResult(rouletteResult);

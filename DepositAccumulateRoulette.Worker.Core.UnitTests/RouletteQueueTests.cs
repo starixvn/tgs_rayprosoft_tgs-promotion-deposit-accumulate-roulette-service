@@ -1,7 +1,4 @@
-﻿using Hangfire;
-using Hangfire.Common;
-using Hangfire.States;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
 using NSubstitute;
 using Tgs.PlayerService.Client;
@@ -25,7 +22,8 @@ internal class RouletteQueueTests
 		var fakePlayRouletteCommandService = Substitute.For<IGetService<PlayRouletteCommand, PlayRouletteResult?>>();
 		var fakePromotionServiceClient = Substitute.For<IPromotionServiceClient>();
 		var fakePlayerServiceClient = Substitute.For<IPlayerServiceClient>();
-		var fakeBackgroundJobClient = Substitute.For<IBackgroundJobClient>();
+		var fakeEnqueueDistributeBonusJobCommandService =
+			Substitute.For<ICommandService<EnqueueDistributeBonusJobCommand>>();
 		var fakeSystemClock = Substitute.For<ISystemClock>();
 
 		var services = new ServiceCollection();
@@ -34,7 +32,8 @@ internal class RouletteQueueTests
 			.AddSingleton(fakePromotionServiceClient)
 			.AddSingleton(fakePlayerServiceClient)
 			.AddSingleton(fakeGetRouletteEventCountService)
-			.AddSingleton(fakePlayRouletteCommandService);
+			.AddSingleton(fakePlayRouletteCommandService)
+			.AddSingleton(fakeEnqueueDistributeBonusJobCommandService);
 
 		var depositItems = new DepositAccumulateItem[]
 		{
@@ -111,18 +110,10 @@ internal class RouletteQueueTests
 			Arg.Any<CancellationToken>())
 			.Returns(playRouletteResult);
 
-		var scheduleInfo = new DistributeBonusScheduleInfo(
-			promotionId,
-			playerCode,
-			eventInfo.Date,
-			2,
-			playRouletteResult.Result);
-
 		var queue = new RouletteTaskQueue(
 			playerCode,
 			promotionId,
 			services.BuildServiceProvider(),
-			fakeBackgroundJobClient,
 			fakeSystemClock,
 			NullLogger<RouletteTaskQueue>.Instance);
 
@@ -135,15 +126,6 @@ internal class RouletteQueueTests
 
 		Assert.IsNotNull(actual);
 		Assert.AreEqual(expected, actual);
-
-		_ = fakeBackgroundJobClient
-			.Received(1)
-			.Create(
-				Arg.Is<Job>(job
-					=> job.Type == typeof(DistributeBonusBackgroundJob) &&
-					   job.Method.Name == "ExecuteAsync"
-					   && (DistributeBonusScheduleInfo)job.Args[0] == scheduleInfo),
-				Arg.Is<EnqueuedState>(p => p.Name == "Enqueued"));
 	}
 
 	[Test]
@@ -158,7 +140,6 @@ internal class RouletteQueueTests
 		var fakeDistributeService = Substitute.For<ICommandService<DistributeBonusCommand>>();
 		var fakePromotionServiceClient = Substitute.For<IPromotionServiceClient>();
 		var fakePlayerServiceClient = Substitute.For<IPlayerServiceClient>();
-		var fakeBackgroundJobClient = Substitute.For<IBackgroundJobClient>();
 		var fakeSystemClock = Substitute.For<ISystemClock>();
 
 		var services = new ServiceCollection();
@@ -194,7 +175,6 @@ internal class RouletteQueueTests
 			playerCode,
 			promotionId,
 			services.BuildServiceProvider(),
-			fakeBackgroundJobClient,
 			fakeSystemClock,
 			NullLogger<RouletteTaskQueue>.Instance);
 
@@ -218,7 +198,6 @@ internal class RouletteQueueTests
 		var fakeDistributeService = Substitute.For<ICommandService<DistributeBonusCommand>>();
 		var fakePromotionServiceClient = Substitute.For<IPromotionServiceClient>();
 		var fakePlayerServiceClient = Substitute.For<IPlayerServiceClient>();
-		var fakeBackgroundJobClient = Substitute.For<IBackgroundJobClient>();
 		var fakeSystemClock = Substitute.For<ISystemClock>();
 
 		var services = new ServiceCollection();
@@ -244,7 +223,6 @@ internal class RouletteQueueTests
 			playerCode,
 			promotionId,
 			services.BuildServiceProvider(),
-			fakeBackgroundJobClient,
 			fakeSystemClock,
 			NullLogger<RouletteTaskQueue>.Instance);
 
@@ -268,7 +246,6 @@ internal class RouletteQueueTests
 		var fakeDistributeService = Substitute.For<ICommandService<DistributeBonusCommand>>();
 		var fakePromotionServiceClient = Substitute.For<IPromotionServiceClient>();
 		var fakePlayerServiceClient = Substitute.For<IPlayerServiceClient>();
-		var fakeBackgroundJobClient = Substitute.For<IBackgroundJobClient>();
 		var fakeSystemClock = Substitute.For<ISystemClock>();
 
 		var services = new ServiceCollection();
@@ -362,7 +339,6 @@ internal class RouletteQueueTests
 			playerCode,
 			promotionId,
 			services.BuildServiceProvider(),
-			fakeBackgroundJobClient,
 			fakeSystemClock,
 			NullLogger<RouletteTaskQueue>.Instance);
 
@@ -388,7 +364,8 @@ internal class RouletteQueueTests
 		var fakeDistributeService = Substitute.For<ICommandService<DistributeBonusCommand>>();
 		var fakePromotionServiceClient = Substitute.For<IPromotionServiceClient>();
 		var fakePlayerServiceClient = Substitute.For<IPlayerServiceClient>();
-		var fakeBackgroundJobClient = Substitute.For<IBackgroundJobClient>();
+		var fakeEnqueueDistributeBonusJobCommandService =
+			Substitute.For<ICommandService<EnqueueDistributeBonusJobCommand>>();
 		var fakeSystemClock = Substitute.For<ISystemClock>();
 
 		var services = new ServiceCollection();
@@ -398,7 +375,8 @@ internal class RouletteQueueTests
 			.AddSingleton(fakePlayerServiceClient)
 			.AddSingleton(fakeGetRouletteEventCountService)
 			.AddSingleton(fakePlayRouletteCommandService)
-			.AddSingleton(fakeDistributeService);
+			.AddSingleton(fakeDistributeService)
+			.AddSingleton(fakeEnqueueDistributeBonusJobCommandService);
 
 		var depositItems = new DepositAccumulateItem[]
 		{
@@ -479,7 +457,6 @@ internal class RouletteQueueTests
 			playerCode,
 			promotionId,
 			services.BuildServiceProvider(),
-			fakeBackgroundJobClient,
 			fakeSystemClock,
 			NullLogger<RouletteTaskQueue>.Instance);
 
@@ -488,7 +465,7 @@ internal class RouletteQueueTests
 		var sut = new RouletteTask(new TaskCompletionSource<RouletteResult>());
 		queue.Enqueue(sut);
 
-		var scheduleInfo = new DistributeBonusScheduleInfo(
+		var enqueueCommand = new EnqueueDistributeBonusJobCommand(
 			promotionId,
 			playerCode,
 			eventInfo.Date,
@@ -500,13 +477,10 @@ internal class RouletteQueueTests
 		Assert.IsNotNull(actual);
 		Assert.AreEqual(expected, actual);
 
-		_ = fakeBackgroundJobClient
+		_ = fakeEnqueueDistributeBonusJobCommandService
 			.Received(1)
-			.Create(
-				Arg.Is<Job>(job
-					=> job.Type == typeof(DistributeBonusBackgroundJob) &&
-					   job.Method.Name == "ExecuteAsync"
-					   && (DistributeBonusScheduleInfo)job.Args[0] == scheduleInfo),
-				Arg.Is<EnqueuedState>(p => p.Name == "Enqueued"));
+			.ExecuteAsync(
+				Arg.Is(enqueueCommand),
+				Arg.Any<CancellationToken>());
 	}
 }

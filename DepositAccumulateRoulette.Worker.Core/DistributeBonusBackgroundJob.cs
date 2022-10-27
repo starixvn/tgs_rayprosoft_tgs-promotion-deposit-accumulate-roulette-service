@@ -1,4 +1,5 @@
-﻿using Tgs.Promotion.Clients;
+﻿using Hangfire;
+using Tgs.Promotion.Clients;
 using Tgs.Promotion.DepositAccumulateRoulette.Worker.ApplicationServices;
 using Tgs.ServiceUtility;
 
@@ -17,6 +18,7 @@ internal class DistributeBonusBackgroundJob
 		_distributeService = distributeService ?? throw new ArgumentNullException(nameof(distributeService));
 	}
 
+	[AutomaticRetry(Attempts = 0)]
 	public async Task ExecuteAsync(DistributeBonusScheduleInfo scheduleInfo)
 	{
 		await _promotionServiceClient.UpdatePromotionUsedAmountAsync(
@@ -27,8 +29,7 @@ internal class DistributeBonusBackgroundJob
 		await _distributeService.ExecuteAsync(new DistributeBonusCommand(
 			scheduleInfo.PromotionId,
 			scheduleInfo.PlayerCode,
-			scheduleInfo.EventDate,
-			scheduleInfo.UsedCount,
+			scheduleInfo.Hash,
 			scheduleInfo.PlayResult.Bonus,
 			scheduleInfo.PlayResult.Bucket)).ConfigureAwait(false);
 	}

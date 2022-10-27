@@ -3,7 +3,6 @@
 public record DistributeBonusCommand(
 	Guid PromotionId,
 	string PlayerCode,
-	DateOnly EventDate,
-	int CurrentRouletteCount,
+	int Hash,
 	decimal Bonus,
 	decimal Bucket);

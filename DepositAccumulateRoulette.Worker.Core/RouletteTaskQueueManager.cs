@@ -9,7 +9,6 @@ namespace Tgs.Promotion.DepositAccumulateRoulette.Worker;
 internal class RouletteTaskQueueManager
 {
 	private readonly IServiceProvider _serviceProvider;
-	private readonly IBackgroundJobClient _backgroundJobClient;
 	private readonly ISystemClock _systemClock;
 
 	private readonly ConcurrentDictionary<string, RouletteTaskQueue> _queuePool = new();
@@ -17,11 +16,9 @@ internal class RouletteTaskQueueManager
 
 	public RouletteTaskQueueManager(
 		IServiceProvider serviceProvider,
-		IBackgroundJobClient backgroundJobClient,
 		ISystemClock systemClock)
 	{
 		_serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
-		_backgroundJobClient = backgroundJobClient;
 		_systemClock = systemClock ?? throw new ArgumentNullException(nameof(systemClock));
 	}
 
@@ -35,7 +32,6 @@ internal class RouletteTaskQueueManager
 				request.PlayerCode,
 				request.PromotionId,
 				_serviceProvider,
-				_backgroundJobClient,
 				_systemClock,
 				_serviceProvider.GetRequiredService<ILogger<RouletteTaskQueue>>()));
 
