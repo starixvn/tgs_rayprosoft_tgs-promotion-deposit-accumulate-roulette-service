@@ -55,7 +55,8 @@ internal class ManuelDistributeBonusCommandService : ICommandService<ManuelDistr
 		var allRecords = await _tgsRepository.GetRouletteRecordInfosAsync(
 				rouletteRecordInfo.PromotionId,
 				rouletteRecordInfo.PlayerCode,
-				rouletteRecordInfo.EventDate)
+				rouletteRecordInfo.EventDate,
+				cancellationToken)
 			.OrderBy(r => r.CreatedOn)
 			.ToArrayAsync(cancellationToken)
 			.ConfigureAwait(false);
