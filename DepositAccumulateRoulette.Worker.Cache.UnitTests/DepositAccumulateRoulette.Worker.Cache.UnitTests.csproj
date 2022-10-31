@@ -21,12 +21,4 @@
     <ProjectReference Include="..\DepositAccumulateRoulette.Worker.Cache\DepositAccumulateRoulette.Worker.Cache.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <EditorConfigFiles Remove="D:\Users\Phoenix\source\repos\tgs-promotion-deposit-accumulate-roulette-service\DepositAccumulateRoulette.Worker.Cache.UnitTests\.editorconfig" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="D:\Users\Phoenix\source\repos\tgs-promotion-deposit-accumulate-roulette-service\DepositAccumulateRoulette.Worker.Cache.UnitTests\.editorconfig" />
-  </ItemGroup>
-
 </Project>
