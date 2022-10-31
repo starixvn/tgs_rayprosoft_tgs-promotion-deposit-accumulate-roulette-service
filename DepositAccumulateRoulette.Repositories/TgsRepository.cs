@@ -121,4 +121,24 @@ internal class TgsRepository : ITgsRepository
 				evt.Bonus,
 				evt.CreatedOn))
 			.AsAsyncEnumerable();
+
+	public IAsyncEnumerable<RouletteRecordInfo> GetRouletteRecordInfosAsync(Guid promotionId, string playerCode)
+	{
+		var today = DateOnly.FromDateTime(DateTimeOffset.UtcNow.ToOffset(TimeSpan.FromHours(8D)).DateTime);
+		var processDate = today.AddDays(-7);
+
+		return _context.DepositAccumulateRouletteGameEvents
+			.Where(evt => evt.PromotionId == promotionId
+						  && evt.PlayerCode == playerCode
+						  && evt.Date >= processDate)
+			.Select(evt => new RouletteRecordInfo(
+				evt.Id,
+				evt.PlayerCode,
+				evt.PromotionId,
+				evt.Date,
+				evt.ItemIndex,
+				evt.Bonus,
+				evt.CreatedOn))
+			.AsAsyncEnumerable();
+	}
 }

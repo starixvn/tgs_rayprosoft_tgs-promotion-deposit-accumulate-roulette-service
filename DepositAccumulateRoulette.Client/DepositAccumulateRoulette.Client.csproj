@@ -6,7 +6,7 @@
     <Nullable>enable</Nullable>
     <RootNamespace>Tgs.DepositAccumulateRoulette.Clients</RootNamespace>
     <PackageId>Tgs.DepositAccumulateRoulette.Client</PackageId>
-    <Version>0.0.2-alpha</Version>
+    <Version>0.0.4</Version>
     <Authors>Raypro</Authors>
     <Product>Tgs.DepositAccumulateRouletteClient</Product>
     <PackageProjectUrl>https://gitlab.com/rayprosoft/tgs-promotion-deposit-accumulate-roulette-service</PackageProjectUrl>
@@ -15,11 +15,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="DateOnlyTimeOnly.AspNet" Version="1.0.3" />
     <PackageReference Include="Google.Protobuf" Version="3.21.8" />
     <PackageReference Include="Grpc.Tools" Version="2.50.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.Http" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="6.0.0" />
     <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.3.48">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -29,7 +32,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Protobuf Include="..\DepositAccumulateRouletteService\Protos\depositaccumulateroulette.proto" Link="Protos\depositaccumulateroulette.proto" GrpcServices="None" Access="Internal" />
+    <Protobuf Include="..\DepositAccumulateRouletteService\Protos\promotion_dar_service.proto" Link="Protos\promotion_dar_service.proto" GrpcServices="None" Access="Internal" />
   </ItemGroup>
 
 </Project>

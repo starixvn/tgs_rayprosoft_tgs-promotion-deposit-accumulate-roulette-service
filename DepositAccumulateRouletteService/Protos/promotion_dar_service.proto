@@ -4,10 +4,6 @@ option csharp_namespace = "Tgs.Promotion.DepositAccumulateRouletteService.Protos
 
 import "phoenix/protobuf/guid.proto";
 
-message RouletteItem {
-	phoenix.protobuf.GuidValue id = 1;
-	string title = 2;
-}
 
 message RouletteRequest {
 	phoenix.protobuf.GuidValue promotion_id = 1;
@@ -18,4 +14,3 @@ message RouletteResponse {
 	phoenix.protobuf.GuidValue id = 1;
 	int32 item_index = 2;
 }
-

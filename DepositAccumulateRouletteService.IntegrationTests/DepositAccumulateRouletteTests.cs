@@ -1,6 +1,9 @@
-﻿using Hangfire;
+﻿extern alias RouletteSvc;
+
+using Hangfire;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
+using RouletteSvc::Tgs.Promotion.DepositAccumulateRouletteService.MessageQueue;
 using Tgs.DepositAccumulateRoulette.Clients;
 using Tgs.MessageQueue;
 using Tgs.PlayerService.Client;
@@ -11,8 +14,13 @@ using Tgs.Promotion.DepositAccumulateRoulette.Worker;
 using Tgs.Promotion.DepositAccumulateRoulette.Worker.ApplicationServices;
 using Tgs.Promotion.DepositAccumulateRoulette.Worker.Clients;
 using Tgs.Promotion.DepositAccumulateRouletteService.ApplicationServices;
-using Tgs.Promotion.DepositAccumulateRouletteService.MessageQueue;
 using Tgs.ServiceUtility;
+
+using Client = Tgs.DepositAccumulateRoulette.Clients;
+
+using EventDuring = Tgs.Promotion.DepositAccumulateRoulette.Worker.Clients.EventDuring;
+
+using Worker = Tgs.Promotion.DepositAccumulateRoulette.Worker;
 
 namespace Tgs.Promotion.DepositAccumulateRouletteService.IntegrationTests;
 
@@ -29,9 +37,8 @@ internal class DepositAccumulateRouletteTests
 		var fakeTgsRepository = Substitute.For<ITgsRepository>();
 		var fakeStoreRepository = Substitute.For<IStoreRepository>();
 		var fakeSystemClock = Substitute.For<ISystemClock>();
-		var fakeRouletteServiceClient = Substitute.For<IDepositAccumulateRouletteServiceClient>();
-		var fakeEnqueueDistributeBonusJobCommandService =
-			Substitute.For<ICommandService<EnqueueDistributeBonusJobCommand>>();
+		var fakeRouletteServiceClient = Substitute.For<Worker.IDepositAccumulateRouletteServiceClient>();
+		var fakeBackgroundJobClient = Substitute.For<IBackgroundJobClient>();
 
 		await using var web = new TestDepositAccumulateRouletteServiceApplication(builder => builder
 			.ConfigureServices(services =>
@@ -44,7 +51,7 @@ internal class DepositAccumulateRouletteTests
 					.AddSingleton(fakeRedisConnectionManager)
 					.AddSingleton(fakeSystemClock)
 					.AddSingleton(fakeRouletteServiceClient)
-					.AddSingleton(fakeEnqueueDistributeBonusJobCommandService);
+					.AddSingleton(fakeBackgroundJobClient);
 
 				_ = services
 					.AddSingleton<IShuffleService, ShuffleService>()
@@ -58,7 +65,9 @@ internal class DepositAccumulateRouletteTests
 					.AddSingleton<ICommandService<DistributeBonusCommand>, DistributeBonusCommandService>()
 					.AddSingleton<IGetService<GetPromotionDistributePlanQuery, PromotionDistributePlanInfo>,
 						GetPromotionDistributePlanQueryService>()
-					.AddSingleton<IGetService<PlayRouletteCommand, PlayRouletteResult>, PlayRouletteCommandService>();
+					.AddSingleton<IGetService<PlayRouletteCommand, PlayRouletteResult>, PlayRouletteCommandService>()
+					.AddSingleton<ICommandService<EnqueueDistributeBonusJobCommand>,
+						EnqueueDistributeBonusJobCommandService>();
 
 				_ = services
 					.AddSingleton<RouletteTaskQueueManager>()
@@ -212,9 +221,8 @@ internal class DepositAccumulateRouletteTests
 		var fakeTgsRepository = Substitute.For<ITgsRepository>();
 		var fakeStoreRepository = Substitute.For<IStoreRepository>();
 		var fakeSystemClock = Substitute.For<ISystemClock>();
-		var fakeRouletteServiceClient = Substitute.For<IDepositAccumulateRouletteServiceClient>();
-		var fakeEnqueueDistributeBonusJobCommandService =
-			Substitute.For<ICommandService<EnqueueDistributeBonusJobCommand>>();
+		var fakeRouletteServiceClient = Substitute.For<Worker.IDepositAccumulateRouletteServiceClient>();
+		var fakeBackgroundJobClient = Substitute.For<IBackgroundJobClient>();
 
 		await using var web = new TestDepositAccumulateRouletteServiceApplication(builder => builder
 			.ConfigureServices(services =>
@@ -227,7 +235,7 @@ internal class DepositAccumulateRouletteTests
 					.AddSingleton(fakeRedisConnectionManager)
 					.AddSingleton(fakeSystemClock)
 					.AddSingleton(fakeRouletteServiceClient)
-					.AddSingleton(fakeEnqueueDistributeBonusJobCommandService);
+					.AddSingleton(fakeBackgroundJobClient);
 
 				_ = services
 					.AddSingleton<IShuffleService, ShuffleService>()
@@ -241,7 +249,9 @@ internal class DepositAccumulateRouletteTests
 					.AddSingleton<ICommandService<DistributeBonusCommand>, DistributeBonusCommandService>()
 					.AddSingleton<IGetService<GetPromotionDistributePlanQuery, PromotionDistributePlanInfo>,
 						GetPromotionDistributePlanQueryService>()
-					.AddSingleton<IGetService<PlayRouletteCommand, PlayRouletteResult>, PlayRouletteCommandService>();
+					.AddSingleton<IGetService<PlayRouletteCommand, PlayRouletteResult>, PlayRouletteCommandService>()
+					.AddSingleton<ICommandService<EnqueueDistributeBonusJobCommand>,
+						EnqueueDistributeBonusJobCommandService>();
 
 				_ = services
 					.AddSingleton<RouletteTaskQueueManager>()
@@ -445,9 +455,8 @@ internal class DepositAccumulateRouletteTests
 		var fakeTgsRepository = Substitute.For<ITgsRepository>();
 		var fakeStoreRepository = Substitute.For<IStoreRepository>();
 		var fakeSystemClock = Substitute.For<ISystemClock>();
-		var fakeRouletteServiceClient = Substitute.For<IDepositAccumulateRouletteServiceClient>();
-		var fakeEnqueueDistributeBonusJobCommandService =
-			Substitute.For<ICommandService<EnqueueDistributeBonusJobCommand>>();
+		var fakeRouletteServiceClient = Substitute.For<Worker.IDepositAccumulateRouletteServiceClient>();
+		var fakeBackgroundJobClient = Substitute.For<IBackgroundJobClient>();
 
 		await using var web = new TestDepositAccumulateRouletteServiceApplication(builder => builder
 			.ConfigureServices(services =>
@@ -460,7 +469,7 @@ internal class DepositAccumulateRouletteTests
 					.AddSingleton(fakeRedisConnectionManager)
 					.AddSingleton(fakeSystemClock)
 					.AddSingleton(fakeRouletteServiceClient)
-					.AddSingleton(fakeEnqueueDistributeBonusJobCommandService);
+					.AddSingleton(fakeBackgroundJobClient);
 
 				_ = services
 					.AddSingleton<IShuffleService, ShuffleService>()
@@ -474,7 +483,9 @@ internal class DepositAccumulateRouletteTests
 					.AddSingleton<ICommandService<DistributeBonusCommand>, DistributeBonusCommandService>()
 					.AddSingleton<IGetService<GetPromotionDistributePlanQuery, PromotionDistributePlanInfo>,
 						GetPromotionDistributePlanQueryService>()
-					.AddSingleton<IGetService<PlayRouletteCommand, PlayRouletteResult>, PlayRouletteCommandService>();
+					.AddSingleton<IGetService<PlayRouletteCommand, PlayRouletteResult>, PlayRouletteCommandService>()
+					.AddSingleton<ICommandService<EnqueueDistributeBonusJobCommand>,
+						EnqueueDistributeBonusJobCommandService>();
 
 				_ = services
 					.AddSingleton<RouletteTaskQueueManager>()
@@ -640,5 +651,63 @@ internal class DepositAccumulateRouletteTests
 				Arg.Any<decimal>(),
 				Arg.Any<int>(),
 				Arg.Any<CancellationToken>());
+	}
+
+	[Test]
+	public async Task Get_Roulette_Records()
+	{
+		var promotionId = Guid.NewGuid();
+		var playerCode = "player1";
+
+		var rouletteRecords = new[]
+		{
+			new RouletteRecord(
+				Guid.NewGuid(),
+				DateOnly.Parse("2022-10-26"),
+				1,
+				DateTimeOffset.Parse("2022-10-26T08:39:00+00:00")),
+			new RouletteRecord(
+				Guid.NewGuid(),
+				DateOnly.Parse("2022-10-27"),
+				0,
+				DateTimeOffset.Parse("2022-10-27T01:39:00+00:00")),
+			new RouletteRecord(
+				Guid.NewGuid(),
+				DateOnly.Parse("2022-10-27"),
+				3,
+				DateTimeOffset.Parse("2022-10-27T08:39:00+00:00"))
+		};
+
+		var fakeWorkerClient = Substitute.For<IDepositAccumulateRouletteWorkerClient>();
+
+		await using var web = new TestDepositAccumulateRouletteServiceApplication(builder =>
+			builder.ConfigureServices(services =>
+			{
+				_ = services.AddSingleton(fakeWorkerClient);
+			}));
+
+		var httpClient = web.CreateClient();
+
+		var sut = new Client.DepositAccumulateRouletteServiceClient(httpClient);
+
+		var recordInfos = rouletteRecords
+			.Select(r => new RouletteRecordInfo(
+				r.RouletteId,
+				r.EventDate,
+				r.ItemIndex,
+				r.CreatedOn));
+
+		_ = fakeWorkerClient.GetRouletteRecordsAsync(
+				Arg.Is(promotionId),
+				Arg.Is(playerCode),
+				Arg.Any<CancellationToken>())
+			.Returns(recordInfos.ToAsyncEnumerable());
+
+		var actual = await sut.GetRouletteRecordsAsync(promotionId, playerCode)
+			.ToArrayAsync()
+			.ConfigureAwait(false);
+
+		Assert.IsNotNull(actual);
+		CollectionAssert.AreEqual(rouletteRecords, actual);
 	}
 }

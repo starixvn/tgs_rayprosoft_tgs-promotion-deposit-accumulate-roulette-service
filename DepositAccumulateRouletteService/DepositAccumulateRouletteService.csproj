@@ -14,6 +14,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Program.cs~RFe9b7748.TMP" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="DateOnlyTimeOnly.AspNet.Swashbuckle" Version="1.0.3" />
     <PackageReference Include="FluentdForward.OpenTelemetry.MessagePack" Version="0.2.0" />
     <PackageReference Include="Google.Protobuf" Version="3.21.8" />
     <PackageReference Include="Grpc.Tools" Version="2.50.0">
@@ -42,7 +47,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Protobuf Include="Protos\depositaccumulateroulette.proto" GrpcServices="None" />
+    <Protobuf Include="Protos\promotion_dar_service.proto" GrpcServices="None" />
   </ItemGroup>
 
 
