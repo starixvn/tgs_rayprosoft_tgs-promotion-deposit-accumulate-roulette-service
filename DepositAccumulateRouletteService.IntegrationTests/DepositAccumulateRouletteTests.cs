@@ -1,18 +1,15 @@
 ﻿extern alias RouletteSvc;
 
-using Google.Protobuf.WellKnownTypes;
 using Hangfire;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 using RouletteSvc::Tgs.Promotion.DepositAccumulateRouletteService.MessageQueue;
-using RouletteSvc::Tgs.Promotion.DepositAccumulateRouletteService.ViewModels;
 using Tgs.DepositAccumulateRoulette.Clients;
 using Tgs.MessageQueue;
 using Tgs.PlayerService.Client;
 using Tgs.Promotion.Clients;
 using Tgs.Promotion.DepositAccumulateRoulette.Common;
 using Tgs.Promotion.DepositAccumulateRoulette.Common.Protos;
-using Tgs.Promotion.DepositAccumulateRoulette.Repositories.Entities;
 using Tgs.Promotion.DepositAccumulateRoulette.Worker;
 using Tgs.Promotion.DepositAccumulateRoulette.Worker.ApplicationServices;
 using Tgs.Promotion.DepositAccumulateRoulette.Worker.Clients;
