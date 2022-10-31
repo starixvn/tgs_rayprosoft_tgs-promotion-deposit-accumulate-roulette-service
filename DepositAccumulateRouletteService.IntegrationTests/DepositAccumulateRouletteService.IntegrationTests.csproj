@@ -27,4 +27,12 @@
     </ProjectReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <EditorConfigFiles Remove="D:\Users\Phoenix\source\repos\tgs-promotion-deposit-accumulate-roulette-service\DepositAccumulateRouletteService.IntegrationTests\.editorconfig" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="D:\Users\Phoenix\source\repos\tgs-promotion-deposit-accumulate-roulette-service\DepositAccumulateRouletteService.IntegrationTests\.editorconfig" />
+  </ItemGroup>
+
 </Project>

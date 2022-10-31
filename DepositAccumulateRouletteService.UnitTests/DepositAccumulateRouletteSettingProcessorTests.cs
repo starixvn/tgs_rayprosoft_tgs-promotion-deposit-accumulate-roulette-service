@@ -1,4 +1,4 @@
-using ExpectedObjects;
+﻿using ExpectedObjects;
 using Google.Protobuf;
 using Tgs.Promotion.Clients.Protos;
 using Tgs.Promotion.DepositAccumulateRoulette.Common;
@@ -84,8 +84,8 @@ public class DepositAccumulateRouletteSettingProcessorTests
 
         var sut = new DepositAccumulateRouletteSettingProcessor(serializer);
 
-        Assert.ThrowsAsync<InvalidOperationException>(async ()
-            => await sut.HandleAsync(request.ToByteArray()));
+		_ = Assert.ThrowsAsync<InvalidOperationException>(async ()
+			=> await sut.HandleAsync(request.ToByteArray()));
     }
 
     [Test]
@@ -109,8 +109,8 @@ public class DepositAccumulateRouletteSettingProcessorTests
 
         var sut = new DepositAccumulateRouletteSettingProcessor(serializer);
 
-        Assert.ThrowsAsync<InvalidOperationException>(async ()
-            => await sut.HandleAsync(request.ToByteArray()));
+		_ = Assert.ThrowsAsync<InvalidOperationException>(async ()
+			=> await sut.HandleAsync(request.ToByteArray()));
     }
 
     [Test]
@@ -141,8 +141,8 @@ public class DepositAccumulateRouletteSettingProcessorTests
 
         var sut = new DepositAccumulateRouletteSettingProcessor(serializer);
 
-        Assert.ThrowsAsync<InvalidOperationException>(async ()
-            => await sut.HandleAsync(request.ToByteArray()));
+		_ = Assert.ThrowsAsync<InvalidOperationException>(async ()
+			=> await sut.HandleAsync(request.ToByteArray()));
     }
 
     [Test]

@@ -36,14 +36,14 @@ internal class BackgroundRepository : IBackgroundRepository
 		DateOnly processDate,
 		CancellationToken cancellationToken = default)
 	{
-		var (from, to) = (processDate.AddDays(-1), processDate);
-		var queryTimeRange = (
-			From: new DateTimeOffset(from.Year, from.Month, from.Day, 0, 0, 0, TimeSpan.FromHours(8D)).UtcDateTime,
-			To: new DateTimeOffset(to.Year, to.Month, to.Day, 0, 0, 0, TimeSpan.FromHours(8D)).UtcDateTime);
+		var (fromDate, toDate) = (processDate.AddDays(-1), processDate);
+		var (from, to) = (
+			new DateTimeOffset(fromDate.Year, fromDate.Month, fromDate.Day, 0, 0, 0, TimeSpan.FromHours(8D)).UtcDateTime,
+			new DateTimeOffset(toDate.Year, toDate.Month, toDate.Day, 0, 0, 0, TimeSpan.FromHours(8D)).UtcDateTime);
 
 		var depositForms = _context.DepositForms
-			.Where(form => form.UpdatedOn >= queryTimeRange.From
-						   && form.UpdatedOn < queryTimeRange.To
+			.Where(form => form.UpdatedOn >= from
+						   && form.UpdatedOn < to
 						   && form.Status >= 8000
 						   && brandIds.Contains(form.BrandId)
 						   && form.PromotionId != null)

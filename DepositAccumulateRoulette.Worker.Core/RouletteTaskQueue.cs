@@ -65,7 +65,7 @@ internal class RouletteTaskQueue : IDisposable
 		IsStartProcess = true;
 
 		_cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-		_cancellationTokenSource.Token.Register(() => _rouletteTasks.CompleteAdding());
+		_ = _cancellationTokenSource.Token.Register(() => _rouletteTasks.CompleteAdding());
 
 		_backgroundTask = Task.Run(async () =>
 		{

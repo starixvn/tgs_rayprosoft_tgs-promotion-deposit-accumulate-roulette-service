@@ -8,16 +8,13 @@ internal class DistributeBonusCommandService : ICommandService<DistributeBonusCo
 {
 	private readonly IPromotionServiceClient _promotionServiceClient;
 	private readonly IGetService<GetPromotionDistributePlanQuery, PromotionDistributePlanInfo> _getDistributePlanService;
-	private readonly ILogger<DistributeBonusCommandService> _logger;
 
 	public DistributeBonusCommandService(
 		IPromotionServiceClient promotionServiceClient,
-		IGetService<GetPromotionDistributePlanQuery, PromotionDistributePlanInfo> getDistributePlanService,
-		ILogger<DistributeBonusCommandService> logger)
+		IGetService<GetPromotionDistributePlanQuery, PromotionDistributePlanInfo> getDistributePlanService)
 	{
 		_promotionServiceClient = promotionServiceClient ?? throw new ArgumentNullException(nameof(promotionServiceClient));
 		_getDistributePlanService = getDistributePlanService ?? throw new ArgumentNullException(nameof(getDistributePlanService));
-		_logger = logger ?? throw new ArgumentNullException(nameof(logger));
 	}
 
 	public async ValueTask ExecuteAsync(

@@ -1,4 +1,4 @@
-using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Options;
 using Npgsql;
 using OpenTelemetry.Exporter;
 using OpenTelemetry.Instrumentation.AspNetCore;
@@ -29,23 +29,21 @@ builder.Logging
 
 builder.Services
 	.AddMessageQueue()
-	.AddNatsMessageQueue(natsConfig =>
-	{
-		natsConfig.ConfigQueueOptions((options, sp) =>
-			{
-				var config = sp.GetRequiredService<IConfiguration>();
-				options.Url = config.GetConnectionString("Nats");
-			})
-			.AddProcessor<DepositAccumulateRouletteSettingProcessor>(
-				"tgs.promotion.depositaccumulateroulette.setting",
-				"tgs.promotion.depositaccumulateroulette.setting")
-			.AddProcessor<RouletteCountItemsQueryProcessor>(
-				"tgs.promotion.depositaccumulateroulette.roulettecountitems.query",
-				"tgs.promotion.depositaccumulateroulette.roulettecountitems.query")
-			.AddProcessor<RouletteProcessor>(
-				"tgs.promotion.depositaccumulateroulette.roulette.play",
-				"tgs.promotion.depositaccumulateroulette.roulette.play");
-	})
+	.AddNatsMessageQueue(natsConfig => natsConfig
+		.ConfigQueueOptions((options, sp) =>
+		{
+			var config = sp.GetRequiredService<IConfiguration>();
+			options.Url = config.GetConnectionString("Nats");
+		})
+		.AddProcessor<DepositAccumulateRouletteSettingProcessor>(
+			"tgs.promotion.depositaccumulateroulette.setting",
+			"tgs.promotion.depositaccumulateroulette.setting")
+		.AddProcessor<RouletteCountItemsQueryProcessor>(
+			"tgs.promotion.depositaccumulateroulette.roulettecountitems.query",
+			"tgs.promotion.depositaccumulateroulette.roulettecountitems.query")
+		.AddProcessor<RouletteProcessor>(
+			"tgs.promotion.depositaccumulateroulette.roulette.play",
+			"tgs.promotion.depositaccumulateroulette.roulette.play"))
 	.ClearAllExchanges()
 	.AddNatsGlobPatternExchange("*");
 
