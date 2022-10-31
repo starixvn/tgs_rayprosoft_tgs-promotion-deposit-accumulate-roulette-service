@@ -46,7 +46,11 @@ public class BidProcessor : IMessageProcessor
 			response.Subject = subject;
 		}
 
-		_logger.LogInformation($"Subject of player({request.PlayerCode}) with promotion({promotionId}): {response.Subject}");
+		_logger.LogInformation(
+			"Subject of player({request.PlayerCode}) with promotion({promotionId}): {response.Subject}",
+			request.PlayerCode,
+			promotionId,
+			response.Subject);
 
 		return response.ToByteArray();
 	}
