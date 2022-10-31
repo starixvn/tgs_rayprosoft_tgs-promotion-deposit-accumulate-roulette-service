@@ -1,6 +1,7 @@
 ﻿// ReSharper disable CheckNamespace
 
 using System.Reflection;
+using Microsoft.Extensions.Options;
 using StackExchange.Redis;
 using Tgs.Promotion.DepositAccumulateRouletteService;
 using Tgs.Promotion.DepositAccumulateRouletteService.ApplicationServices;
@@ -29,4 +30,18 @@ public static class ServiceCollectionExtensions
 
 		return services;
 	}
+
+	public static IServiceCollection AddDepositAccumulateRouletteWorkerClient(
+		this IServiceCollection services,
+		Action<WorkerClientOptions, IServiceProvider> configure)
+		=> services.AddOptions<WorkerClientOptions>()
+			.Configure(configure)
+			.Services
+			.AddHttpClient<IDepositAccumulateRouletteWorkerClient, DepositAccumulateRouletteWorkerClient>()
+			.ConfigureHttpClient((sp, httpClient) =>
+			{
+				var options = sp.GetRequiredService<IOptions<WorkerClientOptions>>().Value;
+				httpClient.BaseAddress = options.BaseUrl;
+			})
+			.Services;
 }

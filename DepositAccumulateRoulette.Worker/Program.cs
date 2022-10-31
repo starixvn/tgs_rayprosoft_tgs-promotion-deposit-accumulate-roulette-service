@@ -48,9 +48,6 @@ builder.Services
 			.AddProcessor<RouletteCountItemsQueryProcessor>(
 				"tgs.promotion.depositaccumulateroulette.worker.roulettecountitems",
 				"tgs.promotion.depositaccumulateroulette.worker.roulettecountitems")
-			.AddProcessor<RouletteRecordsQueryProcessor>(
-				"tgs.promotion.depositaccumulateroulette.worker.roulette.records.query",
-				"tgs.promotion.depositaccumulateroulette.worker.roulette.records.query")
 			.AddHandler<ClearExpiredDepositAccumulateEventCacheHandler>(
 				"tgs.promotion.depositaccumulateroulette.event.expired.clear",
 				"tgs.promotion.depositaccumulateroulette.event.expired.clear");

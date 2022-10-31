@@ -44,10 +44,7 @@ builder.Services
 				"tgs.promotion.depositaccumulateroulette.roulettecountitems.query")
 			.AddProcessor<RouletteProcessor>(
 				"tgs.promotion.depositaccumulateroulette.roulette.play",
-				"tgs.promotion.depositaccumulateroulette.roulette.play")
-			.AddProcessor<RouletteRecordsQueryProcessor>(
-				"tgs.promotion.depositaccumulateroulette.roulette.records.query",
-				"tgs.promotion.depositaccumulateroulette.roulette.records.query");
+				"tgs.promotion.depositaccumulateroulette.roulette.play");
 	})
 	.ClearAllExchanges()
 	.AddNatsGlobPatternExchange("*");
@@ -65,6 +62,11 @@ builder.Services
 		var redisConnectionManager = sp.GetRequiredService<IRedisConnectionManager>();
 		return redisConnectionManager.Database;
 	})
+	.AddDepositAccumulateRouletteWorkerClient((options, sp) =>
+	{
+		var config = sp.GetRequiredService<IConfiguration>();
+		options.BaseUrl = config.GetValue<Uri>("DepositAccumulateRoulette:DepositAccumulateRouletteWorkerBaseUrl");
+	})
 	.AddPromotionClientServices((options, sp) =>
 	{
 		var config = sp.GetRequiredService<IConfiguration>();
@@ -78,7 +80,13 @@ builder.Services
 
 builder.Services
 	.AddRouting(options => options.LowercaseUrls = true)
-	.AddControllers();
+	.AddControllers()
+	.AddMvcOptions(mvcOptions =>
+	{
+		mvcOptions
+			.UseDateOnlyTimeOnlyStringConverters();
+	})
+	.AddJsonOptions(jsonOptions => jsonOptions.UseDateOnlyTimeOnlyStringConverters());
 
 builder.Services
 	.AddSingleton<IConfigureOptions<OtlpExporterOptions>>(
@@ -118,7 +126,10 @@ builder.Services
 	.AddInterceptionService()
 	.AddServiceUtiltiyInterceptors();
 
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+	c.UseDateOnlyTimeOnlyStringConverters();
+});
 
 builder.Services.AddHealthChecks();
 

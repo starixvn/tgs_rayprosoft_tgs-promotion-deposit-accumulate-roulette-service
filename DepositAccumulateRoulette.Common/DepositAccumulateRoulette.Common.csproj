@@ -18,7 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Protobuf Include="Protos\Protos.proto" GrpcServices="None" Access="Public" />
+    <Protobuf Include="Protos\promotion_dar_common.proto" GrpcServices="None" Access="Public" />
   </ItemGroup>
 
 </Project>

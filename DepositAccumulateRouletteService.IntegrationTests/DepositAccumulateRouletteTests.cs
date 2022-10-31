@@ -1,24 +1,27 @@
 ﻿extern alias RouletteSvc;
 
-using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
 using Hangfire;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using NSubstitute;
 using RouletteSvc::Tgs.Promotion.DepositAccumulateRouletteService.MessageQueue;
+using RouletteSvc::Tgs.Promotion.DepositAccumulateRouletteService.ViewModels;
 using Tgs.DepositAccumulateRoulette.Clients;
 using Tgs.MessageQueue;
 using Tgs.PlayerService.Client;
 using Tgs.Promotion.Clients;
 using Tgs.Promotion.DepositAccumulateRoulette.Common;
 using Tgs.Promotion.DepositAccumulateRoulette.Common.Protos;
+using Tgs.Promotion.DepositAccumulateRoulette.Repositories.Entities;
 using Tgs.Promotion.DepositAccumulateRoulette.Worker;
 using Tgs.Promotion.DepositAccumulateRoulette.Worker.ApplicationServices;
 using Tgs.Promotion.DepositAccumulateRoulette.Worker.Clients;
 using Tgs.Promotion.DepositAccumulateRouletteService.ApplicationServices;
 using Tgs.ServiceUtility;
-using RouletteRecordInfo = Tgs.Promotion.DepositAccumulateRoulette.Common.Protos.RouletteRecordInfo;
+
+using Client = Tgs.DepositAccumulateRoulette.Clients;
+
+using EventDuring = Tgs.Promotion.DepositAccumulateRoulette.Worker.Clients.EventDuring;
 
 using Worker = Tgs.Promotion.DepositAccumulateRoulette.Worker;
 
@@ -37,7 +40,7 @@ internal class DepositAccumulateRouletteTests
 		var fakeTgsRepository = Substitute.For<ITgsRepository>();
 		var fakeStoreRepository = Substitute.For<IStoreRepository>();
 		var fakeSystemClock = Substitute.For<ISystemClock>();
-		var fakeRouletteServiceClient = Substitute.For<IDepositAccumulateRouletteServiceClient>();
+		var fakeRouletteServiceClient = Substitute.For<Worker.IDepositAccumulateRouletteServiceClient>();
 		var fakeBackgroundJobClient = Substitute.For<IBackgroundJobClient>();
 
 		await using var web = new TestDepositAccumulateRouletteServiceApplication(builder => builder
@@ -221,7 +224,7 @@ internal class DepositAccumulateRouletteTests
 		var fakeTgsRepository = Substitute.For<ITgsRepository>();
 		var fakeStoreRepository = Substitute.For<IStoreRepository>();
 		var fakeSystemClock = Substitute.For<ISystemClock>();
-		var fakeRouletteServiceClient = Substitute.For<IDepositAccumulateRouletteServiceClient>();
+		var fakeRouletteServiceClient = Substitute.For<Worker.IDepositAccumulateRouletteServiceClient>();
 		var fakeBackgroundJobClient = Substitute.For<IBackgroundJobClient>();
 
 		await using var web = new TestDepositAccumulateRouletteServiceApplication(builder => builder
@@ -455,7 +458,7 @@ internal class DepositAccumulateRouletteTests
 		var fakeTgsRepository = Substitute.For<ITgsRepository>();
 		var fakeStoreRepository = Substitute.For<IStoreRepository>();
 		var fakeSystemClock = Substitute.For<ISystemClock>();
-		var fakeRouletteServiceClient = Substitute.For<IDepositAccumulateRouletteServiceClient>();
+		var fakeRouletteServiceClient = Substitute.For<Worker.IDepositAccumulateRouletteServiceClient>();
 		var fakeBackgroundJobClient = Substitute.For<IBackgroundJobClient>();
 
 		await using var web = new TestDepositAccumulateRouletteServiceApplication(builder => builder
@@ -656,8 +659,6 @@ internal class DepositAccumulateRouletteTests
 	[Test]
 	public async Task Get_Roulette_Records()
 	{
-		var fakeMessageSender = Substitute.For<IMessageSender>();
-
 		var promotionId = Guid.NewGuid();
 		var playerCode = "player1";
 
@@ -676,75 +677,34 @@ internal class DepositAccumulateRouletteTests
 			new RouletteRecord(
 				Guid.NewGuid(),
 				DateOnly.Parse("2022-10-27"),
-				1,
-				DateTimeOffset.Parse("2022-10-27T08:39:00+00:00")),
+				3,
+				DateTimeOffset.Parse("2022-10-27T08:39:00+00:00"))
 		};
 
-		var rouletteRecordInfos = new RouletteRecordInfo[]
-		{
-			new ()
-			{
-				Id= rouletteRecords[0].Id,
-				Date = rouletteRecords[0].Date,
-				ItemIndex = rouletteRecords[0].ItemIndex,
-				CreatedOn = rouletteRecords[0].CreatedOn.ToTimestamp()
-			},
-			new ()
-			{
-				Id= rouletteRecords[1].Id,
-				Date = rouletteRecords[1].Date,
-				ItemIndex = rouletteRecords[1].ItemIndex,
-				CreatedOn = rouletteRecords[1].CreatedOn.ToTimestamp()
-			},
-			new ()
-			{
-				Id= rouletteRecords[2].Id,
-				Date = rouletteRecords[2].Date,
-				ItemIndex = rouletteRecords[2].ItemIndex,
-				CreatedOn = rouletteRecords[2].CreatedOn.ToTimestamp()
-			},
-		};
+		var fakeWorkerClient = Substitute.For<IDepositAccumulateRouletteWorkerClient>();
 
 		await using var web = new TestDepositAccumulateRouletteServiceApplication(builder =>
 			builder.ConfigureServices(services =>
 			{
-				_ = services.AddSingleton(sp =>
-				{
-					var messageSender = Substitute.For<IMessageSender>();
-
-					_ = messageSender.RequestAsync(
-								Arg.Is("tgs.promotion.depositaccumulateroulette.worker.roulette.records.query"),
-								Arg.Any<ReadOnlyMemory<byte>>(),
-								Arg.Any<CancellationToken>())
-							.Returns(callInfo =>
-							{
-								var data = callInfo.Arg<ReadOnlyMemory<byte>>();
-
-								var response = new RouletteRecordsQueryResponse();
-								response.RouletteRecords.AddRange(rouletteRecordInfos);
-
-								return response.ToByteArray();
-							});
-
-					return messageSender;
-				});
+				_ = services.AddSingleton(fakeWorkerClient);
 			}));
 
-		var serviceScope = web.Services.CreateAsyncScope();
+		var httpClient = web.CreateClient();
 
-		var sut = new DepositAccumulateRouletteClient(fakeMessageSender);
+		var sut = new Client.DepositAccumulateRouletteServiceClient(httpClient);
 
-		_ = fakeMessageSender.RequestAsync(
-				Arg.Is("tgs.promotion.depositaccumulateroulette.roulette.records.query"),
-				Arg.Any<ReadOnlyMemory<byte>>())
-			.Returns(callInfo =>
-			{
-				var data = callInfo.Arg<ReadOnlyMemory<byte>>();
+		var recordInfos = rouletteRecords
+			.Select(r => new RouletteRecordInfo(
+				r.RouletteId,
+				r.EventDate,
+				r.ItemIndex,
+				r.CreatedOn));
 
-				var processor = ActivatorUtilities.CreateInstance<RouletteRecordsQueryProcessor>(serviceScope.ServiceProvider);
-
-				return processor.HandleAsync(data).Result;
-			});
+		_ = fakeWorkerClient.GetRouletteRecordsAsync(
+				Arg.Is(promotionId),
+				Arg.Is(playerCode),
+				Arg.Any<CancellationToken>())
+			.Returns(recordInfos.ToAsyncEnumerable());
 
 		var actual = await sut.GetRouletteRecordsAsync(promotionId, playerCode)
 			.ToArrayAsync()

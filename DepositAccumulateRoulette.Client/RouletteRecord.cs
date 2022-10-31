@@ -1,7 +1,7 @@
 ﻿namespace Tgs.DepositAccumulateRoulette.Clients;
 
 public record RouletteRecord(
-	Guid Id,
-	DateOnly Date,
+	Guid RouletteId,
+	DateOnly EventDate,
 	int ItemIndex,
 	DateTimeOffset CreatedOn);
