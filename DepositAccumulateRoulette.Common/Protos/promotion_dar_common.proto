@@ -3,8 +3,6 @@
 option csharp_namespace = "Tgs.Promotion.DepositAccumulateRoulette.Common.Protos";
 
 import "phoenix/protobuf/guid.proto";
-import "phoenix/protobuf/date.proto";
-import "google/protobuf/timestamp.proto";
 
 message ClearEventCacheRequest {
 	phoenix.protobuf.GuidValue promotion_id = 1;

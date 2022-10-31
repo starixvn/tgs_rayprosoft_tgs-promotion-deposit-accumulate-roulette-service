@@ -3,8 +3,6 @@ syntax = "proto3";
 option csharp_namespace = "Tgs.Promotion.DepositAccumulateRouletteService.Protos";
 
 import "phoenix/protobuf/guid.proto";
-import "phoenix/protobuf/date.proto";
-import "google/protobuf/timestamp.proto";
 
 
 message RouletteRequest {
