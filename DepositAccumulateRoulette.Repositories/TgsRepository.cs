@@ -87,7 +87,7 @@ internal class TgsRepository : ITgsRepository
 			.AddAsync(gameEvent, cancellationToken)
 			.ConfigureAwait(false);
 
-		await _context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+		_ = await _context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
 		return recordId;
 	}

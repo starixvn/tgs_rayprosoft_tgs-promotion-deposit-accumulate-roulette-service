@@ -1,4 +1,4 @@
-using Hangfire;
+﻿using Hangfire;
 using Hangfire.MemoryStorage;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -32,26 +32,24 @@ builder.Logging
 
 builder.Services
 	.AddMessageQueue()
-	.AddNatsMessageQueue(natsConfig =>
-	{
-		natsConfig.ConfigQueueOptions((options, sp) =>
-			{
-				var config = sp.GetRequiredService<IConfiguration>();
-				options.Url = config.GetConnectionString("Nats");
-			})
-			.AddProcessor<BidProcessor>(
-				"tgs.promotion.depositaccumulateroulette.bid",
-				"tgs.promotion.depositaccumulateroulette.bid")
-			.AddProcessor<RouletteTaskProcessor>(
-				$"tgs.promotion.depositaccumulateroulette.worker.{Environment.MachineName}.roulette",
-				$"tgs.promotion.depositaccumulateroulette.worker.{Environment.MachineName}.roulette")
-			.AddProcessor<RouletteCountItemsQueryProcessor>(
-				"tgs.promotion.depositaccumulateroulette.worker.roulettecountitems",
-				"tgs.promotion.depositaccumulateroulette.worker.roulettecountitems")
-			.AddHandler<ClearExpiredDepositAccumulateEventCacheHandler>(
-				"tgs.promotion.depositaccumulateroulette.event.expired.clear",
-				"tgs.promotion.depositaccumulateroulette.event.expired.clear");
-	})
+	.AddNatsMessageQueue(natsConfig => natsConfig
+		.ConfigQueueOptions((options, sp) =>
+		{
+			var config = sp.GetRequiredService<IConfiguration>();
+			options.Url = config.GetConnectionString("Nats");
+		})
+		.AddProcessor<BidProcessor>(
+			"tgs.promotion.depositaccumulateroulette.bid",
+			"tgs.promotion.depositaccumulateroulette.bid")
+		.AddProcessor<RouletteTaskProcessor>(
+			$"tgs.promotion.depositaccumulateroulette.worker.{Environment.MachineName}.roulette",
+			$"tgs.promotion.depositaccumulateroulette.worker.{Environment.MachineName}.roulette")
+		.AddProcessor<RouletteCountItemsQueryProcessor>(
+			"tgs.promotion.depositaccumulateroulette.worker.roulettecountitems",
+			"tgs.promotion.depositaccumulateroulette.worker.roulettecountitems")
+		.AddHandler<ClearExpiredDepositAccumulateEventCacheHandler>(
+			"tgs.promotion.depositaccumulateroulette.event.expired.clear",
+			"tgs.promotion.depositaccumulateroulette.event.expired.clear"))
 	.ClearAllExchanges()
 	.AddNatsGlobPatternExchange("*");
 
@@ -133,17 +131,11 @@ builder.Services
 builder.Services
 	.AddRouting(options => options.LowercaseUrls = true)
 	.AddControllers()
-	.AddMvcOptions(mvcOptions =>
-	{
-		mvcOptions
-			.UseDateOnlyTimeOnlyStringConverters();
-	})
+	.AddMvcOptions(mvcOptions => mvcOptions
+		.UseDateOnlyTimeOnlyStringConverters())
 	.AddJsonOptions(jsonOptions => jsonOptions.UseDateOnlyTimeOnlyStringConverters());
 
-builder.Services.AddSwaggerGen(c =>
-{
-	c.UseDateOnlyTimeOnlyStringConverters();
-});
+builder.Services.AddSwaggerGen(c => c.UseDateOnlyTimeOnlyStringConverters());
 
 builder.Services
 	.AddInterceptionService()

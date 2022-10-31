@@ -65,7 +65,7 @@ internal class RouletteHandleService : IRouletteHandleService
 
 		var response = BidResponse.Parser.ParseFrom(responseData.Span);
 
-		_logger.LogInformation($"Subject after bid is {response.Subject}");
+		_logger.LogInformation("Subject after bid is {response.Subject}", response.Subject);
 
 		return response.Subject;
 	}

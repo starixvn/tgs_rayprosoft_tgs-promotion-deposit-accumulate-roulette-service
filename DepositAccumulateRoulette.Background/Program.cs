@@ -1,4 +1,4 @@
-using Hangfire;
+﻿using Hangfire;
 using Hangfire.MemoryStorage;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -33,12 +33,9 @@ builder.Logging
 builder.Services
 	.AddRouting(options => options.LowercaseUrls = true)
 	.AddControllers()
-	.AddMvcOptions(mvcOptions =>
-	{
-		mvcOptions
-			.UseDateOnlyTimeOnlyStringConverters()
-			.AddWebApiToolkitFilters();
-	})
+	.AddMvcOptions(mvcOptions => mvcOptions
+		.UseDateOnlyTimeOnlyStringConverters()
+		.AddWebApiToolkitFilters())
 	.AddJsonOptions(jsonOptions => jsonOptions.UseDateOnlyTimeOnlyStringConverters());
 
 builder.Services
@@ -90,18 +87,13 @@ builder.Services
 		.AddProfileViewExporter()
 		.AddOtlpExporter())
 	.AddProfileViewer()
-	.Configure<AspNetCoreInstrumentationOptions>(options =>
-	{
-		options.Filter = httpContext =>
-		{
-			return !httpContext.Request.Path.HasValue
-				   || !httpContext.Request.Path.StartsWithSegments("/swagger")
-				   && !httpContext.Request.Path.StartsWithSegments("/healthz")
-				   && !httpContext.Request.Path.StartsWithSegments("/profiler/")
-				   && !new[] { "html", "ico", "png", "jpg" }.Any(
-					   ext => httpContext.Request.Path.Value.EndsWith($".{ext}"));
-		};
-	});
+	.Configure<AspNetCoreInstrumentationOptions>(options => options.Filter =
+		httpContext => !httpContext.Request.Path.HasValue
+			|| !httpContext.Request.Path.StartsWithSegments("/swagger")
+			&& !httpContext.Request.Path.StartsWithSegments("/healthz")
+			&& !httpContext.Request.Path.StartsWithSegments("/profiler/")
+			&& !new[] { "html", "ico", "png", "jpg" }.Any(
+				ext => httpContext.Request.Path.Value.EndsWith($".{ext}")));
 
 builder.Services.AddSwaggerGen(c =>
 {

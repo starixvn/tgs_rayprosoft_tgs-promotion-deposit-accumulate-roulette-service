@@ -33,12 +33,10 @@ internal class DistributeBonusTests
 	{
 		var fakePromotionServiceClient = Substitute.For<IPromotionServiceClient>();
 		var fakeGetDistributeService = Substitute.For<IGetService<GetPromotionDistributePlanQuery, PromotionDistributePlanInfo>>();
-		var fakeLogger = NullLogger<DistributeBonusCommandService>.Instance;
 
 		var sut = new DistributeBonusCommandService(
 			fakePromotionServiceClient,
-			fakeGetDistributeService,
-			fakeLogger);
+			fakeGetDistributeService);
 
 		var command = new DistributeBonusCommand(
 			Guid.NewGuid(),

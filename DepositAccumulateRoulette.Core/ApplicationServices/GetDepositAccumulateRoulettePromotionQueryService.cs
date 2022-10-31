@@ -32,10 +32,9 @@ internal class GetDepositAccumulateRoulettePromotionQueryService
 			.GetPromotionRuleAsync<PromotionRule>(query.PromotionId, cancellationToken)
 			.ConfigureAwait(false);
 
-		if (rule is null)
-			throw new InvalidOperationException("DepositAccumulateRoulette setting is null");
-
-		return new DepositAccumulateRoulettePromotionInfo(
+		return rule is null
+			? throw new InvalidOperationException("DepositAccumulateRoulette setting is null")
+			: new DepositAccumulateRoulettePromotionInfo(
 			mainInfo.Id,
 			mainInfo.EventDuring,
 			mainInfo.PromotionLimitAmount,
