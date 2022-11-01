@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Runtime.CompilerServices;
+using Microsoft.EntityFrameworkCore;
 using Tgs.Promotion.DepositAccumulateRoulette.Repositories.Entities;
 using Tgs.Promotion.DepositAccumulateRoulette.Worker;
 using Tgs.SerialNumberGenerator;
@@ -18,11 +19,13 @@ internal class TgsRepository : ITgsRepository
 		_serialNumberGenerator = serialNumberGenerator ?? throw new ArgumentNullException(nameof(serialNumberGenerator));
 	}
 
-	public IAsyncEnumerable<DepositAccumulateRouletteEventInfo> GetDepositAccumulateRouletteEventInfosAsync(
+	public async IAsyncEnumerable<DepositAccumulateRouletteEventInfo> GetDepositAccumulateRouletteEventInfosAsync(
 		Guid promotionId,
 		string playerCode,
-		DateOnly eventDate)
-		=> _context.DepositAccumulateRouletteEvents
+		DateOnly eventDate,
+		[EnumeratorCancellation] CancellationToken cancellationToken = default)
+	{
+		var events = await _context.DepositAccumulateRouletteEvents
 			.Where(evt => evt.PlayerCode == playerCode
 						  && evt.PromotionId == promotionId
 						  && evt.Date >= eventDate)
@@ -33,17 +36,29 @@ internal class TgsRepository : ITgsRepository
 					evt.Date,
 					evt.RouletteCount,
 					evt.TotalDepositAmount))
-			.AsAsyncEnumerable();
+			.ToArrayAsync(cancellationToken)
+			.ConfigureAwait(false);
 
-	public IAsyncEnumerable<Guid> GetPlayerAvailablePromotionIdsAsync(
+		foreach (var info in events)
+			yield return info;
+	}
+
+	public async IAsyncEnumerable<Guid> GetPlayerAvailablePromotionIdsAsync(
 		string playerCode,
-		DateOnly queryDate)
-		=> _context.DepositAccumulateRouletteEvents
+		DateOnly queryDate,
+		[EnumeratorCancellation] CancellationToken cancellationToken = default)
+	{
+		var promotionIds = await _context.DepositAccumulateRouletteEvents
 			.Where(evt => evt.PlayerCode == playerCode
 						  && evt.Date >= queryDate)
 			.Select(evt => evt.PromotionId)
 			.Distinct()
-			.AsAsyncEnumerable();
+			.ToArrayAsync(cancellationToken)
+			.ConfigureAwait(false);
+
+		foreach (var id in promotionIds)
+			yield return id;
+	}
 
 	public async ValueTask<int> GetRouletteUsedCountAsync(
 		Guid promotionId,
@@ -108,10 +123,16 @@ internal class TgsRepository : ITgsRepository
 			.FirstOrDefaultAsync(cancellationToken)
 			.ConfigureAwait(false);
 
-	public IAsyncEnumerable<RouletteRecordInfo> GetRouletteRecordInfosAsync(Guid promotionId, string playerCode, DateOnly eventDate) => _context.DepositAccumulateRouletteGameEvents
+	public async IAsyncEnumerable<RouletteRecordInfo> GetRouletteRecordInfosAsync(
+		Guid promotionId,
+		string playerCode,
+		DateOnly eventDate,
+		[EnumeratorCancellation] CancellationToken cancellationToken = default)
+	{
+		var recordInfos = await _context.DepositAccumulateRouletteGameEvents
 			.Where(evt => evt.PromotionId == promotionId
-				&& evt.PlayerCode == playerCode
-				&& evt.Date == eventDate)
+						  && evt.PlayerCode == playerCode
+						  && evt.Date == eventDate)
 			.Select(evt => new RouletteRecordInfo(
 				evt.Id,
 				evt.PlayerCode,
@@ -120,14 +141,22 @@ internal class TgsRepository : ITgsRepository
 				evt.ItemIndex,
 				evt.Bonus,
 				evt.CreatedOn))
-			.AsAsyncEnumerable();
+			.ToArrayAsync(cancellationToken)
+			.ConfigureAwait(false);
 
-	public IAsyncEnumerable<RouletteRecordInfo> GetRouletteRecordInfosAsync(Guid promotionId, string playerCode)
+		foreach (var info in recordInfos)
+			yield return info;
+	}
+
+	public async IAsyncEnumerable<RouletteRecordInfo> GetRouletteRecordInfosAsync(
+		Guid promotionId,
+		string playerCode,
+		[EnumeratorCancellation] CancellationToken cancellationToken = default)
 	{
 		var today = DateOnly.FromDateTime(DateTimeOffset.UtcNow.ToOffset(TimeSpan.FromHours(8D)).DateTime);
 		var processDate = today.AddDays(-7);
 
-		return _context.DepositAccumulateRouletteGameEvents
+		var recordInfos = await _context.DepositAccumulateRouletteGameEvents
 			.Where(evt => evt.PromotionId == promotionId
 						  && evt.PlayerCode == playerCode
 						  && evt.Date >= processDate)
@@ -139,6 +168,10 @@ internal class TgsRepository : ITgsRepository
 				evt.ItemIndex,
 				evt.Bonus,
 				evt.CreatedOn))
-			.AsAsyncEnumerable();
+			.ToArrayAsync(cancellationToken)
+			.ConfigureAwait(false);
+
+		foreach (var info in recordInfos)
+			yield return info;
 	}
 }

@@ -43,7 +43,8 @@ internal class PromotionService : IPromotionService
 			var infos = await _tgsRepository
 				.GetPlayerAvailablePromotionIdsAsync(
 					playerCode,
-					queryDate)
+					queryDate,
+					cancellationToken)
 				.ToArrayAsync(cancellationToken)
 				.ConfigureAwait(false);
 

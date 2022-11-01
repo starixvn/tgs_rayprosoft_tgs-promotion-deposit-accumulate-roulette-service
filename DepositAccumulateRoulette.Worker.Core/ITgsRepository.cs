@@ -5,11 +5,13 @@ public interface ITgsRepository
 	IAsyncEnumerable<DepositAccumulateRouletteEventInfo> GetDepositAccumulateRouletteEventInfosAsync(
 		Guid promotionId,
 		string playerCode,
-		DateOnly eventDate);
+		DateOnly eventDate,
+		CancellationToken cancellationToken = default);
 
 	IAsyncEnumerable<Guid> GetPlayerAvailablePromotionIdsAsync(
 		string playerCode,
-		DateOnly queryDate);
+		DateOnly queryDate,
+		CancellationToken cancellationToken = default);
 
 	ValueTask<int> GetRouletteUsedCountAsync(
 		Guid promotionId,
@@ -33,9 +35,11 @@ public interface ITgsRepository
 	IAsyncEnumerable<RouletteRecordInfo> GetRouletteRecordInfosAsync(
 		Guid promotionId,
 		string playerCode,
-		DateOnly eventDate);
+		DateOnly eventDate,
+		CancellationToken cancellationToken = default);
 
 	IAsyncEnumerable<RouletteRecordInfo> GetRouletteRecordInfosAsync(
 		Guid promotionId,
-		string playerCode);
+		string playerCode,
+		CancellationToken cancellationToken = default);
 }

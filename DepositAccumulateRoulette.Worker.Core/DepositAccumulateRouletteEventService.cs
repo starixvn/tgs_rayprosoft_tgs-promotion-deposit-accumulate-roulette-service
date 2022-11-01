@@ -65,7 +65,8 @@ internal class DepositAccumulateRouletteEventService : IDepositAccumulateRoulett
 			.GetDepositAccumulateRouletteEventInfosAsync(
 				promotionId,
 				playerCode,
-				queryDate)
+				queryDate,
+				cancellationToken)
 			.ToArrayAsync(cancellationToken)
 			.ConfigureAwait(false);
 

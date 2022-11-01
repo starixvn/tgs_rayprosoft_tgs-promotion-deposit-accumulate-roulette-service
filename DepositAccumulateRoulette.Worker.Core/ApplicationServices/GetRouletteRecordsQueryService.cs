@@ -15,5 +15,8 @@ internal class GetRouletteRecordsQueryService : IQueryService<GetRouletteRecords
 	public IAsyncEnumerable<RouletteRecordInfo> QueryAsync(
 		GetRouletteRecordsQuery query,
 		CancellationToken cancellationToken = default)
-		=> _tgsRepository.GetRouletteRecordInfosAsync(query.PromotionId, query.PlayerCode);
+		=> _tgsRepository.GetRouletteRecordInfosAsync(
+			query.PromotionId,
+			query.PlayerCode,
+			cancellationToken);
 }
