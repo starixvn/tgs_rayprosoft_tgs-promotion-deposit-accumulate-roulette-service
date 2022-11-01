@@ -8,7 +8,7 @@ data:
       "DepositAccumulateRoulette": {
         "PromotionBaseUrl": "http://promotion-api",
         "PlayerBaseUrl": "http://player-api",
-        "DepositAccumulateRouletteServiceBaseUrl": "http://tgs-deposit-accumulate-roulette-worker"
+        "DepositAccumulateRouletteWorkerBaseUrl": "http://tgs-deposit-accumulate-roulette-worker"
       }
     }
   monitor.settings.json: | 
