@@ -76,13 +76,8 @@ internal class TgsRepository : ITgsRepository
 		return count;
 	}
 
-	public async ValueTask<Guid> AddRouletteRecordAsync(
-		Guid promotionId,
-		string playerCode,
-		Guid brandId,
-		DateOnly eventDate,
-		decimal bonus,
-		int itemIndex,
+	public async ValueTask<Guid> CreateRouletteRecordAsync(
+		CreateRouletteRecordInfo createRecordInfo,
 		CancellationToken cancellationToken = default)
 	{
 		var recordId = await _serialNumberGenerator.GenerateAsync(cancellationToken).ConfigureAwait(false);
@@ -90,12 +85,14 @@ internal class TgsRepository : ITgsRepository
 		var gameEvent = new DepositAccumulateRouletteGameEvent
 		{
 			Id = recordId,
-			Bonus = bonus,
-			PromotionId = promotionId,
-			PlayerCode = playerCode,
-			BrandId = brandId,
-			ItemIndex = itemIndex,
-			Date = eventDate
+			PromotionId = createRecordInfo.PromotionId,
+			PlayerCode = createRecordInfo.PlayerCode,
+			BrandId = createRecordInfo.BrandId,
+			ItemIndex = createRecordInfo.ItemIndex,
+			Date = createRecordInfo.EventDate,
+			Bonus = createRecordInfo.BonusAmount,
+			Bucket = createRecordInfo.BucketAmount,
+			RouletteCount = createRecordInfo.RouletteCount
 		};
 
 		_ = await _context.DepositAccumulateRouletteGameEvents
@@ -119,6 +116,8 @@ internal class TgsRepository : ITgsRepository
 				evt.Date,
 				evt.ItemIndex,
 				evt.Bonus,
+				evt.Bucket,
+				evt.RouletteCount,
 				evt.CreatedOn))
 			.FirstOrDefaultAsync(cancellationToken)
 			.ConfigureAwait(false);
@@ -140,6 +139,8 @@ internal class TgsRepository : ITgsRepository
 				evt.Date,
 				evt.ItemIndex,
 				evt.Bonus,
+				evt.Bucket,
+				evt.RouletteCount,
 				evt.CreatedOn))
 			.ToArrayAsync(cancellationToken)
 			.ConfigureAwait(false);
@@ -167,6 +168,8 @@ internal class TgsRepository : ITgsRepository
 				evt.Date,
 				evt.ItemIndex,
 				evt.Bonus,
+				evt.Bucket,
+				evt.RouletteCount,
 				evt.CreatedOn))
 			.ToArrayAsync(cancellationToken)
 			.ConfigureAwait(false);

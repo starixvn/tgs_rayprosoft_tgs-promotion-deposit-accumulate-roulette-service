@@ -7,4 +7,6 @@ public record RouletteRecordInfo(
 	DateOnly EventDate,
 	int ItemIndex,
 	decimal BonusAmount,
+	decimal BucketAmount,
+	int RouletteCount,
 	DateTime CreatedOn);
