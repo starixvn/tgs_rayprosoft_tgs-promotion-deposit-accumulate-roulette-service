@@ -22,7 +22,7 @@ public class RouletteController : ControllerBase
 		await foreach (var info in rouletteRecordInfos.WithCancellation(HttpContext.RequestAborted))
 			yield return new RouletteRecordViewModel
 			{
-				RouletteId = info.RouletteId,
+				RouletteId = info.RecordId,
 				EventDate = info.EventDate,
 				ItemIndex = info.ItemIndex,
 				CreatedOn = info.CreatedOn

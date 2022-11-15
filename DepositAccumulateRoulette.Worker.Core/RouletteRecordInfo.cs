@@ -1,7 +1,7 @@
 ﻿namespace Tgs.Promotion.DepositAccumulateRoulette.Worker;
 
 public record RouletteRecordInfo(
-	Guid RouletteId,
+	Guid RecordId,
 	string PlayerCode,
 	Guid PromotionId,
 	DateOnly EventDate,

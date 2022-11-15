@@ -5,4 +5,5 @@ public record DistributeBonusCommand(
 	string PlayerCode,
 	int Hash,
 	decimal Bonus,
-	decimal Bucket);
+	decimal Bucket,
+	Guid RouletteRecordId);

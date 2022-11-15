@@ -76,7 +76,8 @@ internal class ManuelDistributeBonusCommandService : ICommandService<ManuelDistr
 					rouletteRecordInfo.PlayerCode,
 					hash,
 					rouletteRecordInfo.BonusAmount,
-					bucket),
+					bucket,
+					rouletteRecordInfo.RecordId),
 				cancellationToken).ConfigureAwait(false);
 	}
 }

@@ -26,11 +26,15 @@ internal class DistributeBonusBackgroundJob
 			scheduleInfo.PlayResult.TotalAmount,
 			scheduleInfo.PlayResult.RecordId).ConfigureAwait(false);
 
-		await _distributeService.ExecuteAsync(new DistributeBonusCommand(
-			scheduleInfo.PromotionId,
-			scheduleInfo.PlayerCode,
-			scheduleInfo.Hash,
-			scheduleInfo.PlayResult.Bonus,
-			scheduleInfo.PlayResult.Bucket)).ConfigureAwait(false);
+		await _distributeService
+			.ExecuteAsync(
+				new DistributeBonusCommand(
+					scheduleInfo.PromotionId,
+					scheduleInfo.PlayerCode,
+					scheduleInfo.Hash,
+					scheduleInfo.PlayResult.Bonus,
+					scheduleInfo.PlayResult.Bucket,
+					scheduleInfo.PlayResult.RecordId))
+			.ConfigureAwait(false);
 	}
 }

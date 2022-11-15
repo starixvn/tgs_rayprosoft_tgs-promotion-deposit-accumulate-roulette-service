@@ -32,6 +32,7 @@ internal class DistributeBonusCommandService : ICommandService<DistributeBonusCo
 			command.Bonus,
 			command.Bucket,
 			null,
+			command.RouletteRecordId,
 			cancellationToken).ConfigureAwait(false);
 	}
 }

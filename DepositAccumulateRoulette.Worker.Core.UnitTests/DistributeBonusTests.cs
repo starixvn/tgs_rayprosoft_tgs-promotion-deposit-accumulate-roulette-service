@@ -43,7 +43,8 @@ internal class DistributeBonusTests
 			"player1",
 			123456,
 			100M,
-			100M);
+			100M,
+			Guid.NewGuid());
 
 		var planId = Guid.NewGuid();
 		_ = fakeGetDistributeService
@@ -63,7 +64,8 @@ internal class DistributeBonusTests
 				Arg.Is(command.PlayerCode),
 				Arg.Is(command.Bonus),
 				Arg.Is(command.Bucket),
-				Arg.Any<string>());
+				Arg.Any<string>(),
+				Arg.Is(command.RouletteRecordId));
 	}
 
 	[Test]
