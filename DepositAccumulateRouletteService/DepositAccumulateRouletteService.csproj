@@ -20,7 +20,7 @@
   <ItemGroup>
     <PackageReference Include="DateOnlyTimeOnly.AspNet.Swashbuckle" Version="1.0.3" />
     <PackageReference Include="FluentdForward.OpenTelemetry.MessagePack" Version="0.2.0" />
-    <PackageReference Include="Google.Protobuf" Version="3.21.8" />
+    <PackageReference Include="Google.Protobuf" Version="3.21.9" />
     <PackageReference Include="Grpc.Tools" Version="2.50.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -37,8 +37,8 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
     <PackageReference Include="Tgs.Interceptors" Version="0.2.1" />
     <PackageReference Include="Tgs.MessageQueue.Nats" Version="2.1.6" />
-    <PackageReference Include="Tgs.PlayerService.Client" Version="0.0.15" />
-    <PackageReference Include="Tgs.Promotion.Client" Version="1.0.24-alpha" />
+    <PackageReference Include="Tgs.PlayerService.Client" Version="0.0.23" />
+    <PackageReference Include="Tgs.Promotion.Client" Version="1.0.31" />
   </ItemGroup>
 
   <ItemGroup>
