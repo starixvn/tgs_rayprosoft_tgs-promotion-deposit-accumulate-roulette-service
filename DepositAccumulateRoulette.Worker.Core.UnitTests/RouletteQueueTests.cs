@@ -333,7 +333,7 @@ internal class RouletteQueueTests
 	}
 
 	[Test]
-	public async Task Play_Roulette_Set_Current_Count_To_Distribution_Plan()
+	public async Task Play_Roulette_And_Scheduled_Distribute_Info()
 	{
 		var fakeRouletteServiceClient = Substitute.For<IDepositAccumulateRouletteServiceClient>();
 
@@ -437,11 +437,8 @@ internal class RouletteQueueTests
 		queue.Enqueue(sut);
 
 		var enqueueCommand = new EnqueueDistributeBonusJobCommand(
-			promotionId,
-			playerCode,
-			eventInfo.Date,
-			2,
-			playRouletteResult.Result);
+			playRouletteResult.Result.RecordId,
+			playRouletteResult.Result.TotalDistributeAmount);
 
 		var actual = await sut.Promise.Task.ConfigureAwait(false);
 

@@ -6,7 +6,7 @@ internal record PlayRouletteResult(
 {
 	internal record RouletteResult(
 		Guid RecordId,
-		decimal TotalAmount,
+		decimal TotalDistributeAmount,
 		decimal Bonus,
 		decimal Bucket,
 		Guid RouletteId,

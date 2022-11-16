@@ -187,11 +187,8 @@ internal class RouletteTaskQueue : IDisposable
 
 			await serviceCoordinator.ExecuteAsync(
 					new EnqueueDistributeBonusJobCommand(
-						PromotionId,
-						PlayerCode,
-						_useEvent.Date,
-						playRouletteResult.UsedCount,
-						playRouletteResult.Result),
+						playRouletteResult.Result.RecordId,
+						playRouletteResult.Result.TotalDistributeAmount),
 					cancellationToken)
 				.ConfigureAwait(false);
 
