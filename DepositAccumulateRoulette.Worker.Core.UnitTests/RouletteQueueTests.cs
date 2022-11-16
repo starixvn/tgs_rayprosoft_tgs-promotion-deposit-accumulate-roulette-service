@@ -17,23 +17,17 @@ internal class RouletteQueueTests
 	{
 		var fakeRouletteServiceClient = Substitute.For<IDepositAccumulateRouletteServiceClient>();
 
-		var fakeGetRouletteEventCountService = Substitute.For<
-			IGetService<GetAvailableRouletteCountEventQuery, RouletteEventCountInfo?>>();
-		var fakePlayRouletteCommandService = Substitute.For<IGetService<PlayRouletteCommand, PlayRouletteResult?>>();
 		var fakePromotionServiceClient = Substitute.For<IPromotionServiceClient>();
 		var fakePlayerServiceClient = Substitute.For<IPlayerServiceClient>();
-		var fakeEnqueueDistributeBonusJobCommandService =
-			Substitute.For<ICommandService<EnqueueDistributeBonusJobCommand>>();
 		var fakeSystemClock = Substitute.For<ISystemClock>();
+		var fakeServiceCoordinator = Substitute.For<IServiceCoordinator>();
 
 		var services = new ServiceCollection();
 		_ = services
 			.AddSingleton(fakeRouletteServiceClient)
 			.AddSingleton(fakePromotionServiceClient)
 			.AddSingleton(fakePlayerServiceClient)
-			.AddSingleton(fakeGetRouletteEventCountService)
-			.AddSingleton(fakePlayRouletteCommandService)
-			.AddSingleton(fakeEnqueueDistributeBonusJobCommandService);
+			.AddSingleton(fakeServiceCoordinator);
 
 		var depositItems = new DepositAccumulateItem[]
 		{
@@ -97,12 +91,12 @@ internal class RouletteQueueTests
 				null,
 				settings));
 
-		_ = fakeGetRouletteEventCountService.GetAsync(
+		_ = fakeServiceCoordinator.GetAsync<GetAvailableRouletteCountEventQuery, RouletteEventCountInfo?>(
 				Arg.Is(new GetAvailableRouletteCountEventQuery(promotionId, playerCode)),
 				Arg.Any<CancellationToken>())
 			.Returns(rouletteCountInfo);
 
-		_ = fakePlayRouletteCommandService.GetAsync(
+		_ = fakeServiceCoordinator.GetAsync<PlayRouletteCommand, PlayRouletteResult?>(
 			Arg.Is<PlayRouletteCommand>(x =>
 				x.PlayerInfo == playerInfo
 				&& x.EventInfo == rouletteCountInfo
@@ -134,13 +128,10 @@ internal class RouletteQueueTests
 		var fakeTgsRepository = Substitute.For<ITgsRepository>();
 		var fakeRouletteServiceClient = Substitute.For<IDepositAccumulateRouletteServiceClient>();
 
-		var fakeGetRouletteEventCountService = Substitute.For<
-			IGetService<GetAvailableRouletteCountEventQuery, RouletteEventCountInfo?>>();
-		var fakePlayRouletteCommandService = Substitute.For<IGetService<PlayRouletteCommand, PlayRouletteResult?>>();
-		var fakeDistributeService = Substitute.For<ICommandService<DistributeBonusCommand>>();
 		var fakePromotionServiceClient = Substitute.For<IPromotionServiceClient>();
 		var fakePlayerServiceClient = Substitute.For<IPlayerServiceClient>();
 		var fakeSystemClock = Substitute.For<ISystemClock>();
+		var fakeServiceCoordinator = Substitute.For<IServiceCoordinator>();
 
 		var services = new ServiceCollection();
 		_ = services
@@ -148,9 +139,7 @@ internal class RouletteQueueTests
 			.AddSingleton(fakeRouletteServiceClient)
 			.AddSingleton(fakePromotionServiceClient)
 			.AddSingleton(fakePlayerServiceClient)
-			.AddSingleton(fakeGetRouletteEventCountService)
-			.AddSingleton(fakePlayRouletteCommandService)
-			.AddSingleton(fakeDistributeService);
+			.AddSingleton(fakeServiceCoordinator);
 
 		var promotionId = Guid.NewGuid();
 		var brandId = Guid.NewGuid();
@@ -192,13 +181,10 @@ internal class RouletteQueueTests
 		var fakeTgsRepository = Substitute.For<ITgsRepository>();
 		var fakeRouletteServiceClient = Substitute.For<IDepositAccumulateRouletteServiceClient>();
 
-		var fakeGetRouletteEventCountService = Substitute.For<
-			IGetService<GetAvailableRouletteCountEventQuery, RouletteEventCountInfo?>>();
-		var fakePlayRouletteCommandService = Substitute.For<IGetService<PlayRouletteCommand, PlayRouletteResult?>>();
-		var fakeDistributeService = Substitute.For<ICommandService<DistributeBonusCommand>>();
 		var fakePromotionServiceClient = Substitute.For<IPromotionServiceClient>();
 		var fakePlayerServiceClient = Substitute.For<IPlayerServiceClient>();
 		var fakeSystemClock = Substitute.For<ISystemClock>();
+		var fakeServiceCoordinator = Substitute.For<IServiceCoordinator>();
 
 		var services = new ServiceCollection();
 		_ = services
@@ -206,9 +192,7 @@ internal class RouletteQueueTests
 			.AddSingleton(fakeRouletteServiceClient)
 			.AddSingleton(fakePromotionServiceClient)
 			.AddSingleton(fakePlayerServiceClient)
-			.AddSingleton(fakeGetRouletteEventCountService)
-			.AddSingleton(fakePlayRouletteCommandService)
-			.AddSingleton(fakeDistributeService);
+			.AddSingleton(fakeServiceCoordinator);
 
 		var promotionId = Guid.NewGuid();
 		var brandId = Guid.NewGuid();
@@ -240,13 +224,10 @@ internal class RouletteQueueTests
 		var fakeTgsRepository = Substitute.For<ITgsRepository>();
 		var fakeRouletteServiceClient = Substitute.For<IDepositAccumulateRouletteServiceClient>();
 
-		var fakeGetRouletteEventCountService = Substitute.For<
-			IGetService<GetAvailableRouletteCountEventQuery, RouletteEventCountInfo?>>();
-		var fakePlayRouletteCommandService = Substitute.For<IGetService<PlayRouletteCommand, PlayRouletteResult?>>();
-		var fakeDistributeService = Substitute.For<ICommandService<DistributeBonusCommand>>();
 		var fakePromotionServiceClient = Substitute.For<IPromotionServiceClient>();
 		var fakePlayerServiceClient = Substitute.For<IPlayerServiceClient>();
 		var fakeSystemClock = Substitute.For<ISystemClock>();
+		var fakeServiceCoordinator = Substitute.For<IServiceCoordinator>();
 
 		var services = new ServiceCollection();
 		_ = services
@@ -254,9 +235,7 @@ internal class RouletteQueueTests
 			.AddSingleton(fakeRouletteServiceClient)
 			.AddSingleton(fakePromotionServiceClient)
 			.AddSingleton(fakePlayerServiceClient)
-			.AddSingleton(fakeGetRouletteEventCountService)
-			.AddSingleton(fakePlayRouletteCommandService)
-			.AddSingleton(fakeDistributeService);
+			.AddSingleton(fakeServiceCoordinator);
 
 		var depositItems = new DepositAccumulateItem[]
 		{
@@ -314,12 +293,12 @@ internal class RouletteQueueTests
 				null,
 				settings));
 
-		_ = fakeGetRouletteEventCountService.GetAsync(
+		_ = fakeServiceCoordinator.GetAsync<GetAvailableRouletteCountEventQuery, RouletteEventCountInfo?>(
 				Arg.Is(new GetAvailableRouletteCountEventQuery(promotionId, playerCode)),
 				Arg.Any<CancellationToken>())
 			.Returns(rouletteCountInfo);
 
-		_ = fakePlayRouletteCommandService.GetAsync(
+		_ = fakeServiceCoordinator.GetAsync<PlayRouletteCommand, PlayRouletteResult?>(
 				Arg.Is<PlayRouletteCommand>(x =>
 					x.PlayerInfo == playerInfo
 					&& x.EventInfo == rouletteCountInfo
@@ -354,29 +333,21 @@ internal class RouletteQueueTests
 	}
 
 	[Test]
-	public async Task Play_Roulette_Set_Current_Count_To_Distribution_Plan()
+	public async Task Play_Roulette_And_Scheduled_Distribute_Info()
 	{
 		var fakeRouletteServiceClient = Substitute.For<IDepositAccumulateRouletteServiceClient>();
 
-		var fakeGetRouletteEventCountService = Substitute.For<
-			IGetService<GetAvailableRouletteCountEventQuery, RouletteEventCountInfo?>>();
-		var fakePlayRouletteCommandService = Substitute.For<IGetService<PlayRouletteCommand, PlayRouletteResult?>>();
-		var fakeDistributeService = Substitute.For<ICommandService<DistributeBonusCommand>>();
 		var fakePromotionServiceClient = Substitute.For<IPromotionServiceClient>();
 		var fakePlayerServiceClient = Substitute.For<IPlayerServiceClient>();
-		var fakeEnqueueDistributeBonusJobCommandService =
-			Substitute.For<ICommandService<EnqueueDistributeBonusJobCommand>>();
 		var fakeSystemClock = Substitute.For<ISystemClock>();
+		var fakeServiceCoordinator = Substitute.For<IServiceCoordinator>();
 
 		var services = new ServiceCollection();
 		_ = services
 			.AddSingleton(fakeRouletteServiceClient)
 			.AddSingleton(fakePromotionServiceClient)
 			.AddSingleton(fakePlayerServiceClient)
-			.AddSingleton(fakeGetRouletteEventCountService)
-			.AddSingleton(fakePlayRouletteCommandService)
-			.AddSingleton(fakeDistributeService)
-			.AddSingleton(fakeEnqueueDistributeBonusJobCommandService);
+			.AddSingleton(fakeServiceCoordinator);
 
 		var depositItems = new DepositAccumulateItem[]
 		{
@@ -440,12 +411,12 @@ internal class RouletteQueueTests
 				null,
 				settings));
 
-		_ = fakeGetRouletteEventCountService.GetAsync(
+		_ = fakeServiceCoordinator.GetAsync<GetAvailableRouletteCountEventQuery, RouletteEventCountInfo?>(
 				Arg.Is(new GetAvailableRouletteCountEventQuery(promotionId, playerCode)),
 				Arg.Any<CancellationToken>())
 			.Returns(rouletteCountInfo);
 
-		_ = fakePlayRouletteCommandService.GetAsync(
+		_ = fakeServiceCoordinator.GetAsync<PlayRouletteCommand, PlayRouletteResult?>(
 			Arg.Is<PlayRouletteCommand>(x =>
 				x.PlayerInfo == playerInfo
 				&& x.EventInfo == rouletteCountInfo
@@ -466,18 +437,15 @@ internal class RouletteQueueTests
 		queue.Enqueue(sut);
 
 		var enqueueCommand = new EnqueueDistributeBonusJobCommand(
-			promotionId,
-			playerCode,
-			eventInfo.Date,
-			2,
-			playRouletteResult.Result);
+			playRouletteResult.Result.RecordId,
+			playRouletteResult.Result.TotalDistributeAmount);
 
 		var actual = await sut.Promise.Task.ConfigureAwait(false);
 
 		Assert.IsNotNull(actual);
 		Assert.AreEqual(expected, actual);
 
-		_ = fakeEnqueueDistributeBonusJobCommandService
+		_ = fakeServiceCoordinator
 			.Received(1)
 			.ExecuteAsync(
 				Arg.Is(enqueueCommand),

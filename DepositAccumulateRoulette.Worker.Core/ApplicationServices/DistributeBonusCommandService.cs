@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-using Tgs.Promotion.Clients;
+﻿using Tgs.Promotion.Clients;
 using Tgs.ServiceUtility;
 
 namespace Tgs.Promotion.DepositAccumulateRoulette.Worker.ApplicationServices;
@@ -24,14 +23,15 @@ internal class DistributeBonusCommandService : ICommandService<DistributeBonusCo
 		var plan = await _getDistributePlanService.GetAsync(
 			new GetPromotionDistributePlanQuery(
 				command.PromotionId,
-				command.Hash), cancellationToken);
+				command.DistributePlanHash), cancellationToken);
 
 		_ = await _promotionServiceClient.DistributePromotionBonusAsync(
 			plan.Id,
 			command.PlayerCode,
-			command.Bonus,
-			command.Bucket,
-			null,
+			command.BonusAmount,
+			command.BucketAmount,
+			distributor: null,
+			command.RouletteRecordId,
 			cancellationToken).ConfigureAwait(false);
 	}
 }

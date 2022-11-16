@@ -1,5 +1,4 @@
 ﻿using System.Collections.Concurrent;
-using Hangfire;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Tgs.PlayerService.Client;
@@ -155,11 +154,13 @@ internal class RouletteTaskQueue : IDisposable
 					.ConfigureAwait(false);
 			}
 
+			var serviceCoordinator = scope.ServiceProvider.GetRequiredService<IServiceCoordinator>();
+
 			var rouletteItems = _promotion!.CampaignDetail.RouletteItems.ToArray();
 
 			if (_useEvent is null || _useEvent.Date != _today && _useEvent.AvailableCount <= 0)
 			{
-				_useEvent = await GetAvailableEventAsync(scope.ServiceProvider, cancellationToken)
+				_useEvent = await GetAvailableEventAsync(serviceCoordinator, cancellationToken)
 					.ConfigureAwait(false);
 			}
 
@@ -170,10 +171,7 @@ internal class RouletteTaskQueue : IDisposable
 				return;
 			}
 
-			var playRouletteCommandService = scope.ServiceProvider
-				.GetRequiredService<IGetService<PlayRouletteCommand, PlayRouletteResult>>();
-
-			var playRouletteResult = await playRouletteCommandService.GetAsync(
+			var playRouletteResult = await serviceCoordinator.GetAsync<PlayRouletteCommand, PlayRouletteResult>(
 					new PlayRouletteCommand(_player!, _useEvent, rouletteItems),
 					cancellationToken)
 				.ConfigureAwait(false);
@@ -187,16 +185,10 @@ internal class RouletteTaskQueue : IDisposable
 
 			_useEvent = _useEvent with { UsedCount = playRouletteResult.UsedCount };
 
-			var enqueueDistributeBonusJobCommandService = scope.ServiceProvider
-				.GetRequiredService<ICommandService<EnqueueDistributeBonusJobCommand>>();
-
-			await enqueueDistributeBonusJobCommandService.ExecuteAsync(
+			await serviceCoordinator.ExecuteAsync(
 					new EnqueueDistributeBonusJobCommand(
-						PromotionId,
-						PlayerCode,
-						_useEvent.Date,
-						playRouletteResult.UsedCount,
-						playRouletteResult.Result),
+						playRouletteResult.Result.RecordId,
+						playRouletteResult.Result.TotalDistributeAmount),
 					cancellationToken)
 				.ConfigureAwait(false);
 
@@ -216,14 +208,11 @@ internal class RouletteTaskQueue : IDisposable
 	}
 
 	private async ValueTask<RouletteEventCountInfo> GetAvailableEventAsync(
-		IServiceProvider serviceProvider,
+		IServiceCoordinator serviceCoordinator,
 		CancellationToken cancellationToken)
 	{
-		var getAvailableRouletteEventService = serviceProvider
-			.GetRequiredService<IGetService<GetAvailableRouletteCountEventQuery, RouletteEventCountInfo?>>();
-
-		var eventInfo = await getAvailableRouletteEventService
-			.GetAsync(
+		var eventInfo = await serviceCoordinator
+			.GetAsync<GetAvailableRouletteCountEventQuery, RouletteEventCountInfo?>(
 				new GetAvailableRouletteCountEventQuery(PromotionId, PlayerCode),
 				cancellationToken)
 			.ConfigureAwait(false);

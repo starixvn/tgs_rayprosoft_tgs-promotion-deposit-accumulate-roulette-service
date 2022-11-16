@@ -32,6 +32,8 @@ namespace Tgs.Promotion.DepositAccumulateRoulette.Repositories.Entities.Configur
 
             entity.Property(e => e.BrandId).HasColumnName("brand_id");
 
+            entity.Property(e => e.Bucket).HasColumnName("bucket");
+
             entity.Property(e => e.CreatedOn)
                 .HasColumnName("created_on")
                 .HasDefaultValueSql("now()");
@@ -47,6 +49,8 @@ namespace Tgs.Promotion.DepositAccumulateRoulette.Repositories.Entities.Configur
                 .HasColumnName("player_code");
 
             entity.Property(e => e.PromotionId).HasColumnName("promotion_id");
+
+            entity.Property(e => e.RouletteCount).HasColumnName("roulette_count");
 
             entity.HasOne(d => d.Promotion)
                 .WithMany(p => p.DepositAccumulateRouletteGameEvents)

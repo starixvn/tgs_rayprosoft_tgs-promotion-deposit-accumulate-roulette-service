@@ -46,6 +46,7 @@ internal class PlayRouletteCommandService : IGetService<PlayRouletteCommand, Pla
 			rouletteItems,
 			command.PlayerInfo.BrandId,
 			itemIndex,
+			usedCount,
 			cancellationToken).ConfigureAwait(false);
 
 		return new PlayRouletteResult(result, usedCount);
@@ -56,10 +57,13 @@ internal class PlayRouletteCommandService : IGetService<PlayRouletteCommand, Pla
 		IReadOnlyList<RouletteItem> rouletteItems,
 		Guid brandId,
 		int itemIndex,
+		int usedCount,
 		CancellationToken cancellationToken)
 	{
 		var rouletteItem = rouletteItems[itemIndex];
 		var distributeAmount = rouletteItem.Bonus;
+
+		var bucket = rouletteItem.Bonus * rouletteItem.TurnoverRate;
 
 		var totalAmount = await _statisticsService
 			.IncrementTotalDistributeAmountAsync(
@@ -68,17 +72,18 @@ internal class PlayRouletteCommandService : IGetService<PlayRouletteCommand, Pla
 				cancellationToken)
 			.ConfigureAwait(false);
 
-		var recordId = await _tgsRepository.AddRouletteRecordAsync(
-				eventInfo.PromotionId,
-				eventInfo.PlayerCode,
-				brandId,
-				eventInfo.Date,
-				distributeAmount,
-				itemIndex,
+		var recordId = await _tgsRepository.CreateRouletteRecordAsync(
+				new CreateRouletteRecordInfo(
+					eventInfo.PromotionId,
+					eventInfo.PlayerCode,
+					brandId,
+					eventInfo.Date,
+					usedCount,
+					distributeAmount,
+					bucket,
+					itemIndex),
 				cancellationToken)
 			.ConfigureAwait(false);
-
-		var bucket = rouletteItem.Bonus * rouletteItem.TurnoverRate;
 
 		return new PlayRouletteResult.RouletteResult(
 			recordId,

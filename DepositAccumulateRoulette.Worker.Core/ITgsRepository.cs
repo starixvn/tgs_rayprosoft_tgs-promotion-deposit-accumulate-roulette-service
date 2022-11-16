@@ -1,4 +1,6 @@
-﻿namespace Tgs.Promotion.DepositAccumulateRoulette.Worker;
+﻿using System.Threading;
+
+namespace Tgs.Promotion.DepositAccumulateRoulette.Worker;
 
 public interface ITgsRepository
 {
@@ -19,13 +21,8 @@ public interface ITgsRepository
 		DateOnly eventDate,
 		CancellationToken cancellationToken = default);
 
-	ValueTask<Guid> AddRouletteRecordAsync(
-		Guid promotionId,
-		string playerCode,
-		Guid brandId,
-		DateOnly eventDate,
-		decimal bonus,
-		int itemIndex,
+	ValueTask<Guid> CreateRouletteRecordAsync(
+		CreateRouletteRecordInfo createRecordInfo,
 		CancellationToken cancellationToken = default);
 
 	ValueTask<RouletteRecordInfo?> GetRouletteRecordInfoAsync(

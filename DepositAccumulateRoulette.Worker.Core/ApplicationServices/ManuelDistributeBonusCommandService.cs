@@ -36,47 +36,26 @@ internal class ManuelDistributeBonusCommandService : ICommandService<ManuelDistr
 			.ConfigureAwait(false);
 
 		if (rouletteRecordInfo == null)
+		{
+			_logger.LogInformation("Cannot find roulette record with id '{0}' to process manual distribute", command.RouletteRecordId);
 			return;
+		}
 
-		var promotion = await _rouletteServiceClient
-				.GetDepositAccumulateRoulettePromotionAsync(rouletteRecordInfo.PromotionId,
-					cancellationToken)
-				.ConfigureAwait(false);
-
-		if (promotion == null)
-			return;
-
-		var turnoverRate = promotion.CampaignDetail.RouletteItems
-			.ElementAt(rouletteRecordInfo.ItemIndex)
-			.TurnoverRate;
-
-		var bucket = rouletteRecordInfo.BonusAmount * turnoverRate;
-
-		var allRecords = await _tgsRepository.GetRouletteRecordInfosAsync(
-				rouletteRecordInfo.PromotionId,
-				rouletteRecordInfo.PlayerCode,
-				rouletteRecordInfo.EventDate,
-				cancellationToken)
-			.OrderBy(r => r.CreatedOn)
-			.ToArrayAsync(cancellationToken)
-			.ConfigureAwait(false);
-
-		var usedCount = Array.IndexOf(allRecords, rouletteRecordInfo) + 1;
-
-		var hash = _hasher.GetHashCode(rouletteRecordInfo.EventDate, usedCount);
+		var distributePlanHash = _hasher.GetHashCode(rouletteRecordInfo.EventDate, rouletteRecordInfo.RouletteCount);
 
 		_logger.LogInformation(
 			"Hash generate with Date: {date}, Count: {count}; Hash: {hash}",
-			rouletteRecordInfo.EventDate, usedCount, hash);
+			rouletteRecordInfo.EventDate, rouletteRecordInfo.RecordId, distributePlanHash);
 
 		await _distributeService
 			.ExecuteAsync(
 				new DistributeBonusCommand(
 					rouletteRecordInfo.PromotionId,
 					rouletteRecordInfo.PlayerCode,
-					hash,
+					distributePlanHash,
 					rouletteRecordInfo.BonusAmount,
-					bucket),
+					rouletteRecordInfo.BucketAmount,
+					rouletteRecordInfo.RecordId),
 				cancellationToken).ConfigureAwait(false);
 	}
 }

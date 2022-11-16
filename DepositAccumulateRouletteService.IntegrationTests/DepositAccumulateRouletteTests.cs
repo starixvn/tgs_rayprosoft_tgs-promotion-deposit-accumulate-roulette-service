@@ -423,24 +423,22 @@ internal class DepositAccumulateRouletteTests
 
 		_ = fakeTgsRepository
 			.Received(2)
-			.AddRouletteRecordAsync(
-				Arg.Is(promotionId),
-				Arg.Is(playerCode),
-				Arg.Is(brandId),
-				Arg.Is(eventInfos[0].Date),
-				Arg.Any<decimal>(),
-				Arg.Any<int>(),
+			.CreateRouletteRecordAsync(
+				Arg.Is<CreateRouletteRecordInfo>(
+					x =>
+					x.PromotionId == promotionId
+					&& x.PlayerCode == playerCode
+					&& x.EventDate == eventInfos[0].Date),
 				Arg.Any<CancellationToken>());
 
 		_ = fakeTgsRepository
 			.Received(1)
-			.AddRouletteRecordAsync(
-				Arg.Is(promotionId),
-				Arg.Is(playerCode),
-				Arg.Is(brandId),
-				Arg.Is(eventInfos[1].Date),
-				Arg.Any<decimal>(),
-				Arg.Any<int>(),
+			.CreateRouletteRecordAsync(
+				Arg.Is<CreateRouletteRecordInfo>(
+					x =>
+						x.PromotionId == promotionId
+						&& x.PlayerCode == playerCode
+						&& x.EventDate == eventInfos[1].Date),
 				Arg.Any<CancellationToken>());
 	}
 
@@ -643,13 +641,12 @@ internal class DepositAccumulateRouletteTests
 
 		_ = fakeTgsRepository
 			.Received(2)
-			.AddRouletteRecordAsync(
-				Arg.Is(promotionId),
-				Arg.Is(playerCode),
-				Arg.Is(brandId),
-				Arg.Is(eventInfos[0].Date),
-				Arg.Any<decimal>(),
-				Arg.Any<int>(),
+			.CreateRouletteRecordAsync(
+				Arg.Is<CreateRouletteRecordInfo>(
+					x =>
+						x.PromotionId == promotionId
+						&& x.PlayerCode == playerCode
+						&& x.EventDate == eventInfos[0].Date),
 				Arg.Any<CancellationToken>());
 	}
 

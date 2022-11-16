@@ -43,17 +43,18 @@ internal class DistributeBonusTests
 			"player1",
 			123456,
 			100M,
-			100M);
+			100M,
+			Guid.NewGuid());
 
 		var planId = Guid.NewGuid();
 		_ = fakeGetDistributeService
 			.GetAsync(Arg.Is<GetPromotionDistributePlanQuery>(x =>
-				x.PromotionId == command.PromotionId && x.ConditionHash == command.Hash))
+				x.PromotionId == command.PromotionId && x.ConditionHash == command.DistributePlanHash))
 			.Returns(new PromotionDistributePlanInfo(
 				planId,
 				Guid.NewGuid(),
 				command.PromotionId,
-				command.Hash));
+				command.DistributePlanHash));
 
 		await sut.ExecuteAsync(command);
 
@@ -61,51 +62,28 @@ internal class DistributeBonusTests
 			.DistributePromotionBonusAsync(
 				Arg.Is(planId),
 				Arg.Is(command.PlayerCode),
-				Arg.Is(command.Bonus),
-				Arg.Is(command.Bucket),
-				Arg.Any<string>());
+				Arg.Is(command.BonusAmount),
+				Arg.Is(command.BucketAmount),
+				Arg.Any<string>(),
+				Arg.Is(command.RouletteRecordId));
 	}
 
 	[Test]
 	public async Task Enqueue_Distribute_Bonus_Job()
 	{
-		var fakeDistributePlanHasher = Substitute.For<IDistributePlanHasher>();
 		var fakeBackgroundJobClient = Substitute.For<IBackgroundJobClient>();
-		var fakeLogger = NullLogger<EnqueueDistributeBonusJobCommandService>.Instance;
 
 		var command = new EnqueueDistributeBonusJobCommand(
 			Guid.NewGuid(),
-			"player1",
-			DateOnly.Parse("2022-10-26"),
-			2,
-			new PlayRouletteResult.RouletteResult(
-				Guid.NewGuid(),
-				1000,
-				10,
-				30,
-				Guid.NewGuid(),
-				3));
-
-		var hash = 1459347545;
+			1000);
 
 		var scheduleInfo = new DistributeBonusScheduleInfo(
-			command.PromotionId,
-			command.PlayerCode,
-			command.EventDate,
-			command.UsedCount,
-			command.PlayResult,
-			hash
+			command.RouletteRecordId,
+			command.TotalDistributeAmount
 		);
 
-		_ = fakeDistributePlanHasher.GetHashCode(
-				Arg.Is(command.EventDate),
-				Arg.Is(command.UsedCount))
-			.Returns(hash);
-
 		var sut = new EnqueueDistributeBonusJobCommandService(
-			fakeDistributePlanHasher,
-			fakeBackgroundJobClient,
-			fakeLogger);
+			fakeBackgroundJobClient);
 
 		await sut.ExecuteAsync(command);
 
@@ -117,5 +95,71 @@ internal class DistributeBonusTests
 					   job.Method.Name == "ExecuteAsync"
 					   && (DistributeBonusScheduleInfo)job.Args[0] == scheduleInfo),
 				Arg.Is<EnqueuedState>(p => p.Name == "Enqueued"));
+	}
+
+	[Test]
+	public async Task Execute_Distribute_Job()
+	{
+		var fakePromotionServiceClient = Substitute.For<IPromotionServiceClient>();
+		var fakeTgsRepository = Substitute.For<ITgsRepository>();
+		var fakeDistributePlanHasher = Substitute.For<IDistributePlanHasher>();
+		var fakeDistributeBonusCommandService = Substitute.For<ICommandService<DistributeBonusCommand>>();
+		var fakeLogger = NullLogger<DistributeBonusBackgroundJob>.Instance;
+
+		var scheduleInfo = new DistributeBonusScheduleInfo(
+			Guid.NewGuid(),
+			1000);
+
+		var rouletteRecordInfo = new RouletteRecordInfo(
+			scheduleInfo.RouletteRecordId,
+			"player1",
+			Guid.NewGuid(),
+			DateOnly.Parse("2022-11-16"),
+			2,
+			30,
+			90,
+			1,
+			DateTime.Parse("2022-11-16 08:00:00+08:00"));
+
+		var distributePlanHash = -89153043;
+
+		_ = fakeTgsRepository.GetRouletteRecordInfoAsync(
+				Arg.Is(scheduleInfo.RouletteRecordId),
+				Arg.Any<CancellationToken>())
+			.Returns(rouletteRecordInfo);
+
+		_ = fakeDistributePlanHasher.GetHashCode(
+				Arg.Is(rouletteRecordInfo.EventDate),
+				Arg.Is(rouletteRecordInfo.RouletteCount))
+			.Returns(distributePlanHash);
+
+		var sut = new DistributeBonusBackgroundJob(
+			fakePromotionServiceClient,
+			fakeTgsRepository,
+			fakeDistributePlanHasher,
+			fakeDistributeBonusCommandService,
+			fakeLogger);
+
+		await sut.ExecuteAsync(scheduleInfo);
+
+		_ = fakePromotionServiceClient
+			.Received(1)
+			.UpdatePromotionUsedAmountAsync(
+				Arg.Is(rouletteRecordInfo.PromotionId),
+				Arg.Is(scheduleInfo.TotalDistributeAmount),
+				Arg.Is(rouletteRecordInfo.RecordId));
+
+		var expectedDistributeBonusCommand = new DistributeBonusCommand(
+			rouletteRecordInfo.PromotionId,
+			rouletteRecordInfo.PlayerCode,
+			distributePlanHash,
+			rouletteRecordInfo.BonusAmount,
+			rouletteRecordInfo.BucketAmount,
+			rouletteRecordInfo.RecordId);
+
+		_ = fakeDistributeBonusCommandService
+			.Received(1)
+			.ExecuteAsync(
+				Arg.Is(expectedDistributeBonusCommand));
 	}
 }

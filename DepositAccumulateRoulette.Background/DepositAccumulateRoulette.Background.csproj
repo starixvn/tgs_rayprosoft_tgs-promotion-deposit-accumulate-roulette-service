@@ -17,7 +17,7 @@
     <PackageReference Include="DateOnlyTimeOnly.AspNet" Version="1.0.3" />
     <PackageReference Include="DateOnlyTimeOnly.AspNet.Swashbuckle" Version="1.0.3" />
     <PackageReference Include="FluentdForward.OpenTelemetry.MessagePack" Version="0.2.0" />
-    <PackageReference Include="Google.Protobuf" Version="3.21.8" />
+    <PackageReference Include="Google.Protobuf" Version="3.21.9" />
     <PackageReference Include="Grpc.Tools" Version="2.50.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

@@ -69,13 +69,8 @@ internal class RouletteServiceTests
 
 		_ = fakeTgsRepository
 			.Received(1)
-			.AddRouletteRecordAsync(
-				Arg.Is(command.EventInfo.PromotionId),
-				Arg.Is(command.EventInfo.PlayerCode),
-				Arg.Any<Guid>(),
-				Arg.Is(command.EventInfo.Date),
-				Arg.Any<decimal>(),
-				Arg.Any<int>());
+			.CreateRouletteRecordAsync(
+				Arg.Any<CreateRouletteRecordInfo>());
 
 		_ = fakeStatisticsService
 			.Received(1)
@@ -135,13 +130,13 @@ internal class RouletteServiceTests
 
 		_ = fakeTgsRepository
 			.DidNotReceive()
-			.AddRouletteRecordAsync(
-				Arg.Is(command.EventInfo.PromotionId),
-				Arg.Is(command.EventInfo.PlayerCode),
-				Arg.Any<Guid>(),
-				Arg.Is(command.EventInfo.Date),
-				Arg.Any<decimal>(),
-				Arg.Any<int>());
+			.CreateRouletteRecordAsync(
+				Arg.Is<CreateRouletteRecordInfo>(
+					x =>
+					x.PromotionId == command.EventInfo.PromotionId
+					&& x.PlayerCode == command.EventInfo.PlayerCode
+					&& x.EventDate == command.EventInfo.Date),
+			Arg.Any<CancellationToken>());
 	}
 
 	[Test]

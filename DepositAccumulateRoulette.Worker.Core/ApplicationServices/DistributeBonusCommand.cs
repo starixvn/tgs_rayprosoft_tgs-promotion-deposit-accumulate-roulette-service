@@ -3,6 +3,7 @@
 public record DistributeBonusCommand(
 	Guid PromotionId,
 	string PlayerCode,
-	int Hash,
-	decimal Bonus,
-	decimal Bucket);
+	int DistributePlanHash,
+	decimal BonusAmount,
+	decimal BucketAmount,
+	Guid RouletteRecordId);
