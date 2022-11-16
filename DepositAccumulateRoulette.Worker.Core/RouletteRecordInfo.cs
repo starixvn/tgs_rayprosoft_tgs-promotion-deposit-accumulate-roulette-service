@@ -9,4 +9,4 @@ public record RouletteRecordInfo(
 	decimal BonusAmount,
 	decimal BucketAmount,
 	int RouletteCount,
-	DateTime CreatedOn);
+	DateTimeOffset CreatedOn);

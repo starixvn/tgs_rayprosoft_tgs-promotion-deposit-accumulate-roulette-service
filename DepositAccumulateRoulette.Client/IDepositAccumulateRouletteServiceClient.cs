@@ -6,4 +6,9 @@ public interface IDepositAccumulateRouletteServiceClient
 		Guid promotionId,
 		string playerCode,
 		CancellationToken cancellationToken = default);
+
+	IAsyncEnumerable<RouletteRecord> GetRouletteRecordsAsync(
+		Guid brandId,
+		RouletteRecordQuery query,
+		CancellationToken cancellationToken = default);
 }

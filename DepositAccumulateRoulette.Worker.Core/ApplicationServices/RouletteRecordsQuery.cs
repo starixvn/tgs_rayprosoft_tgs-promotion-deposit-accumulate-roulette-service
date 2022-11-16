@@ -1,5 +1,5 @@
 ﻿namespace Tgs.Promotion.DepositAccumulateRoulette.Worker.ApplicationServices;
 
-public record GetRouletteRecordsQuery(
+public record RouletteRecordsQuery(
 	Guid PromotionId,
 	string PlayerCode);

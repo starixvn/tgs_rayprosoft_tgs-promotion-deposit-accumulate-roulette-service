@@ -1,6 +1,4 @@
-﻿using System.Threading;
-
-namespace Tgs.Promotion.DepositAccumulateRoulette.Worker;
+﻿namespace Tgs.Promotion.DepositAccumulateRoulette.Worker;
 
 public interface ITgsRepository
 {
@@ -29,14 +27,16 @@ public interface ITgsRepository
 		Guid rouletteRecordId,
 		CancellationToken cancellationToken = default);
 
-	IAsyncEnumerable<RouletteRecordInfo> GetRouletteRecordInfosAsync(
+	IAsyncEnumerable<RouletteRecordInfo> QueryRouletteRecordListAsync(
 		Guid promotionId,
 		string playerCode,
-		DateOnly eventDate,
 		CancellationToken cancellationToken = default);
 
-	IAsyncEnumerable<RouletteRecordInfo> GetRouletteRecordInfosAsync(
-		Guid promotionId,
-		string playerCode,
-		CancellationToken cancellationToken = default);
+	IAsyncEnumerable<RouletteRecordInfo> QueryRouletteRecordListAsync(
+		Guid brandId,
+		IEnumerable<string> playerCodes,
+		IEnumerable<Guid> promotionIds,
+		DateTime beginTime,
+		DateTime endTime,
+		CancellationToken cancellationToken);
 }
