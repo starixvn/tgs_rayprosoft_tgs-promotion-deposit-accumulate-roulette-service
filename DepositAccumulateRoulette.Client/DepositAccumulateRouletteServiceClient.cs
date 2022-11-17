@@ -1,4 +1,5 @@
-﻿using System.Net.Http.Json;
+﻿using System.Net;
+using System.Net.Http.Json;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -80,5 +81,23 @@ internal class DepositAccumulateRouletteServiceClient : IDepositAccumulateRoulet
 
 		foreach (var info in rouletteRecords)
 			yield return info;
+	}
+
+	public async ValueTask<RouletteRecord?> GetRouletteRecordAsync(
+		Guid brandId,
+		Guid recordId,
+		CancellationToken cancellationToken = default)
+	{
+		var response = await _httpClient
+			.GetAsync($"/api/roulette/record/{brandId}/{recordId}", cancellationToken)
+			.ConfigureAwait(false);
+
+		_ = response.EnsureSuccessStatusCode();
+
+		return response.StatusCode == HttpStatusCode.NoContent
+			? null
+			: await response.Content
+				.ReadFromJsonAsync<RouletteRecord>(_SerializerOptions, cancellationToken)
+				.ConfigureAwait(false);
 	}
 }

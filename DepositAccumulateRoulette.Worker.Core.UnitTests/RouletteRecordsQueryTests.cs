@@ -50,4 +50,23 @@ internal class RouletteRecordsQueryTests
 				Arg.Is(query.EndTime.UtcDateTime),
 				Arg.Any<CancellationToken>());
 	}
+
+	[Test]
+	public async Task Get_Roulette_Record_With_BrandId_And_RecordId()
+	{
+		var fakeTgsRepository = Substitute.For<ITgsRepository>();
+
+		var query = new GetRouletteRecordQuery(
+			Guid.NewGuid(),
+			Guid.NewGuid());
+
+		var sut = new GetRouletteRecordQueryService(fakeTgsRepository);
+
+		_ = await sut.GetAsync(query);
+
+		_ = fakeTgsRepository
+			.Received(1)
+			.GetRouletteRecordInfoAsync(
+				Arg.Is(query.RecordId));
+	}
 }

@@ -18,9 +18,9 @@ public class RouletteController : ControllerBase
 	{
 		var rouletteRecordInfos = queryService
 			.QueryAsync(
-				new RouletteRecordsQuery(promotionId, playerCode));
+				new RouletteRecordsQuery(promotionId, playerCode), HttpContext.RequestAborted);
 
-		await foreach (var info in rouletteRecordInfos.WithCancellation(HttpContext.RequestAborted))
+		await foreach (var info in rouletteRecordInfos)
 			yield return new RouletteRecordViewModel
 			{
 				RouletteId = info.RecordId,
@@ -71,6 +71,32 @@ public class RouletteController : ControllerBase
 				EventDate = info.EventDate,
 				ItemIndex = info.ItemIndex,
 				CreatedOn = info.CreatedOn
+			};
+	}
+
+	[HttpGet("record/{brandId}/{recordId}", Name = "GetRouletteRecord")]
+	public async ValueTask<RouletteRecordViewModel?> GetRouletteRecordAsync(
+		[FromServices] IGetService<GetRouletteRecordQuery, RouletteRecordInfo?> getService,
+		Guid brandId,
+		Guid recordId)
+	{
+		var recordInfo = await getService.GetAsync(
+				new GetRouletteRecordQuery(
+					brandId,
+					recordId),
+				HttpContext.RequestAborted)
+			.ConfigureAwait(false);
+
+		return recordInfo is null
+			? null
+			: new RouletteRecordViewModel
+			{
+				RouletteId = recordInfo.RecordId,
+				PlayerCode = recordInfo.PlayerCode,
+				PromotionId = recordInfo.PromotionId,
+				EventDate = recordInfo.EventDate,
+				ItemIndex = recordInfo.ItemIndex,
+				CreatedOn = recordInfo.CreatedOn
 			};
 	}
 }

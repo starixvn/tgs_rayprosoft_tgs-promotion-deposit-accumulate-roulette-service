@@ -7,8 +7,8 @@ namespace Tgs.Promotion.DepositAccumulateRouletteService.Controllers;
 [ApiController]
 public class RouletteController : ControllerBase
 {
-	[HttpGet("records/{playerCode}/{promotionId}", Name = "GetRouletteRecordsByPlayerCodeAndPromotionId")]
-	public async IAsyncEnumerable<RouletteRecordView> GetRouletteRecordsAsync(
+	[HttpGet("records/{playerCode}/{promotionId}", Name = "QueryRouletteRecordsWithPlayerCodeAndPromotionId")]
+	public async IAsyncEnumerable<RouletteRecordView> QueryRouletteRecordsAsync(
 		[FromServices] IDepositAccumulateRouletteWorkerClient client,
 		string playerCode,
 		Guid promotionId)
@@ -28,8 +28,8 @@ public class RouletteController : ControllerBase
 			};
 	}
 
-	[HttpGet("records/{brandId}", Name = "GetRouletteRecordsByBrandId")]
-	public async IAsyncEnumerable<RouletteRecordView> GetRouletteRecordsAsync(
+	[HttpGet("records/{brandId}", Name = "QueryRouletteRecordsWithBrandId")]
+	public async IAsyncEnumerable<RouletteRecordView> QueryRouletteRecordsAsync(
 		[FromServices] IDepositAccumulateRouletteWorkerClient client,
 		Guid brandId,
 		[FromQuery] RouletteRecordsQueryViewModel conditions,
@@ -63,6 +63,28 @@ public class RouletteController : ControllerBase
 				EventDate = info.EventDate,
 				ItemIndex = info.ItemIndex,
 				CreatedOn = info.CreatedOn
+			};
+	}
+
+	[HttpGet("record/{brandId}/{recordId}", Name = "GetRouletteRecordWithBrandId")]
+	public async ValueTask<RouletteRecordView?> GetRouletteRecordAsync(
+		[FromServices] IDepositAccumulateRouletteWorkerClient client,
+		Guid brandId,
+		Guid recordId)
+	{
+		var recordInfo = await client.GetRouletteRecordAsync(brandId, recordId, HttpContext.RequestAborted)
+			.ConfigureAwait(false);
+
+		return recordInfo is null
+			? null
+			: new RouletteRecordView
+			{
+				RouletteId = recordInfo.RouletteId,
+				PlayerCode = recordInfo.PlayerCode,
+				PromotionId = recordInfo.PromotionId,
+				EventDate = recordInfo.EventDate,
+				ItemIndex = recordInfo.ItemIndex,
+				CreatedOn = recordInfo.CreatedOn
 			};
 	}
 }

@@ -114,6 +114,7 @@ internal class DistributeBonusTests
 			scheduleInfo.RouletteRecordId,
 			"player1",
 			Guid.NewGuid(),
+			Guid.NewGuid(),
 			DateOnly.Parse("2022-11-16"),
 			2,
 			30,

@@ -11,4 +11,9 @@ public interface IDepositAccumulateRouletteServiceClient
 		Guid brandId,
 		RouletteRecordQuery query,
 		CancellationToken cancellationToken = default);
+
+	ValueTask<RouletteRecord?> GetRouletteRecordAsync(
+		Guid brandId,
+		Guid recordId,
+		CancellationToken cancellationToken = default);
 }

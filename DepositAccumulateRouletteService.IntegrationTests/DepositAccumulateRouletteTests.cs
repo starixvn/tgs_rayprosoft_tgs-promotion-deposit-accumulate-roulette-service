@@ -797,4 +797,49 @@ internal class DepositAccumulateRouletteTests
 		Assert.IsNotNull(actual);
 		CollectionAssert.AreEqual(rouletteRecords, actual);
 	}
+
+	[Test]
+	public async Task Get_Roulette_Records_With_RecordId()
+	{
+		var brandId = Guid.NewGuid();
+		var recordId = Guid.NewGuid();
+
+		var expected = new RouletteRecord(
+			recordId,
+			"player1",
+			Guid.NewGuid(),
+			DateOnly.Parse("2022-10-26"),
+			1,
+			DateTimeOffset.Parse("2022-10-26T08:39:00+00:00"));
+
+		var fakeWorkerClient = Substitute.For<IDepositAccumulateRouletteWorkerClient>();
+
+		await using var web = new TestDepositAccumulateRouletteServiceApplication(builder =>
+			builder.ConfigureServices(services =>
+			{
+				_ = services.AddSingleton(fakeWorkerClient);
+			}));
+
+		var httpClient = web.CreateClient();
+
+		var sut = new Client.DepositAccumulateRouletteServiceClient(httpClient);
+
+		_ = fakeWorkerClient.GetRouletteRecordAsync(
+				Arg.Is(brandId),
+				Arg.Is(recordId),
+				Arg.Any<CancellationToken>())
+			.Returns(new RouletteRecordInfo(
+				recordId,
+				expected.PlayerCode,
+				expected.PromotionId,
+				expected.EventDate,
+				expected.ItemIndex,
+				expected.CreatedOn));
+
+		var actual = await sut.GetRouletteRecordAsync(brandId, recordId)
+			.ConfigureAwait(false);
+
+		Assert.IsNotNull(actual);
+		Assert.AreEqual(expected, actual);
+	}
 }

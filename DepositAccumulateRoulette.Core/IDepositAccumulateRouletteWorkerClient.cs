@@ -12,4 +12,9 @@ public interface IDepositAccumulateRouletteWorkerClient
 		RouletteRecordQueryConditions conditions,
 		Paging paging,
 		CancellationToken cancellationToken = default);
+
+	ValueTask<RouletteRecordInfo?> GetRouletteRecordAsync(
+		Guid brandId,
+		Guid recordId,
+		CancellationToken cancellationToken = default);
 }

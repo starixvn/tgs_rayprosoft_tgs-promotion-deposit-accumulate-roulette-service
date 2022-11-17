@@ -1,6 +1,5 @@
 ﻿using System.Runtime.CompilerServices;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Query;
 using Tgs.Promotion.DepositAccumulateRoulette.Repositories.Entities;
 using Tgs.Promotion.DepositAccumulateRoulette.Worker;
 using Tgs.SerialNumberGenerator;
@@ -114,6 +113,7 @@ internal class TgsRepository : ITgsRepository
 				evt.Id,
 				evt.PlayerCode,
 				evt.PromotionId,
+				evt.BrandId,
 				evt.Date,
 				evt.ItemIndex,
 				evt.Bonus,
@@ -139,6 +139,7 @@ internal class TgsRepository : ITgsRepository
 				evt.Id,
 				evt.PlayerCode,
 				evt.PromotionId,
+				evt.BrandId,
 				evt.Date,
 				evt.ItemIndex,
 				evt.Bonus,
@@ -181,6 +182,7 @@ internal class TgsRepository : ITgsRepository
 				evt.Id,
 				evt.PlayerCode,
 				evt.PromotionId,
+				evt.BrandId,
 				evt.Date,
 				evt.ItemIndex,
 				evt.Bonus,
