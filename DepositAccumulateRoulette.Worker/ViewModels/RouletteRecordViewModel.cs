@@ -2,11 +2,15 @@
 
 public class RouletteRecordViewModel
 {
-	public Guid RouletteId { get; init; }
+	public DateTimeOffset CreatedOn { get; init; }
 
 	public DateOnly EventDate { get; init; }
 
 	public int ItemIndex { get; init; }
 
-	public DateTimeOffset CreatedOn { get; init; }
+	public string PlayerCode { get; init; } = default!;
+
+	public Guid PromotionId { get; init; }
+
+	public Guid RouletteId { get; init; }
 }

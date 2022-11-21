@@ -113,6 +113,7 @@ internal class TgsRepository : ITgsRepository
 				evt.Id,
 				evt.PlayerCode,
 				evt.PromotionId,
+				evt.BrandId,
 				evt.Date,
 				evt.ItemIndex,
 				evt.Bonus,
@@ -122,34 +123,7 @@ internal class TgsRepository : ITgsRepository
 			.FirstOrDefaultAsync(cancellationToken)
 			.ConfigureAwait(false);
 
-	public async IAsyncEnumerable<RouletteRecordInfo> GetRouletteRecordInfosAsync(
-		Guid promotionId,
-		string playerCode,
-		DateOnly eventDate,
-		[EnumeratorCancellation] CancellationToken cancellationToken = default)
-	{
-		var recordInfos = await _context.DepositAccumulateRouletteGameEvents
-			.Where(evt => evt.PromotionId == promotionId
-						  && evt.PlayerCode == playerCode
-						  && evt.Date == eventDate)
-			.Select(evt => new RouletteRecordInfo(
-				evt.Id,
-				evt.PlayerCode,
-				evt.PromotionId,
-				evt.Date,
-				evt.ItemIndex,
-				evt.Bonus,
-				evt.Bucket,
-				evt.RouletteCount,
-				evt.CreatedOn))
-			.ToArrayAsync(cancellationToken)
-			.ConfigureAwait(false);
-
-		foreach (var info in recordInfos)
-			yield return info;
-	}
-
-	public async IAsyncEnumerable<RouletteRecordInfo> GetRouletteRecordInfosAsync(
+	public async IAsyncEnumerable<RouletteRecordInfo> QueryRouletteRecordListAsync(
 		Guid promotionId,
 		string playerCode,
 		[EnumeratorCancellation] CancellationToken cancellationToken = default)
@@ -165,6 +139,50 @@ internal class TgsRepository : ITgsRepository
 				evt.Id,
 				evt.PlayerCode,
 				evt.PromotionId,
+				evt.BrandId,
+				evt.Date,
+				evt.ItemIndex,
+				evt.Bonus,
+				evt.Bucket,
+				evt.RouletteCount,
+				evt.CreatedOn))
+			.ToArrayAsync(cancellationToken)
+			.ConfigureAwait(false);
+
+		foreach (var info in recordInfos)
+			yield return info;
+	}
+
+	public async IAsyncEnumerable<RouletteRecordInfo> QueryRouletteRecordListAsync(
+		Guid brandId,
+		IEnumerable<string> playerCodes,
+		IEnumerable<Guid> promotionIds,
+		DateTime beginTime,
+		DateTime endTime,
+		[EnumeratorCancellation] CancellationToken cancellationToken = default)
+	{
+		var today = DateOnly.FromDateTime(DateTimeOffset.UtcNow.ToOffset(TimeSpan.FromHours(8D)).DateTime);
+		var processDate = today.AddDays(-90);
+
+		var query = _context.DepositAccumulateRouletteGameEvents
+			.Where(evt =>
+				evt.BrandId == brandId
+				&& evt.Date >= processDate
+				&& evt.CreatedOn >= beginTime
+				&& evt.CreatedOn < endTime);
+
+		if (promotionIds.Any())
+			query = query.Where(evt => promotionIds.Contains(evt.PromotionId));
+
+		if (playerCodes.Any())
+			query = query.Where(evt => playerCodes.Contains(evt.PlayerCode));
+
+		var recordInfos = await query
+			.Select(evt => new RouletteRecordInfo(
+				evt.Id,
+				evt.PlayerCode,
+				evt.PromotionId,
+				evt.BrandId,
 				evt.Date,
 				evt.ItemIndex,
 				evt.Bonus,
