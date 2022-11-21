@@ -10,7 +10,7 @@ namespace Tgs.Promotion.DepositAccumulateRoulette.Worker.Controllers;
 [ApiController]
 public class RouletteController : ControllerBase
 {
-	[HttpGet("records/{playerCode}/{promotionId}", Name = "QueryRouletteRecordsByPlayerAndPromotion")]
+	[HttpGet("records/{playerCode}/{promotionId}", Name = "QueryRouletteRecordsByPlayerCodeAndPromotionId")]
 	public async IAsyncEnumerable<RouletteRecordViewModel> QueryRouletteRecordsAsync(
 		[FromServices] IQueryService<RouletteRecordsQuery, RouletteRecordInfo> queryService,
 		string playerCode,

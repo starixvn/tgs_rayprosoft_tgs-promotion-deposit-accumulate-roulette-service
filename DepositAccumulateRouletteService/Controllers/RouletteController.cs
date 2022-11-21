@@ -7,14 +7,16 @@ namespace Tgs.Promotion.DepositAccumulateRouletteService.Controllers;
 [ApiController]
 public class RouletteController : ControllerBase
 {
-	[HttpGet("records/{playerCode}/{promotionId}", Name = "QueryRouletteRecordsWithPlayerCodeAndPromotionId")]
+	[HttpGet("records/{playerCode}/{promotionId}", Name = "QueryRouletteRecordsByPlayerCodeAndPromotionId")]
 	public async IAsyncEnumerable<RouletteRecordView> QueryRouletteRecordsAsync(
 		[FromServices] IDepositAccumulateRouletteWorkerClient client,
 		string playerCode,
 		Guid promotionId)
 	{
-		var records = client
-			.QueryRouletteRecordsAsync(promotionId, playerCode, HttpContext.RequestAborted);
+		var records = client.QueryRouletteRecordsAsync(
+			promotionId,
+			playerCode,
+			HttpContext.RequestAborted);
 
 		await foreach (var info in records)
 			yield return new RouletteRecordView
@@ -28,7 +30,7 @@ public class RouletteController : ControllerBase
 			};
 	}
 
-	[HttpGet("records/{brandId}", Name = "QueryRouletteRecordsWithBrandId")]
+	[HttpGet("records/{brandId}", Name = "QueryRouletteRecordsByBrandId")]
 	public async IAsyncEnumerable<RouletteRecordView> QueryRouletteRecordsAsync(
 		[FromServices] IDepositAccumulateRouletteWorkerClient client,
 		Guid brandId,
@@ -66,13 +68,14 @@ public class RouletteController : ControllerBase
 			};
 	}
 
-	[HttpGet("record/{brandId}/{recordId}", Name = "GetRouletteRecordWithBrandId")]
+	[HttpGet("record/{brandId}/{recordId}", Name = "GetRouletteRecord")]
 	public async ValueTask<RouletteRecordView?> GetRouletteRecordAsync(
 		[FromServices] IDepositAccumulateRouletteWorkerClient client,
 		Guid brandId,
 		Guid recordId)
 	{
-		var recordInfo = await client.GetRouletteRecordAsync(brandId, recordId, HttpContext.RequestAborted)
+		var recordInfo = await client
+			.GetRouletteRecordAsync(brandId, recordId, HttpContext.RequestAborted)
 			.ConfigureAwait(false);
 
 		return recordInfo is null
