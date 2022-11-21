@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using NSubstitute;
+﻿using NSubstitute;
 using Tgs.Promotion.DepositAccumulateRoulette.Worker.ApplicationServices;
 
 namespace Tgs.Promotion.DepositAccumulateRoulette.Worker.Core.UnitTests;
@@ -7,7 +6,7 @@ namespace Tgs.Promotion.DepositAccumulateRoulette.Worker.Core.UnitTests;
 internal class RouletteRecordsQueryTests
 {
 	[Test]
-	public async Task Query_Roulette_Records_With_PlayerCode_And_PromotionId()
+	public async Task Query_Roulette_Record_List_By_PlayerCode_And_PromotionId()
 	{
 		var fakeTgsRepository = Substitute.For<ITgsRepository>();
 
@@ -25,7 +24,7 @@ internal class RouletteRecordsQueryTests
 	}
 
 	[Test]
-	public async Task QueryRoulette_Records_With_Conditions()
+	public async Task Query_Roulette_Record_List()
 	{
 		var fakeTgsRepository = Substitute.For<ITgsRepository>();
 
@@ -52,7 +51,7 @@ internal class RouletteRecordsQueryTests
 	}
 
 	[Test]
-	public async Task Get_Roulette_Record_With_BrandId_And_RecordId()
+	public async Task Get_Roulette_Record_Info()
 	{
 		var fakeTgsRepository = Substitute.For<ITgsRepository>();
 

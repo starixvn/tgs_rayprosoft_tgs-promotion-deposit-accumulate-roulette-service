@@ -2,7 +2,6 @@
 
 using Hangfire;
 using Microsoft.Extensions.DependencyInjection;
-using Npgsql.Replication.PgOutput.Messages;
 using NSubstitute;
 using RouletteSvc::Tgs.Promotion.DepositAccumulateRouletteService.MessageQueue;
 using Tgs.DepositAccumulateRoulette.Clients;
@@ -652,29 +651,29 @@ internal class DepositAccumulateRouletteTests
 	}
 
 	[Test]
-	public async Task Query_Roulette_Records_With_PlayerCode_And_PromotionId()
+	public async Task Query_Roulette_Records_By_PlayerCode_And_PromotionId()
 	{
 		var promotionId = Guid.NewGuid();
 		var playerCode = "player1";
 
 		var rouletteRecords = new[]
 		{
-			new RouletteRecord(
-				Guid.NewGuid(),
+			new RouletteRecordInfo(
+				Guid.Parse("D9153E13-0A5F-4F41-956F-BD736C1F98DF"),
 				playerCode,
 				promotionId,
 				DateOnly.Parse("2022-10-26"),
 				1,
 				DateTimeOffset.Parse("2022-10-26T08:39:00+00:00")),
-			new RouletteRecord(
-				Guid.NewGuid(),
+			new RouletteRecordInfo(
+				Guid.Parse("FC9FCA02-0962-4CAC-BF51-367BF52CC1A5"),
 				playerCode,
 				promotionId,
 				DateOnly.Parse("2022-10-27"),
 				0,
 				DateTimeOffset.Parse("2022-10-27T01:39:00+00:00")),
-			new RouletteRecord(
-				Guid.NewGuid(),
+			new RouletteRecordInfo(
+				Guid.Parse("B72D901C-1FEE-4443-A1B6-F2D2D07FD243"),
 				playerCode,
 				promotionId,
 				DateOnly.Parse("2022-10-27"),
@@ -694,31 +693,47 @@ internal class DepositAccumulateRouletteTests
 
 		var sut = new Client.DepositAccumulateRouletteServiceClient(httpClient);
 
-		var recordInfos = rouletteRecords
-			.Select(r => new RouletteRecordInfo(
-				r.RouletteId,
-				r.PlayerCode,
-				r.PromotionId,
-				r.EventDate,
-				r.ItemIndex,
-				r.CreatedOn));
-
 		_ = fakeWorkerClient.QueryRouletteRecordsAsync(
 				Arg.Is(promotionId),
 				Arg.Is(playerCode),
 				Arg.Any<CancellationToken>())
-			.Returns(recordInfos.ToAsyncEnumerable());
+			.Returns(rouletteRecords.ToAsyncEnumerable());
+
+		var expected = new[]
+		{
+			new RouletteRecord(
+				Guid.Parse("D9153E13-0A5F-4F41-956F-BD736C1F98DF"),
+				playerCode,
+				promotionId,
+				DateOnly.Parse("2022-10-26"),
+				1,
+				DateTimeOffset.Parse("2022-10-26T08:39:00+00:00")),
+			new RouletteRecord(
+				Guid.Parse("FC9FCA02-0962-4CAC-BF51-367BF52CC1A5"),
+				playerCode,
+				promotionId,
+				DateOnly.Parse("2022-10-27"),
+				0,
+				DateTimeOffset.Parse("2022-10-27T01:39:00+00:00")),
+			new RouletteRecord(
+				Guid.Parse("B72D901C-1FEE-4443-A1B6-F2D2D07FD243"),
+				playerCode,
+				promotionId,
+				DateOnly.Parse("2022-10-27"),
+				3,
+				DateTimeOffset.Parse("2022-10-27T08:39:00+00:00"))
+		};
 
 		var actual = await sut.GetRouletteRecordsAsync(promotionId, playerCode)
 			.ToArrayAsync()
 			.ConfigureAwait(false);
 
 		Assert.IsNotNull(actual);
-		CollectionAssert.AreEqual(rouletteRecords, actual);
+		CollectionAssert.AreEqual(expected, actual);
 	}
 
 	[Test]
-	public async Task Query_Roulette_Records_With_Conditions()
+	public async Task Query_Roulette_Records()
 	{
 		var brandId = Guid.NewGuid();
 		var promotionId = Guid.NewGuid();
@@ -726,22 +741,22 @@ internal class DepositAccumulateRouletteTests
 
 		var rouletteRecords = new[]
 		{
-			new RouletteRecord(
-				Guid.NewGuid(),
+			new RouletteRecordInfo(
+				Guid.Parse("D9153E13-0A5F-4F41-956F-BD736C1F98DF"),
 				playerCode,
 				promotionId,
 				DateOnly.Parse("2022-10-26"),
 				1,
 				DateTimeOffset.Parse("2022-10-26T08:39:00+00:00")),
-			new RouletteRecord(
-				Guid.NewGuid(),
+			new RouletteRecordInfo(
+				Guid.Parse("2875F264-C843-4B06-A68C-1CC2DBD2225C"),
 				playerCode,
 				promotionId,
 				DateOnly.Parse("2022-10-27"),
 				0,
 				DateTimeOffset.Parse("2022-10-27T01:39:00+00:00")),
-			new RouletteRecord(
-				Guid.NewGuid(),
+			new RouletteRecordInfo(
+				Guid.Parse("DB0BAE5F-F938-42C9-88D0-F52F214EE390"),
 				playerCode,
 				promotionId,
 				DateOnly.Parse("2022-10-27"),
@@ -760,15 +775,6 @@ internal class DepositAccumulateRouletteTests
 		var httpClient = web.CreateClient();
 
 		var sut = new Client.DepositAccumulateRouletteServiceClient(httpClient);
-
-		var recordInfos = rouletteRecords
-			.Select(r => new RouletteRecordInfo(
-				r.RouletteId,
-				r.PlayerCode,
-				r.PromotionId,
-				r.EventDate,
-				r.ItemIndex,
-				r.CreatedOn));
 
 		var query = new RouletteRecordQuery
 		{
@@ -787,7 +793,32 @@ internal class DepositAccumulateRouletteTests
 					   && condition.TimeRange.End == query.EndTime),
 				Arg.Any<Paging>(),
 				Arg.Any<CancellationToken>())
-			.Returns(recordInfos.ToAsyncEnumerable());
+			.Returns(rouletteRecords.ToAsyncEnumerable());
+
+		var expected = new[]
+		{
+			new RouletteRecord(
+				Guid.Parse("D9153E13-0A5F-4F41-956F-BD736C1F98DF"),
+				playerCode,
+				promotionId,
+				DateOnly.Parse("2022-10-26"),
+				1,
+				DateTimeOffset.Parse("2022-10-26T08:39:00+00:00")),
+			new RouletteRecord(
+				Guid.Parse("2875F264-C843-4B06-A68C-1CC2DBD2225C"),
+				playerCode,
+				promotionId,
+				DateOnly.Parse("2022-10-27"),
+				0,
+				DateTimeOffset.Parse("2022-10-27T01:39:00+00:00")),
+			new RouletteRecord(
+				Guid.Parse("DB0BAE5F-F938-42C9-88D0-F52F214EE390"),
+				playerCode,
+				promotionId,
+				DateOnly.Parse("2022-10-27"),
+				3,
+				DateTimeOffset.Parse("2022-10-27T08:39:00+00:00"))
+		};
 
 		var actual = await sut
 			.GetRouletteRecordsAsync(brandId, query)
@@ -795,19 +826,20 @@ internal class DepositAccumulateRouletteTests
 			.ConfigureAwait(false);
 
 		Assert.IsNotNull(actual);
-		CollectionAssert.AreEqual(rouletteRecords, actual);
+		CollectionAssert.AreEqual(expected, actual);
 	}
 
 	[Test]
-	public async Task Get_Roulette_Records_With_RecordId()
+	public async Task Get_Roulette_Record()
 	{
-		var brandId = Guid.NewGuid();
 		var recordId = Guid.NewGuid();
+		var brandId = Guid.NewGuid();
+		var promotionId = Guid.NewGuid();
 
-		var expected = new RouletteRecord(
+		var recordInfo = new RouletteRecordInfo(
 			recordId,
 			"player1",
-			Guid.NewGuid(),
+			promotionId,
 			DateOnly.Parse("2022-10-26"),
 			1,
 			DateTimeOffset.Parse("2022-10-26T08:39:00+00:00"));
@@ -828,13 +860,15 @@ internal class DepositAccumulateRouletteTests
 				Arg.Is(brandId),
 				Arg.Is(recordId),
 				Arg.Any<CancellationToken>())
-			.Returns(new RouletteRecordInfo(
-				recordId,
-				expected.PlayerCode,
-				expected.PromotionId,
-				expected.EventDate,
-				expected.ItemIndex,
-				expected.CreatedOn));
+			.Returns(recordInfo);
+
+		var expected = new RouletteRecord(
+			recordId,
+			"player1",
+			promotionId,
+			DateOnly.Parse("2022-10-26"),
+			1,
+			DateTimeOffset.Parse("2022-10-26T08:39:00+00:00"));
 
 		var actual = await sut.GetRouletteRecordAsync(brandId, recordId)
 			.ConfigureAwait(false);
