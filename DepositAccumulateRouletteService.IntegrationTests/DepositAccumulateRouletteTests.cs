@@ -31,13 +31,13 @@ internal class DepositAccumulateRouletteTests
 	{
 		var fakeMessageSender = Substitute.For<IMessageSender>();
 		var fakePromotionServiceClient = Substitute.For<IPromotionServiceClient>();
-		var fakePlayerServiceClient = Substitute.For<IPlayerServiceClient>();
-		var fakeRedisConnectionManager = Substitute.For<IRedisConnectionManager>();
 
+		var fakeRedisConnectionManager = Substitute.For<IRedisConnectionManager>();
 		var fakeTgsRepository = Substitute.For<ITgsRepository>();
 		var fakeStoreRepository = Substitute.For<IStoreRepository>();
 		var fakeSystemClock = Substitute.For<ISystemClock>();
 		var fakeRouletteServiceClient = Substitute.For<Worker.IDepositAccumulateRouletteServiceClient>();
+		var fakePlayerServiceClient = Substitute.For<IPlayerServiceClient>();
 		var fakeBackgroundJobClient = Substitute.For<IBackgroundJobClient>();
 
 		await using var web = new TestDepositAccumulateRouletteServiceApplication(builder => builder
@@ -45,13 +45,15 @@ internal class DepositAccumulateRouletteTests
 			{
 				_ = services
 					.AddSingleton(fakePromotionServiceClient)
-					.AddSingleton(fakeStoreRepository)
+					.AddSingleton(fakeRouletteServiceClient)
 					.AddSingleton(fakePlayerServiceClient)
+					.AddSingleton(fakeStoreRepository)
 					.AddSingleton(fakeTgsRepository)
 					.AddSingleton(fakeRedisConnectionManager)
 					.AddSingleton(fakeSystemClock)
-					.AddSingleton(fakeRouletteServiceClient)
-					.AddSingleton(fakeBackgroundJobClient);
+
+					.AddSingleton(fakeBackgroundJobClient)
+					;
 
 				_ = services
 					.AddSingleton<IShuffleService, ShuffleService>()
@@ -115,7 +117,10 @@ internal class DepositAccumulateRouletteTests
 			new(Guid.Parse("aadd13cf-e1ea-4a53-9426-46f44cb7dbd4"),"300PHP", 3M, 0.75M, 300M)
 		};
 
+		var settings = new DepositAccumulateRouletteSettings(depositItems, rouletteItems);
+
 		var now = DateTimeOffset.Now;
+		_ = fakeSystemClock.UtcNow.Returns(now);
 
 		var eventInfo = new DepositAccumulateRouletteEventInfo(
 			playerCode,
@@ -133,10 +138,6 @@ internal class DepositAccumulateRouletteTests
 			PromotionLimitAmount = null,
 			PromotionType = "DepositAccumulateRoulette"
 		};
-
-		var settings = new DepositAccumulateRouletteSettings(depositItems, rouletteItems);
-
-		_ = fakeSystemClock.UtcNow.Returns(now);
 
 		_ = fakeStoreRepository.GetDepositAccumulateRouletteEventInfosAsync(
 				Arg.Is(promotionId),
@@ -180,7 +181,10 @@ internal class DepositAccumulateRouletteTests
 		_ = fakePromotionServiceClient.GetPromotionRuleAsync<GetDepositAccumulateRoulettePromotionQueryService.PromotionRule>(
 				Arg.Is(promotionId),
 				Arg.Any<CancellationToken>())
-			.Returns(new GetDepositAccumulateRoulettePromotionQueryService.PromotionRule { CompaignDetail = settings });
+			.Returns(new GetDepositAccumulateRoulettePromotionQueryService.PromotionRule
+			{
+				CompaignDetail = settings
+			});
 
 		_ = fakeRouletteServiceClient.GetDepositAccumulateRoulettePromotionAsync(
 				Arg.Is(promotionId),
