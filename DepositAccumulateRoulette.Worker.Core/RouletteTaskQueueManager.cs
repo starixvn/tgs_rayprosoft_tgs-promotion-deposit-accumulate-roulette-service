@@ -8,7 +8,7 @@ internal class RouletteTaskQueueManager
 {
 	private readonly IServiceProvider _serviceProvider;
 
-	private readonly ConcurrentDictionary<string, RouletteTaskQueue> _queuePool = new();
+	private readonly ConcurrentDictionary<string, RouletteCommandQueue> _queuePool = new();
 	private readonly CancellationTokenSource _cancellationTokenSource = new();
 
 	public RouletteTaskQueueManager(
@@ -23,7 +23,7 @@ internal class RouletteTaskQueueManager
 
 		var queue = _queuePool.GetOrAdd(
 			key,
-			_ => ActivatorUtilities.CreateInstance<RouletteTaskQueue>(
+			_ => ActivatorUtilities.CreateInstance<RouletteCommandQueue>(
 				_serviceProvider,
 				request.PlayerCode,
 				request.PromotionId));
@@ -32,10 +32,10 @@ internal class RouletteTaskQueueManager
 			await queue.StartProcessAsync(_cancellationTokenSource.Token)
 				.ConfigureAwait(false);
 
-		var task = new RouletteTask(new TaskCompletionSource<RouletteResult>());
-		queue.Enqueue(task);
+		var command = new RouletteCommand(new TaskCompletionSource<RouletteResult>());
+		queue.Enqueue(command);
 
-		return await task.Promise.Task.ConfigureAwait(false);
+		return await command.Promise.Task.ConfigureAwait(false);
 	}
 
 	public void StopReceive()

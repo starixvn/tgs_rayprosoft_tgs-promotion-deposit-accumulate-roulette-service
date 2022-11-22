@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging.Abstractions;
 using NSubstitute;
 using Tgs.PlayerService.Client;
 using Tgs.Promotion.Clients;
@@ -94,24 +93,23 @@ internal class RouletteQueueTests
 
 		_ = fakeServiceCoordinator.GetAsync<PlayRouletteCommand, PlayRouletteResult?>(
 			Arg.Is<PlayRouletteCommand>(x =>
-				x.PlayerInfo == playerInfo
+				x.BrandId == playerInfo.BrandId
 				&& x.EventInfo == rouletteCountInfo
 				&& x.RouletteItems.Count() == rouletteItems.Length),
 			Arg.Any<CancellationToken>())
 			.Returns(playRouletteResult);
 
-		var queue = new RouletteTaskQueue(
+		var queue = new RouletteCommandQueue(
 			playerCode,
 			promotionId,
 			services.BuildServiceProvider(),
 			fakePlayerServiceClient,
 			fakeRouletteServiceClient,
-			fakeSystemClock,
-			NullLogger<RouletteTaskQueue>.Instance);
+			fakeSystemClock);
 
 		await queue.StartProcessAsync(CancellationToken.None);
 
-		var sut = new RouletteTask(new TaskCompletionSource<RouletteResult>());
+		var sut = new RouletteCommand(new TaskCompletionSource<RouletteResult>());
 		queue.Enqueue(sut);
 
 		var actual = await sut.Promise.Task.ConfigureAwait(false);
@@ -151,14 +149,13 @@ internal class RouletteQueueTests
 				Arg.Any<CancellationToken>())
 			.Returns((DepositAccumulateRoulettePromotion?)null);
 
-		var sut = new RouletteTaskQueue(
+		var sut = new RouletteCommandQueue(
 			playerCode,
 			promotionId,
 			services.BuildServiceProvider(),
 			fakePlayerServiceClient,
 			fakeRouletteServiceClient,
-			fakeSystemClock,
-			NullLogger<RouletteTaskQueue>.Instance);
+			fakeSystemClock);
 
 		_ = Assert.CatchAsync(async () => await sut.StartProcessAsync(CancellationToken.None));
 	}
@@ -184,14 +181,13 @@ internal class RouletteQueueTests
 				Arg.Any<CancellationToken>())
 			.Returns((PlayerInfo?)null);
 
-		var sut = new RouletteTaskQueue(
+		var sut = new RouletteCommandQueue(
 			playerCode,
 			promotionId,
 			services.BuildServiceProvider(),
 			fakePlayerServiceClient,
 			fakeRouletteServiceClient,
-			fakeSystemClock,
-			NullLogger<RouletteTaskQueue>.Instance);
+			fakeSystemClock);
 
 		_ = Assert.CatchAsync(async () => await sut.StartProcessAsync(CancellationToken.None));
 	}
@@ -272,24 +268,23 @@ internal class RouletteQueueTests
 
 		_ = fakeServiceCoordinator.GetAsync<PlayRouletteCommand, PlayRouletteResult?>(
 				Arg.Is<PlayRouletteCommand>(x =>
-					x.PlayerInfo == playerInfo
+					x.BrandId == playerInfo.BrandId
 					&& x.EventInfo == rouletteCountInfo
 					&& x.RouletteItems.Count() == rouletteItems.Length),
 				Arg.Any<CancellationToken>())
 			.Returns(new PlayRouletteResult(null, 0));
 
-		var queue = new RouletteTaskQueue(
+		var queue = new RouletteCommandQueue(
 			playerCode,
 			promotionId,
 			services.BuildServiceProvider(),
 			fakePlayerServiceClient,
 			fakeRouletteServiceClient,
-			fakeSystemClock,
-			NullLogger<RouletteTaskQueue>.Instance);
+			fakeSystemClock);
 
 		await queue.StartProcessAsync(CancellationToken.None);
 
-		var sut = new RouletteTask(new TaskCompletionSource<RouletteResult>());
+		var sut = new RouletteCommand(new TaskCompletionSource<RouletteResult>());
 		queue.Enqueue(sut);
 
 		var actual = await sut.Promise.Task.ConfigureAwait(false);
@@ -381,24 +376,23 @@ internal class RouletteQueueTests
 
 		_ = fakeServiceCoordinator.GetAsync<PlayRouletteCommand, PlayRouletteResult?>(
 			Arg.Is<PlayRouletteCommand>(x =>
-				x.PlayerInfo == playerInfo
+				x.BrandId == playerInfo.BrandId
 				&& x.EventInfo == rouletteCountInfo
 				&& x.RouletteItems.Count() == rouletteItems.Length),
 			Arg.Any<CancellationToken>())
 			.Returns(playRouletteResult);
 
-		var queue = new RouletteTaskQueue(
+		var queue = new RouletteCommandQueue(
 			playerCode,
 			promotionId,
 			services.BuildServiceProvider(),
 			fakePlayerServiceClient,
 			fakeRouletteServiceClient,
-			fakeSystemClock,
-			NullLogger<RouletteTaskQueue>.Instance);
+			fakeSystemClock);
 
 		await queue.StartProcessAsync(CancellationToken.None);
 
-		var sut = new RouletteTask(new TaskCompletionSource<RouletteResult>());
+		var sut = new RouletteCommand(new TaskCompletionSource<RouletteResult>());
 		queue.Enqueue(sut);
 
 		var enqueueCommand = new EnqueueDistributeBonusJobCommand(

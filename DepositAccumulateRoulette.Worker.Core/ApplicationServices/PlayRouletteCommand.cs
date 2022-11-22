@@ -1,9 +1,8 @@
-﻿using Tgs.PlayerService.Client;
-using Tgs.Promotion.DepositAccumulateRoulette.Common;
+﻿using Tgs.Promotion.DepositAccumulateRoulette.Common;
 
 namespace Tgs.Promotion.DepositAccumulateRoulette.Worker.ApplicationServices;
 
 internal record PlayRouletteCommand(
-	PlayerInfo PlayerInfo,
+	Guid BrandId,
 	RouletteEventCountInfo EventInfo,
 	IEnumerable<RouletteItem> RouletteItems);
