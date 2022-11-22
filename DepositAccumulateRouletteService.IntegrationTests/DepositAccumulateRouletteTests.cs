@@ -72,10 +72,10 @@ internal class DepositAccumulateRouletteTests
 						EnqueueDistributeBonusJobCommandService>();
 
 				_ = services
-					.AddSingleton<RouletteTaskQueueManager>()
+					.AddSingleton<RouletteCommandQueueManager>()
 					.AddSingleton(sp =>
 					{
-						var manager = sp.GetRequiredService<RouletteTaskQueueManager>();
+						var manager = sp.GetRequiredService<RouletteCommandQueueManager>();
 						var fakeRouletteHandleService = Substitute.For<IRouletteHandleService>();
 						_ = fakeRouletteHandleService.RequestAsync(
 								Arg.Any<RouletteTaskRequest>(),
@@ -86,7 +86,7 @@ internal class DepositAccumulateRouletteTests
 
 								return manager
 									.RequestAsync(
-										new RouletteTaskQueueRequest(
+										new RouletteCommandRequest(
 											request.PromotionId,
 											request.PlayerCode))
 									.Result;
@@ -258,10 +258,10 @@ internal class DepositAccumulateRouletteTests
 						EnqueueDistributeBonusJobCommandService>();
 
 				_ = services
-					.AddSingleton<RouletteTaskQueueManager>()
+					.AddSingleton<RouletteCommandQueueManager>()
 					.AddSingleton(sp =>
 					{
-						var manager = sp.GetRequiredService<RouletteTaskQueueManager>();
+						var manager = sp.GetRequiredService<RouletteCommandQueueManager>();
 						var fakeRouletteHandleService = Substitute.For<IRouletteHandleService>();
 						_ = fakeRouletteHandleService.RequestAsync(
 								Arg.Any<RouletteTaskRequest>(),
@@ -272,7 +272,7 @@ internal class DepositAccumulateRouletteTests
 
 								return manager
 									.RequestAsync(
-										new RouletteTaskQueueRequest(
+										new RouletteCommandRequest(
 											request.PromotionId,
 											request.PlayerCode))
 									.Result;
@@ -490,10 +490,10 @@ internal class DepositAccumulateRouletteTests
 						EnqueueDistributeBonusJobCommandService>();
 
 				_ = services
-					.AddSingleton<RouletteTaskQueueManager>()
+					.AddSingleton<RouletteCommandQueueManager>()
 					.AddSingleton(sp =>
 					{
-						var manager = sp.GetRequiredService<RouletteTaskQueueManager>();
+						var manager = sp.GetRequiredService<RouletteCommandQueueManager>();
 						var fakeRouletteHandleService = Substitute.For<IRouletteHandleService>();
 						_ = fakeRouletteHandleService.RequestAsync(
 								Arg.Any<RouletteTaskRequest>(),
@@ -504,7 +504,7 @@ internal class DepositAccumulateRouletteTests
 
 								return manager
 									.RequestAsync(
-										new RouletteTaskQueueRequest(
+										new RouletteCommandRequest(
 											request.PromotionId,
 											request.PlayerCode))
 									.Result;
