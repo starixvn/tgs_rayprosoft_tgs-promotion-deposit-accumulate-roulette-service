@@ -1,7 +1,5 @@
 ﻿using System.Collections.Concurrent;
-using Hangfire;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Tgs.Promotion.DepositAccumulateRoulette.Common;
 
 namespace Tgs.Promotion.DepositAccumulateRoulette.Worker;
@@ -9,39 +7,35 @@ namespace Tgs.Promotion.DepositAccumulateRoulette.Worker;
 internal class RouletteTaskQueueManager
 {
 	private readonly IServiceProvider _serviceProvider;
-	private readonly ISystemClock _systemClock;
 
 	private readonly ConcurrentDictionary<string, RouletteTaskQueue> _queuePool = new();
 	private readonly CancellationTokenSource _cancellationTokenSource = new();
 
 	public RouletteTaskQueueManager(
-		IServiceProvider serviceProvider,
-		ISystemClock systemClock)
+		IServiceProvider serviceProvider)
 	{
 		_serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
-		_systemClock = systemClock ?? throw new ArgumentNullException(nameof(systemClock));
 	}
 
-	public Task<RouletteResult> RequestAsync(RouletteTaskQueueRequest request)
+	public async Task<RouletteResult> RequestAsync(RouletteTaskQueueRequest request)
 	{
 		var key = $"{request.PlayerCode}:{request.PromotionId}";
 
 		var queue = _queuePool.GetOrAdd(
 			key,
-			_ => new RouletteTaskQueue(
-				request.PlayerCode,
-				request.PromotionId,
+			_ => ActivatorUtilities.CreateInstance<RouletteTaskQueue>(
 				_serviceProvider,
-				_systemClock,
-				_serviceProvider.GetRequiredService<ILogger<RouletteTaskQueue>>()));
+				request.PlayerCode,
+				request.PromotionId));
 
 		if (!queue.IsStartProcess)
-			queue.StartProcess(_cancellationTokenSource.Token);
+			await queue.StartProcessAsync(_cancellationTokenSource.Token)
+				.ConfigureAwait(false);
 
 		var task = new RouletteTask(new TaskCompletionSource<RouletteResult>());
 		queue.Enqueue(task);
 
-		return task.Promise.Task;
+		return await task.Promise.Task.ConfigureAwait(false);
 	}
 
 	public void StopReceive()

@@ -12,6 +12,9 @@ namespace Tgs.Promotion.DepositAccumulateRoulette.Worker;
 internal class RouletteTaskQueue : IDisposable
 {
 	private readonly IServiceProvider _serviceProvider;
+	private readonly IPlayerServiceClient _playerServiceClient;
+	private readonly IDepositAccumulateRouletteServiceClient _rouletteServiceClient;
+
 	private readonly ILogger<RouletteTaskQueue> _logger;
 	private readonly BlockingCollection<RouletteTask> _rouletteTasks = new();
 
@@ -38,6 +41,8 @@ internal class RouletteTaskQueue : IDisposable
 		string playerCode,
 		Guid promotionId,
 		IServiceProvider serviceProvider,
+		IPlayerServiceClient playerServiceClient,
+		IDepositAccumulateRouletteServiceClient rouletteServiceClient,
 		ISystemClock systemClock,
 		ILogger<RouletteTaskQueue> logger)
 	{
@@ -45,6 +50,8 @@ internal class RouletteTaskQueue : IDisposable
 		PromotionId = promotionId;
 
 		_serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
+		_playerServiceClient = playerServiceClient ?? throw new ArgumentNullException(nameof(playerServiceClient));
+		_rouletteServiceClient = rouletteServiceClient ?? throw new ArgumentNullException(nameof(rouletteServiceClient));
 		_logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
 		if (systemClock is null)
@@ -56,12 +63,22 @@ internal class RouletteTaskQueue : IDisposable
 	public void Enqueue(RouletteTask task)
 		=> _rouletteTasks.Add(task);
 
-	public void StartProcess(CancellationToken cancellationToken)
+	public async Task StartProcessAsync(CancellationToken cancellationToken)
 	{
 		if (IsStartProcess)
 			return;
 
-		IsStartProcess = true;
+		_player = await _playerServiceClient
+			.GetPlayerInfoAsync(PlayerCode, cancellationToken)
+			.ConfigureAwait(false)
+				  ?? throw new ArgumentNullException($"Player '{PlayerCode}' is not found");
+
+		_promotion = await _rouletteServiceClient
+			.GetDepositAccumulateRoulettePromotionAsync(
+				PromotionId,
+				cancellationToken)
+			.ConfigureAwait(false)
+					 ?? throw new ArgumentNullException($"Promotion '{PromotionId}' is not found");
 
 		_cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
 		_ = _cancellationTokenSource.Token.Register(() => _rouletteTasks.CompleteAdding());
@@ -76,6 +93,8 @@ internal class RouletteTaskQueue : IDisposable
 					.ConfigureAwait(false);
 			}
 		}, cancellationToken);
+
+		IsStartProcess = true;
 	}
 
 	public void StopProcess()
@@ -133,27 +152,6 @@ internal class RouletteTaskQueue : IDisposable
 			}
 
 			await using var scope = _serviceProvider.CreateAsyncScope();
-
-			if (_player is null)
-			{
-				var playerServiceClient = scope.ServiceProvider.GetRequiredService<IPlayerServiceClient>();
-				_player = await playerServiceClient
-					.GetPlayerInfoAsync(PlayerCode, cancellationToken)
-					.ConfigureAwait(false);
-			}
-
-			if (_promotion is null)
-			{
-				var rouletteServiceClient =
-					scope.ServiceProvider.GetRequiredService<IDepositAccumulateRouletteServiceClient>();
-
-				_promotion = await rouletteServiceClient
-					.GetDepositAccumulateRoulettePromotionAsync(
-						PromotionId,
-						cancellationToken)
-					.ConfigureAwait(false);
-			}
-
 			var serviceCoordinator = scope.ServiceProvider.GetRequiredService<IServiceCoordinator>();
 
 			var rouletteItems = _promotion!.CampaignDetail.RouletteItems.ToArray();
