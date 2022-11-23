@@ -55,7 +55,7 @@ internal class RouletteCommandQueue : IRouletteQueueStore, IDisposable
 		_today = DateOnly.FromDateTime(systemClock.UtcNow.ToOffset(TimeSpan.FromHours(8D)).DateTime);
 	}
 
-	public void Enqueue(RouletteCommand command)
+	public void Enqueue(IRouletteCommand command)
 		=> _rouletteCommands.Add(command);
 
 	public async Task StartProcessAsync(CancellationToken cancellationToken)
@@ -129,14 +129,15 @@ internal class RouletteCommandQueue : IRouletteQueueStore, IDisposable
 		GC.SuppressFinalize(this);
 	}
 
-	async ValueTask<RouletteEventCountInfo> IRouletteQueueStore.GetAvailableEventAsync(
-		IServiceCoordinator serviceCoordinator,
-		CancellationToken cancellationToken)
+	async ValueTask<RouletteEventCountInfo> IRouletteQueueStore.GetAvailableEventAsync(CancellationToken cancellationToken)
 	{
 		if (_useEvent is null || _useEvent.Date != _today && _useEvent.AvailableCount <= 0)
 		{
-			var eventInfo = await serviceCoordinator
-				.GetAsync<GetAvailableRouletteCountEventQuery, RouletteEventCountInfo?>(
+			var getService = _serviceProvider.GetRequiredService<
+				IGetService<GetAvailableRouletteCountEventQuery, RouletteEventCountInfo?>>();
+
+			var eventInfo = await getService
+				.GetAsync(
 					new GetAvailableRouletteCountEventQuery(PromotionId, PlayerCode),
 					cancellationToken)
 				.ConfigureAwait(false);
@@ -153,7 +154,7 @@ internal class RouletteCommandQueue : IRouletteQueueStore, IDisposable
 		return _useEvent;
 	}
 
-	ValueTask IRouletteQueueStore.UpdateEventUsedCountAsync(int usedCount)
+	ValueTask IRouletteQueueStore.UpdateEventUsedCountAsync(int usedCount, CancellationToken cancellationToken)
 	{
 		_useEvent = _useEvent! with { UsedCount = usedCount };
 

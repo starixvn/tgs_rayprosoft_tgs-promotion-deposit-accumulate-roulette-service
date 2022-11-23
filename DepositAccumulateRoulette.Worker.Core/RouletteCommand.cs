@@ -24,7 +24,7 @@ internal record RouletteCommand(
 
 			var serviceCoordinator = serviceProvider.GetRequiredService<IServiceCoordinator>();
 
-			var useEvent = await store.GetAvailableEventAsync(serviceCoordinator, cancellationToken)
+			var useEvent = await store.GetAvailableEventAsync(cancellationToken)
 					.ConfigureAwait(false);
 
 			if (useEvent.DistributeCount == 0 || useEvent.AvailableCount <= 0)
@@ -46,7 +46,7 @@ internal record RouletteCommand(
 				return;
 			}
 
-			await store.UpdateEventUsedCountAsync(playRouletteResult.UsedCount)
+			await store.UpdateEventUsedCountAsync(playRouletteResult.UsedCount, cancellationToken)
 				.ConfigureAwait(false);
 
 			await serviceCoordinator.ExecuteAsync(

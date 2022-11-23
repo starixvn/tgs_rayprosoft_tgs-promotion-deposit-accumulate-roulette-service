@@ -1,5 +1,4 @@
 ﻿using Tgs.Promotion.DepositAccumulateRoulette.Common;
-using Tgs.ServiceUtility;
 
 namespace Tgs.Promotion.DepositAccumulateRoulette.Worker;
 
@@ -13,9 +12,7 @@ internal interface IRouletteQueueStore
 
 	IEnumerable<RouletteItem> RouletteItems { get; }
 
-	ValueTask<RouletteEventCountInfo> GetAvailableEventAsync(
-		IServiceCoordinator serviceCoordinator,
-		CancellationToken cancellationToken = default);
+	ValueTask<RouletteEventCountInfo> GetAvailableEventAsync(CancellationToken cancellationToken = default);
 
-	ValueTask UpdateEventUsedCountAsync(int usedCount);
+	ValueTask UpdateEventUsedCountAsync(int usedCount, CancellationToken cancellationToken = default);
 }

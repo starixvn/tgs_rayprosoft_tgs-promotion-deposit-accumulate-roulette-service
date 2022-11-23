@@ -2,11 +2,8 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using NSubstitute;
-using Tgs.PlayerService.Client;
-using Tgs.Promotion.Clients;
 using Tgs.Promotion.DepositAccumulateRoulette.Common;
 using Tgs.Promotion.DepositAccumulateRoulette.Worker.ApplicationServices;
-using Tgs.Promotion.DepositAccumulateRoulette.Worker.Clients;
 using Tgs.ServiceUtility;
 
 namespace Tgs.Promotion.DepositAccumulateRoulette.Worker.Core.UnitTests;
@@ -48,9 +45,7 @@ internal class RouletteCommandTests
 
 		_ = fakeRouletteQueueStore.BrandId.Returns(brandId);
 
-		_ = fakeRouletteQueueStore.GetAvailableEventAsync(
-				Arg.Is(fakeServiceCoordinator),
-				Arg.Any<CancellationToken>())
+		_ = fakeRouletteQueueStore.GetAvailableEventAsync(Arg.Any<CancellationToken>())
 			.Returns(rouletteCountInfo);
 
 		_ = fakeServiceCoordinator.GetAsync<PlayRouletteCommand, PlayRouletteResult>(
@@ -113,9 +108,7 @@ internal class RouletteCommandTests
 
 		_ = fakeRouletteQueueStore.BrandId.Returns(brandId);
 
-		_ = fakeRouletteQueueStore.GetAvailableEventAsync(
-				Arg.Is(fakeServiceCoordinator),
-				Arg.Any<CancellationToken>())
+		_ = fakeRouletteQueueStore.GetAvailableEventAsync(Arg.Any<CancellationToken>())
 			.Returns(rouletteCountInfo);
 
 		_ = fakeServiceCoordinator.GetAsync<PlayRouletteCommand, PlayRouletteResult>(
@@ -171,9 +164,7 @@ internal class RouletteCommandTests
 
 		_ = fakeRouletteQueueStore.BrandId.Returns(brandId);
 
-		_ = fakeRouletteQueueStore.GetAvailableEventAsync(
-				Arg.Is(fakeServiceCoordinator),
-				Arg.Any<CancellationToken>())
+		_ = fakeRouletteQueueStore.GetAvailableEventAsync(Arg.Any<CancellationToken>())
 			.Returns(rouletteCountInfo);
 
 		_ = fakeServiceCoordinator.GetAsync<PlayRouletteCommand, PlayRouletteResult?>(

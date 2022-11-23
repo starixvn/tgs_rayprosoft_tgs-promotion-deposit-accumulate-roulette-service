@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 using Tgs.PlayerService.Client;
-using Tgs.Promotion.Clients;
 using Tgs.Promotion.DepositAccumulateRoulette.Common;
 using Tgs.Promotion.DepositAccumulateRoulette.Worker.ApplicationServices;
 using Tgs.Promotion.DepositAccumulateRoulette.Worker.Clients;
@@ -20,8 +19,12 @@ internal class RouletteQueueTests
 		var fakeSystemClock = Substitute.For<ISystemClock>();
 		var fakeServiceCoordinator = Substitute.For<IServiceCoordinator>();
 
+		var fakeEventGetService =
+			Substitute.For<IGetService<GetAvailableRouletteCountEventQuery, RouletteEventCountInfo?>>();
+
 		var services = new ServiceCollection();
 		_ = services
+			.AddSingleton(fakeEventGetService)
 			.AddSingleton(fakeServiceCoordinator);
 
 		var depositItems = new DepositAccumulateItem[]
@@ -70,18 +73,14 @@ internal class RouletteQueueTests
 			fakeRouletteServiceClient,
 			fakeSystemClock);
 
-		var command = new RouletteCommand(new TaskCompletionSource<RouletteResult>());
+		var command = new StubRouletteCommand();
 
 		await sut.StartProcessAsync(CancellationToken.None);
 		sut.Enqueue(command);
 
-		_ = await command.Promise.Task.ConfigureAwait(false);
+		await command.Promise.Task;
 
-		_ = fakeServiceCoordinator
-			.Received(1)
-			.GetAsync<GetAvailableRouletteCountEventQuery, RouletteEventCountInfo?>(
-				Arg.Any<GetAvailableRouletteCountEventQuery>(),
-				Arg.Any<CancellationToken>());
+		Assert.IsTrue(command.IsExecuted);
 	}
 
 	[Test]
