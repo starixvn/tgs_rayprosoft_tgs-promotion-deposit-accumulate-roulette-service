@@ -1,47 +1,41 @@
 ﻿using System.Collections.Concurrent;
-using Hangfire;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Tgs.Promotion.DepositAccumulateRoulette.Common;
 
 namespace Tgs.Promotion.DepositAccumulateRoulette.Worker;
 
-internal class RouletteTaskQueueManager
+internal class RouletteCommandQueueManager
 {
 	private readonly IServiceProvider _serviceProvider;
-	private readonly ISystemClock _systemClock;
 
-	private readonly ConcurrentDictionary<string, RouletteTaskQueue> _queuePool = new();
+	private readonly ConcurrentDictionary<string, RouletteCommandQueue> _queuePool = new();
 	private readonly CancellationTokenSource _cancellationTokenSource = new();
 
-	public RouletteTaskQueueManager(
-		IServiceProvider serviceProvider,
-		ISystemClock systemClock)
+	public RouletteCommandQueueManager(
+		IServiceProvider serviceProvider)
 	{
 		_serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
-		_systemClock = systemClock ?? throw new ArgumentNullException(nameof(systemClock));
 	}
 
-	public Task<RouletteResult> RequestAsync(RouletteTaskQueueRequest request)
+	public async Task<RouletteResult> RequestAsync(RouletteCommandRequest request)
 	{
 		var key = $"{request.PlayerCode}:{request.PromotionId}";
 
 		var queue = _queuePool.GetOrAdd(
 			key,
-			_ => new RouletteTaskQueue(
-				request.PlayerCode,
-				request.PromotionId,
+			_ => ActivatorUtilities.CreateInstance<RouletteCommandQueue>(
 				_serviceProvider,
-				_systemClock,
-				_serviceProvider.GetRequiredService<ILogger<RouletteTaskQueue>>()));
+				request.PlayerCode,
+				request.PromotionId));
 
 		if (!queue.IsStartProcess)
-			queue.StartProcess(_cancellationTokenSource.Token);
+			await queue.StartProcessAsync(_cancellationTokenSource.Token)
+				.ConfigureAwait(false);
 
-		var task = new RouletteTask(new TaskCompletionSource<RouletteResult>());
-		queue.Enqueue(task);
+		var command = new RouletteCommand(new TaskCompletionSource<RouletteResult>());
+		queue.Enqueue(command);
 
-		return task.Promise.Task;
+		return await command.Promise.Task.ConfigureAwait(false);
 	}
 
 	public void StopReceive()

@@ -44,7 +44,7 @@ internal class PlayRouletteCommandService : IGetService<PlayRouletteCommand, Pla
 		var result = await ProcessRouletteResultAsync(
 			command.EventInfo,
 			rouletteItems,
-			command.PlayerInfo.BrandId,
+			command.BrandId,
 			itemIndex,
 			usedCount,
 			cancellationToken).ConfigureAwait(false);

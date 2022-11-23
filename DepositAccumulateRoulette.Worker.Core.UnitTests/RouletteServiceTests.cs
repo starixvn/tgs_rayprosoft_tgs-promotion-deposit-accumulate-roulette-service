@@ -26,21 +26,18 @@ internal class RouletteServiceTests
 			new(Guid.Parse("aadd13cf-e1ea-4a53-9426-46f44cb7dbd4"),"300PHP", 3M, 0.75M, 300M)
 		};
 
-		var playerInfo = new PlayerInfo
-		{
-			PlayerCode = "player1",
-			BrandId = Guid.NewGuid()
-		};
+		var playerCode = "player1";
+		var brandId = Guid.NewGuid();
 
 		var rouletteEventCountInfo = new RouletteEventCountInfo(
-			playerInfo.PlayerCode,
+			playerCode,
 			Guid.NewGuid(),
 			DateOnly.Parse("2022-08-11"),
 			4,
 			3);
 
 		var command = new PlayRouletteCommand(
-			playerInfo,
+			brandId,
 			rouletteEventCountInfo,
 			rouletteItems);
 
@@ -99,21 +96,18 @@ internal class RouletteServiceTests
 			new(Guid.Parse("aadd13cf-e1ea-4a53-9426-46f44cb7dbd4"),"300PHP", 3M, 0.75M, 300M)
 		};
 
-		var playerInfo = new PlayerInfo
-		{
-			PlayerCode = "player1",
-			BrandId = Guid.NewGuid()
-		};
+		var playerCode = "player1";
+		var brandId = Guid.NewGuid();
 
 		var rouletteEventCountInfo = new RouletteEventCountInfo(
-			playerInfo.PlayerCode,
+			playerCode,
 			Guid.NewGuid(),
 			DateOnly.Parse("2022-08-11"),
 			4,
 			0);
 
 		var command = new PlayRouletteCommand(
-			playerInfo,
+			brandId,
 			rouletteEventCountInfo,
 			rouletteItems);
 

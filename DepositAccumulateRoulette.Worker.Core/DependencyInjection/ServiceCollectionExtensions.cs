@@ -24,8 +24,8 @@ public static class ServiceCollectionExtensions
 
 			.AddSingleton<IShuffleService, ShuffleService>();
 
-		_ = services.AddSingleton<RouletteTaskQueueManager>()
-			.AddHostedService<RouletteTaskBackgroundService>();
+		_ = services.AddSingleton<RouletteCommandQueueManager>()
+			.AddHostedService<RouletteCommandBackgroundService>();
 
 		return services;
 	}

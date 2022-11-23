@@ -5,10 +5,10 @@ namespace Tgs.Promotion.DepositAccumulateRoulette.Worker.ApplicationServices;
 
 internal class RouletteTaskCommandService : IGetService<RouletteTaskCommand, RouletteResult>
 {
-	private readonly RouletteTaskQueueManager _queueManager;
+	private readonly RouletteCommandQueueManager _queueManager;
 
 	public RouletteTaskCommandService(
-		RouletteTaskQueueManager queueManager)
+		RouletteCommandQueueManager queueManager)
 	{
 		_queueManager = queueManager ?? throw new ArgumentNullException(nameof(queueManager));
 	}
@@ -17,7 +17,7 @@ internal class RouletteTaskCommandService : IGetService<RouletteTaskCommand, Rou
 		RouletteTaskCommand command,
 		CancellationToken cancellationToken = default)
 	{
-		var request = new RouletteTaskQueueRequest(command.PromotionId, command.PlayerCode);
+		var request = new RouletteCommandRequest(command.PromotionId, command.PlayerCode);
 
 		return await _queueManager.RequestAsync(request).ConfigureAwait(false);
 	}
