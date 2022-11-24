@@ -6,4 +6,9 @@ internal interface IDepositAccumulateRouletteEventService
 		Guid promotionId,
 		string playerCode,
 		CancellationToken cancellationToken = default);
+
+	ValueTask<RouletteEventCountInfo?> GetAvailableRouletteCountEventAsync(
+		Guid promotionId,
+		string playerCode,
+		CancellationToken cancellationToken = default);
 }

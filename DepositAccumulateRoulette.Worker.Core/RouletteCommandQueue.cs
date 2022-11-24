@@ -135,12 +135,11 @@ internal class RouletteCommandQueue : IRouletteQueueStore, IDisposable
 		{
 			await using var scope = _serviceProvider.CreateAsyncScope();
 
-			var getService = scope.ServiceProvider.GetRequiredService<
-				IGetService<GetAvailableRouletteCountEventQuery, RouletteEventCountInfo?>>();
+			var eventService = scope.ServiceProvider.GetRequiredService<IDepositAccumulateRouletteEventService>();
 
-			var eventInfo = await getService
-				.GetAsync(
-					new GetAvailableRouletteCountEventQuery(PromotionId, PlayerCode),
+			var eventInfo = await eventService.GetAvailableRouletteCountEventAsync(
+					PromotionId,
+					PlayerCode,
 					cancellationToken)
 				.ConfigureAwait(false);
 
