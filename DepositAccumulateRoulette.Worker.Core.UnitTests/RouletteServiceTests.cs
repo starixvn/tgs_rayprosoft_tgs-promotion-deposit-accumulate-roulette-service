@@ -158,7 +158,7 @@ internal class RouletteServiceTests
 				1200)
 		};
 
-		_ = fakeEventService.GetDepositAccumulateRouletteEventInfosAsync(
+		_ = fakeEventService.QueryDepositAccumulateRouletteEventInfosAsync(
 				Arg.Is(promotionId),
 				Arg.Is(playerCode),
 				Arg.Any<CancellationToken>())
@@ -208,7 +208,7 @@ internal class RouletteServiceTests
 			4,
 			3000);
 
-		_ = fakeEventService.GetDepositAccumulateRouletteEventInfosAsync(
+		_ = fakeEventService.QueryDepositAccumulateRouletteEventInfosAsync(
 				Arg.Is(promotionId),
 				Arg.Is(playerCode),
 				Arg.Any<CancellationToken>())
@@ -253,7 +253,7 @@ internal class RouletteServiceTests
 				3000)
 		};
 
-		_ = fakeEventService.GetDepositAccumulateRouletteEventInfosAsync(
+		_ = fakeEventService.QueryDepositAccumulateRouletteEventInfosAsync(
 				Arg.Is(promotionId),
 				Arg.Is(playerCode),
 				Arg.Any<CancellationToken>())

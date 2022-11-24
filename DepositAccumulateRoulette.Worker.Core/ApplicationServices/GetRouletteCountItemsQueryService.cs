@@ -35,7 +35,7 @@ internal class GetRouletteCountItemsQueryService
 		await foreach (var promotionId in promotionIds.WithCancellation(cancellationToken))
 		{
 			var infos = await _eventService
-				.GetDepositAccumulateRouletteEventInfosAsync(
+				.QueryDepositAccumulateRouletteEventInfosAsync(
 					promotionId,
 					query.PlayerCode,
 					cancellationToken)

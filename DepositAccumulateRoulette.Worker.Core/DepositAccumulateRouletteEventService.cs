@@ -18,7 +18,7 @@ internal class DepositAccumulateRouletteEventService : IDepositAccumulateRoulett
 		_storeRepository = storeRepository ?? throw new ArgumentNullException(nameof(storeRepository));
 	}
 
-	public async IAsyncEnumerable<DepositAccumulateRouletteEventInfo> GetDepositAccumulateRouletteEventInfosAsync(
+	public async IAsyncEnumerable<DepositAccumulateRouletteEventInfo> QueryDepositAccumulateRouletteEventInfosAsync(
 		Guid promotionId,
 		string playerCode,
 		[EnumeratorCancellation] CancellationToken cancellationToken = default)

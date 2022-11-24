@@ -20,7 +20,7 @@ internal class GetAvailableRouletteCountEventQueryService : IGetService<GetAvail
 		CancellationToken cancellationToken = default)
 	{
 		var eventInfos = await _eventService
-			.GetDepositAccumulateRouletteEventInfosAsync(
+			.QueryDepositAccumulateRouletteEventInfosAsync(
 				query.PromotionId,
 				query.PlayerCode,
 				cancellationToken)

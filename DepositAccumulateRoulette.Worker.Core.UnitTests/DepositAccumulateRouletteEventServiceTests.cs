@@ -38,7 +38,7 @@ internal class DepositAccumulateRouletteEventServiceTests
 		var sut = new DepositAccumulateRouletteEventService(fakeSystemClock, fakeTgsRepository, fakeStoreRepository);
 
 		var actual = await sut
-			.GetDepositAccumulateRouletteEventInfosAsync(promotionId, playerCode)
+			.QueryDepositAccumulateRouletteEventInfosAsync(promotionId, playerCode)
 			.ToArrayAsync().ConfigureAwait(false);
 
 		CollectionAssert.AreEqual(expected, actual);
@@ -93,7 +93,7 @@ internal class DepositAccumulateRouletteEventServiceTests
 		var sut = new DepositAccumulateRouletteEventService(fakeSystemClock, fakeTgsRepository, fakeStoreRepository);
 
 		var actual = await sut
-			.GetDepositAccumulateRouletteEventInfosAsync(promotionId, playerCode)
+			.QueryDepositAccumulateRouletteEventInfosAsync(promotionId, playerCode)
 			.ToArrayAsync().ConfigureAwait(false);
 
 		CollectionAssert.AreEqual(expected, actual);
@@ -154,7 +154,7 @@ internal class DepositAccumulateRouletteEventServiceTests
 		var sut = new DepositAccumulateRouletteEventService(fakeSystemClock, fakeTgsRepository, fakeStoreRepository);
 
 		var actual = await sut
-			.GetDepositAccumulateRouletteEventInfosAsync(promotionId, playerCode)
+			.QueryDepositAccumulateRouletteEventInfosAsync(promotionId, playerCode)
 			.ToArrayAsync().ConfigureAwait(false);
 
 		CollectionAssert.AreEqual(expected, actual);
@@ -214,7 +214,7 @@ internal class DepositAccumulateRouletteEventServiceTests
 		var sut = new DepositAccumulateRouletteEventService(fakeSystemClock, fakeTgsRepository, fakeStoreRepository);
 
 		var actual = await sut
-			.GetDepositAccumulateRouletteEventInfosAsync(promotionId, playerCode)
+			.QueryDepositAccumulateRouletteEventInfosAsync(promotionId, playerCode)
 			.ToArrayAsync().ConfigureAwait(false);
 
 		CollectionAssert.AreEqual(expected, actual);
