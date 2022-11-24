@@ -133,7 +133,9 @@ internal class RouletteCommandQueue : IRouletteQueueStore, IDisposable
 	{
 		if (_useEvent is null || _useEvent.Date != _today && _useEvent.AvailableCount <= 0)
 		{
-			var getService = _serviceProvider.GetRequiredService<
+			await using var scope = _serviceProvider.CreateAsyncScope();
+
+			var getService = scope.ServiceProvider.GetRequiredService<
 				IGetService<GetAvailableRouletteCountEventQuery, RouletteEventCountInfo?>>();
 
 			var eventInfo = await getService
