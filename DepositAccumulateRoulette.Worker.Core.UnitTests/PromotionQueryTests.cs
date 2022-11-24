@@ -62,13 +62,13 @@ internal class PromotionQueryTests
 			.Returns(new[] { firstPromotionId, secondPromotionId }.ToAsyncEnumerable());
 
 		_ = fakeEventService
-			.GetDepositAccumulateRouletteEventInfosAsync(
+			.QueryDepositAccumulateRouletteEventInfosAsync(
 				Arg.Is(firstPromotionId),
 				Arg.Is(playerInfo.PlayerCode),
 				Arg.Any<CancellationToken>())
 			.Returns(new[] { firstEventInfo }.ToAsyncEnumerable());
 
-		_ = fakeEventService.GetDepositAccumulateRouletteEventInfosAsync(
+		_ = fakeEventService.QueryDepositAccumulateRouletteEventInfosAsync(
 				Arg.Is(secondPromotionId),
 				Arg.Is(playerInfo.PlayerCode),
 				Arg.Any<CancellationToken>())
@@ -142,7 +142,7 @@ internal class PromotionQueryTests
 			.Returns(new[] { promotionId }.ToAsyncEnumerable());
 
 		_ = fakeEventService
-			.GetDepositAccumulateRouletteEventInfosAsync(
+			.QueryDepositAccumulateRouletteEventInfosAsync(
 				Arg.Is(promotionId),
 				Arg.Is(playerInfo.PlayerCode),
 				Arg.Any<CancellationToken>())

@@ -51,9 +51,7 @@ internal class DepositAccumulateRouletteTests
 					.AddSingleton(fakeTgsRepository)
 					.AddSingleton(fakeRedisConnectionManager)
 					.AddSingleton(fakeSystemClock)
-
-					.AddSingleton(fakeBackgroundJobClient)
-					;
+					.AddSingleton(fakeBackgroundJobClient);
 
 				_ = services
 					.AddSingleton<IShuffleService, ShuffleService>()
@@ -62,8 +60,6 @@ internal class DepositAccumulateRouletteTests
 					.AddSingleton<IDepositAccumulateRouletteEventService, DepositAccumulateRouletteEventService>();
 
 				_ = services
-					.AddSingleton<IGetService<GetAvailableRouletteCountEventQuery, RouletteEventCountInfo?>,
-						GetAvailableRouletteCountEventQueryService>()
 					.AddSingleton<ICommandService<DistributeBonusCommand>, DistributeBonusCommandService>()
 					.AddSingleton<IGetService<GetPromotionDistributePlanQuery, PromotionDistributePlanInfo>,
 						GetPromotionDistributePlanQueryService>()
@@ -248,8 +244,6 @@ internal class DepositAccumulateRouletteTests
 					.AddSingleton<IDepositAccumulateRouletteEventService, DepositAccumulateRouletteEventService>();
 
 				_ = services
-					.AddSingleton<IGetService<GetAvailableRouletteCountEventQuery, RouletteEventCountInfo?>,
-						GetAvailableRouletteCountEventQueryService>()
 					.AddSingleton<ICommandService<DistributeBonusCommand>, DistributeBonusCommandService>()
 					.AddSingleton<IGetService<GetPromotionDistributePlanQuery, PromotionDistributePlanInfo>,
 						GetPromotionDistributePlanQueryService>()
@@ -480,8 +474,6 @@ internal class DepositAccumulateRouletteTests
 					.AddSingleton<IDepositAccumulateRouletteEventService, DepositAccumulateRouletteEventService>();
 
 				_ = services
-					.AddSingleton<IGetService<GetAvailableRouletteCountEventQuery, RouletteEventCountInfo?>,
-						GetAvailableRouletteCountEventQueryService>()
 					.AddSingleton<ICommandService<DistributeBonusCommand>, DistributeBonusCommandService>()
 					.AddSingleton<IGetService<GetPromotionDistributePlanQuery, PromotionDistributePlanInfo>,
 						GetPromotionDistributePlanQueryService>()

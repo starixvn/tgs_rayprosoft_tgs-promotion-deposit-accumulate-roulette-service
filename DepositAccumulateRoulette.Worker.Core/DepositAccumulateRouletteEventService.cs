@@ -18,10 +18,44 @@ internal class DepositAccumulateRouletteEventService : IDepositAccumulateRoulett
 		_storeRepository = storeRepository ?? throw new ArgumentNullException(nameof(storeRepository));
 	}
 
-	public async IAsyncEnumerable<DepositAccumulateRouletteEventInfo> GetDepositAccumulateRouletteEventInfosAsync(
+	public IAsyncEnumerable<DepositAccumulateRouletteEventInfo> QueryDepositAccumulateRouletteEventInfosAsync(
 		Guid promotionId,
 		string playerCode,
-		[EnumeratorCancellation] CancellationToken cancellationToken = default)
+		CancellationToken cancellationToken = default)
+		=> QueryDepositAccumulateRouletteEventsAsync(promotionId, playerCode, cancellationToken);
+
+	public async ValueTask<RouletteEventCountInfo?> GetAvailableRouletteCountEventAsync(Guid promotionId, string playerCode,
+		CancellationToken cancellationToken = default)
+	{
+		var eventInfos = await QueryDepositAccumulateRouletteEventsAsync(
+				promotionId,
+				playerCode,
+				cancellationToken)
+			.OrderBy(evt => evt.Date)
+			.ToArrayAsync(cancellationToken);
+
+		foreach (var info in eventInfos)
+		{
+			var count = await _storeRepository
+				.GetRouletteUsedCountAsync(info.PromotionId, info.PlayerCode, info.Date)
+				.ConfigureAwait(false);
+
+			if (info.RouletteCount > count)
+				return new RouletteEventCountInfo(
+					info.PlayerCode,
+					info.PromotionId,
+					info.Date,
+					info.RouletteCount,
+					count.Value);
+		}
+
+		return null;
+	}
+
+	private async IAsyncEnumerable<DepositAccumulateRouletteEventInfo> QueryDepositAccumulateRouletteEventsAsync(
+		Guid promotionId,
+		string playerCode,
+		[EnumeratorCancellation] CancellationToken cancellationToken)
 	{
 		var now = _systemClock.UtcNow.ToOffset(TimeSpan.FromHours(8D));
 		var currentDate = DateOnly.FromDateTime(now.DateTime);
@@ -40,7 +74,7 @@ internal class DepositAccumulateRouletteEventService : IDepositAccumulateRoulett
 		}
 		else
 		{
-			var eventInfos = QueryDepositAccumulateRouletteEventInfosAsync(
+			var eventInfos = QueryDepositAccumulateRouletteEventsAsync(
 				promotionId,
 				playerCode,
 				queryDate,
@@ -53,7 +87,7 @@ internal class DepositAccumulateRouletteEventService : IDepositAccumulateRoulett
 		}
 	}
 
-	private async IAsyncEnumerable<DepositAccumulateRouletteEventInfo> QueryDepositAccumulateRouletteEventInfosAsync(
+	private async IAsyncEnumerable<DepositAccumulateRouletteEventInfo> QueryDepositAccumulateRouletteEventsAsync(
 		Guid promotionId,
 		string playerCode,
 		DateOnly queryDate,

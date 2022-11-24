@@ -19,8 +19,7 @@ internal class RouletteQueueTests
 		var fakeSystemClock = Substitute.For<ISystemClock>();
 		var fakeServiceCoordinator = Substitute.For<IServiceCoordinator>();
 
-		var fakeEventGetService =
-			Substitute.For<IGetService<GetAvailableRouletteCountEventQuery, RouletteEventCountInfo?>>();
+		var fakeEventGetService = Substitute.For<IDepositAccumulateRouletteEventService>();
 
 		var services = new ServiceCollection();
 		_ = services
