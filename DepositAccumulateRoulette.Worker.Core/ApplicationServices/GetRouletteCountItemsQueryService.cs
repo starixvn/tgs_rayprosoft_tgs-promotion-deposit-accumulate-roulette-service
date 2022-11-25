@@ -54,8 +54,7 @@ internal class GetRouletteCountItemsQueryService
 				totalCount += availableCount;
 			}
 
-			if (totalCount > 0)
-				yield return new RouletteCountItemInfo(promotionId, totalCount);
+			yield return new RouletteCountItemInfo(promotionId, totalCount);
 		}
 	}
 

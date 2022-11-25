@@ -1,6 +1,7 @@
 ﻿using ExpectedObjects;
 using NSubstitute;
 using Tgs.PlayerService.Client;
+using Tgs.Promotion.Clients;
 using Tgs.Promotion.DepositAccumulateRoulette.Worker.ApplicationServices;
 
 namespace Tgs.Promotion.DepositAccumulateRoulette.Worker.Core.UnitTests;
@@ -90,7 +91,7 @@ internal class PromotionQueryTests
 
 		var actual = await sut.QueryAsync(query).ToArrayAsync();
 
-		CollectionAssert.AreEqual(expected, actual);
+		CollectionAssert.AreEquivalent(expected, actual);
 	}
 
 	[Test]
@@ -174,11 +175,87 @@ internal class PromotionQueryTests
 	}
 
 	[Test]
+	public async Task Get_Player_Roulette_Promotions_When_The_Total_Count_Is_Zero()
+	{
+		var fakePlayerServiceClient = Substitute.For<IPlayerServiceClient>();
+		var fakeTgsRepository = Substitute.For<ITgsRepository>();
+		var fakeStoreRepository = Substitute.For<IStoreRepository>();
+		var fakeEventService = Substitute.For<IDepositAccumulateRouletteEventService>();
+		var fakePromotionService = Substitute.For<IPromotionService>();
+
+		var sut = new GetRouletteCountItemsQueryService(
+			fakePromotionService,
+			fakeEventService,
+			fakeTgsRepository,
+			fakeStoreRepository);
+
+		var playerInfo = new PlayerInfo
+		{
+			PlayerCode = "player1",
+			BrandId = Guid.NewGuid(),
+			UserName = "player1"
+		};
+
+		var promotionId = Guid.NewGuid();
+
+		var eventInfo = new DepositAccumulateRouletteEventInfo(
+			playerInfo.PlayerCode,
+			promotionId,
+			DateOnly.Parse("2022-09-01"),
+			5,
+			4800);
+
+		var usedCount = 5;
+
+		var expected = new[]
+		{
+			new RouletteCountItemInfo(promotionId, 0)
+		};
+
+		var query = new GetRouletteCountItemsQuery(playerInfo.PlayerCode);
+
+		_ = fakePlayerServiceClient.GetPlayerInfoAsync(Arg.Is(query.PlayerCode))
+			.Returns(playerInfo);
+
+		_ = fakePromotionService.GetPlayerAvailablePromotionIdsAsync(
+				Arg.Is(playerInfo.PlayerCode),
+				Arg.Any<CancellationToken>())
+			.Returns(new[] { promotionId }.ToAsyncEnumerable());
+
+		_ = fakeEventService
+			.QueryDepositAccumulateRouletteEventInfosAsync(
+				Arg.Is(promotionId),
+				Arg.Is(playerInfo.PlayerCode),
+				Arg.Any<CancellationToken>())
+			.Returns(new[] { eventInfo }.ToAsyncEnumerable());
+
+		_ = fakeStoreRepository
+			.GetRouletteUsedCountAsync(
+				Arg.Is(eventInfo.PromotionId),
+				Arg.Is(eventInfo.PlayerCode),
+				Arg.Is(eventInfo.Date))
+			.Returns((int?)null);
+
+		_ = fakeTgsRepository
+			.GetRouletteUsedCountAsync(
+				Arg.Is(eventInfo.PromotionId),
+				Arg.Is(eventInfo.PlayerCode),
+				Arg.Is(eventInfo.Date))
+			.Returns(usedCount);
+
+		var actual = await sut.QueryAsync(query).ToArrayAsync();
+
+		CollectionAssert.AreEquivalent(expected, actual);
+	}
+
+	[Test]
 	public async Task Get_Player_Available_Promotions_When_Promotion_Is_Stored()
 	{
 		var fakeSystemClock = Substitute.For<ISystemClock>();
 		var fakeTgsRepository = Substitute.For<ITgsRepository>();
 		var fakeStoreRepository = Substitute.For<IStoreRepository>();
+		var fakePromotionServiceClient = Substitute.For<IPromotionServiceClient>();
+		var fakePlayerServiceClient = Substitute.For<IPlayerServiceClient>();
 
 		var playerCode = "player1";
 
@@ -193,7 +270,9 @@ internal class PromotionQueryTests
 		var sut = new PromotionService(
 			fakeSystemClock,
 			fakeTgsRepository,
-			fakeStoreRepository);
+			fakeStoreRepository,
+			fakePromotionServiceClient,
+			fakePlayerServiceClient);
 
 		_ = fakeSystemClock.UtcNow.Returns(now.ToUniversalTime());
 
@@ -208,7 +287,7 @@ internal class PromotionQueryTests
 
 		_ = fakeTgsRepository
 			.DidNotReceive()
-			.GetPlayerAvailablePromotionIdsAsync(
+			.GetPlayerRouletteAvailablePromotionIdsAsync(
 				Arg.Is(playerCode),
 				Arg.Is(date));
 	}
@@ -219,42 +298,82 @@ internal class PromotionQueryTests
 		var fakeSystemClock = Substitute.For<ISystemClock>();
 		var fakeTgsRepository = Substitute.For<ITgsRepository>();
 		var fakeStoreRepository = Substitute.For<IStoreRepository>();
+		var fakePromotionServiceClient = Substitute.For<IPromotionServiceClient>();
+		var fakePlayerServiceClient = Substitute.For<IPlayerServiceClient>();
 
-		var playerCode = "player1";
+		var playerInfo = new PlayerInfo
+		{
+			PlayerCode = "player1",
+			BrandId = Guid.NewGuid()
+		};
 
 		var now = new DateTimeOffset(2022, 9, 1, 8, 0, 0, TimeSpan.FromHours(8));
 		var date = DateOnly.FromDateTime(now.DateTime);
 
-		var firstPromotionId = Guid.NewGuid();
-		var secondPromotionId = Guid.NewGuid();
+		var promotions = new[]
+		{
+			new PromotionView
+			{
+				Id = Guid.NewGuid(),
+				PromotionType = "DepositAccumulateRoulette"
+			},
+			new PromotionView
+			{
+				Id = Guid.NewGuid(),
+				PromotionType = "Roulette"
+			}
+		};
 
-		var expected = new[] { firstPromotionId, secondPromotionId };
+		var roulettePromotionIds = new[]
+		{
+			Guid.NewGuid(),
+			promotions[0].Id
+		};
 
 		var sut = new PromotionService(
 			fakeSystemClock,
 			fakeTgsRepository,
-			fakeStoreRepository);
+			fakeStoreRepository,
+			fakePromotionServiceClient,
+			fakePlayerServiceClient);
 
 		_ = fakeSystemClock.UtcNow.Returns(now.ToUniversalTime());
 
+		_ = fakePlayerServiceClient.GetPlayerInfoAsync(
+				Arg.Is(playerInfo.PlayerCode),
+				Arg.Any<CancellationToken>())
+			.Returns(playerInfo);
+
+		_ = fakePromotionServiceClient.ListPromotionsAsync(
+				Arg.Is(playerInfo.BrandId),
+				Arg.Is(playerInfo.PlayerCode),
+				Arg.Any<CancellationToken>())
+			.Returns(promotions.ToAsyncEnumerable());
+
 		_ = fakeStoreRepository.GetPlayerAvailablePromotionIdsAsync(
-				Arg.Is(playerCode),
+				Arg.Is(playerInfo.PlayerCode),
 				Arg.Is(date))
 			.Returns(Array.Empty<Guid>().ToAsyncEnumerable());
 
-		_ = fakeTgsRepository.GetPlayerAvailablePromotionIdsAsync(
-				Arg.Is(playerCode),
+		_ = fakeTgsRepository.GetPlayerRouletteAvailablePromotionIdsAsync(
+				Arg.Is(playerInfo.PlayerCode),
 				Arg.Is(date))
-			.Returns(expected.ToAsyncEnumerable());
+			.Returns(roulettePromotionIds.ToAsyncEnumerable());
 
-		var actual = await sut.GetPlayerAvailablePromotionIdsAsync(playerCode).ToArrayAsync();
+		var expected = new[]
+		{
+			promotions[0].Id,
+			roulettePromotionIds[0],
+		};
 
-		CollectionAssert.AreEqual(expected, actual);
+		var actual = await sut.GetPlayerAvailablePromotionIdsAsync(playerInfo.PlayerCode).ToArrayAsync();
+
+		CollectionAssert.AreEquivalent(expected, actual);
 
 		_ = fakeStoreRepository
 			.Received(1)
 			.SetPlayerAvailablePromotionIdsAsync(
-				Arg.Is(playerCode),
+				Arg.Is(playerInfo.PlayerCode),
 				Arg.Is(date),
 				Arg.Is<IEnumerable<Guid>>(x
 					=> expected.ToExpectedObject().Matches(x)),
