@@ -8,7 +8,7 @@ public interface ITgsRepository
 		DateOnly eventDate,
 		CancellationToken cancellationToken = default);
 
-	IAsyncEnumerable<Guid> GetPlayerAvailablePromotionIdsAsync(
+	IAsyncEnumerable<Guid> GetPlayerRouletteAvailablePromotionIdsAsync(
 		string playerCode,
 		DateOnly queryDate,
 		CancellationToken cancellationToken = default);

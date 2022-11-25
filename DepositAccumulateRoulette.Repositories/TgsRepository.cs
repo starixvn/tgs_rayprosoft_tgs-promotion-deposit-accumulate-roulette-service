@@ -43,7 +43,7 @@ internal class TgsRepository : ITgsRepository
 			yield return info;
 	}
 
-	public async IAsyncEnumerable<Guid> GetPlayerAvailablePromotionIdsAsync(
+	public async IAsyncEnumerable<Guid> GetPlayerRouletteAvailablePromotionIdsAsync(
 		string playerCode,
 		DateOnly queryDate,
 		[EnumeratorCancellation] CancellationToken cancellationToken = default)
