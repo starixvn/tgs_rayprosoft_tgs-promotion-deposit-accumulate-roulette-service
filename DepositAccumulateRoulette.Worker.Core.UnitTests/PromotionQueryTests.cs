@@ -1,6 +1,7 @@
 ﻿using ExpectedObjects;
 using NSubstitute;
 using Tgs.PlayerService.Client;
+using Tgs.Promotion.Clients;
 using Tgs.Promotion.DepositAccumulateRoulette.Worker.ApplicationServices;
 
 namespace Tgs.Promotion.DepositAccumulateRoulette.Worker.Core.UnitTests;
@@ -171,6 +172,80 @@ internal class PromotionQueryTests
 			Arg.Is(eventInfo.PlayerCode),
 			Arg.Is(eventInfo.Date),
 			Arg.Is(usedCount));
+	}
+
+	[Test]
+	public async Task Get_Player_Roulette_Promotions_When_The_Total_Count_Is_Zero()
+	{
+		var fakePlayerServiceClient = Substitute.For<IPlayerServiceClient>();
+		var fakeTgsRepository = Substitute.For<ITgsRepository>();
+		var fakeStoreRepository = Substitute.For<IStoreRepository>();
+		var fakeEventService = Substitute.For<IDepositAccumulateRouletteEventService>();
+		var fakePromotionService = Substitute.For<IPromotionService>();
+
+		var sut = new GetRouletteCountItemsQueryService(
+			fakePromotionService,
+			fakeEventService,
+			fakeTgsRepository,
+			fakeStoreRepository);
+
+		var playerInfo = new PlayerInfo
+		{
+			PlayerCode = "player1",
+			BrandId = Guid.NewGuid(),
+			UserName = "player1"
+		};
+
+		var promotionId = Guid.NewGuid();
+
+		var eventInfo = new DepositAccumulateRouletteEventInfo(
+			playerInfo.PlayerCode,
+			promotionId,
+			DateOnly.Parse("2022-09-01"),
+			5,
+			4800);
+
+		var usedCount = 5;
+
+		var expected = new[]
+		{
+			new RouletteCountItemInfo(promotionId, 0)
+		};
+
+		var query = new GetRouletteCountItemsQuery(playerInfo.PlayerCode);
+
+		_ = fakePlayerServiceClient.GetPlayerInfoAsync(Arg.Is(query.PlayerCode))
+			.Returns(playerInfo);
+
+		_ = fakePromotionService.GetPlayerAvailablePromotionIdsAsync(
+				Arg.Is(playerInfo.PlayerCode),
+				Arg.Any<CancellationToken>())
+			.Returns(new[] { promotionId }.ToAsyncEnumerable());
+
+		_ = fakeEventService
+			.QueryDepositAccumulateRouletteEventInfosAsync(
+				Arg.Is(promotionId),
+				Arg.Is(playerInfo.PlayerCode),
+				Arg.Any<CancellationToken>())
+			.Returns(new[] { eventInfo }.ToAsyncEnumerable());
+
+		_ = fakeStoreRepository
+			.GetRouletteUsedCountAsync(
+				Arg.Is(eventInfo.PromotionId),
+				Arg.Is(eventInfo.PlayerCode),
+				Arg.Is(eventInfo.Date))
+			.Returns((int?)null);
+
+		_ = fakeTgsRepository
+			.GetRouletteUsedCountAsync(
+				Arg.Is(eventInfo.PromotionId),
+				Arg.Is(eventInfo.PlayerCode),
+				Arg.Is(eventInfo.Date))
+			.Returns(usedCount);
+
+		var actual = await sut.QueryAsync(query).ToArrayAsync();
+
+		CollectionAssert.AreEquivalent(expected, actual);
 	}
 
 	[Test]
