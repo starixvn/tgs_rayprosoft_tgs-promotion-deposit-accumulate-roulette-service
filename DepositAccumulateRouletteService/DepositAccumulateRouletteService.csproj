@@ -37,8 +37,8 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
     <PackageReference Include="Tgs.Interceptors" Version="0.2.1" />
     <PackageReference Include="Tgs.MessageQueue.Nats" Version="2.1.6" />
-    <PackageReference Include="Tgs.PlayerService.Client" Version="0.0.25" />
-    <PackageReference Include="Tgs.Promotion.Client" Version="1.0.32" />
+    <PackageReference Include="Tgs.PlayerService.Client" Version="0.0.27" />
+    <PackageReference Include="Tgs.Promotion.Client" Version="1.0.37" />
   </ItemGroup>
 
   <ItemGroup>
