@@ -6,10 +6,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>Tgs.Promotion.DepositAccumulateRoulette.Worker</RootNamespace>
     <UserSecretsId>e7ef8328-a199-4f5b-8b54-571e18959fa0</UserSecretsId>
-    <GlobalNugetConfig>$(UserProfile)\AppData\Roaming\NuGet\NuGet.Config</GlobalNugetConfig>
-    <GlobalNugetConfig Condition="'$(UserProfile)'==''">$(HOME)/.nuget/NuGet/NuGet.Config</GlobalNugetConfig>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-    <DockerfileBuildArguments>--build-arg "BuildConfiguration=$(Configuration)" --secret id=nuget,src="$(GlobalNugetConfig)"</DockerfileBuildArguments>
+    <DockerfileBuildArguments>--build-arg "BuildConfiguration=$(Configuration)"</DockerfileBuildArguments>
     <DockerfileTag Condition="$(DockerfileTag) == ''">deposit-accumulate-roulette-worker</DockerfileTag>
   </PropertyGroup>
 
