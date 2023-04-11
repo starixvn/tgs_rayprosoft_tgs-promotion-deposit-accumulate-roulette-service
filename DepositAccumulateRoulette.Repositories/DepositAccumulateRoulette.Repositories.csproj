@@ -9,8 +9,8 @@
 
   <ItemGroup>
     <PackageReference Include="DateOnlyTimeOnly.AspNet" Version="1.0.3" />
-    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="6.0.7" />
-    <PackageReference Include="StackExchange.Redis" Version="2.6.70" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="7.0.3" />
+    <PackageReference Include="StackExchange.Redis" Version="2.6.104" />
     <PackageReference Include="Tgs.SerialNumberGenerator" Version="1.0.0" />
   </ItemGroup>
 

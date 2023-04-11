@@ -9,10 +9,10 @@
 
   <ItemGroup>
     <PackageReference Include="DateOnlyTimeOnly.AspNet" Version="1.0.3" />
-    <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="7.0.0" />
     <PackageReference Include="PagingUtility.AsyncEnumerable" Version="1.1.0" />
-    <PackageReference Include="Scrutor" Version="4.2.0" />
-    <PackageReference Include="StackExchange.Redis" Version="2.6.70" />
+    <PackageReference Include="Scrutor" Version="4.2.2" />
+    <PackageReference Include="StackExchange.Redis" Version="2.6.104" />
     <PackageReference Include="Tgs.MessageQueue" Version="2.1.0" />
     <PackageReference Include="Tgs.PlayerService.Client" Version="0.0.27" />
     <PackageReference Include="Tgs.Promotion.Client" Version="1.0.37" />
