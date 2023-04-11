@@ -6,7 +6,7 @@
     <Nullable>enable</Nullable>
     <RootNamespace>Tgs.DepositAccumulateRoulette.Clients</RootNamespace>
     <PackageId>Tgs.DepositAccumulateRoulette.Client</PackageId>
-    <Version>0.0.5</Version>
+    <Version>0.0.6</Version>
     <Authors>Raypro</Authors>
     <Product>Tgs.DepositAccumulateRouletteClient</Product>
     <PackageProjectUrl>https://gitlab.com/rayprosoft/tgs-promotion-deposit-accumulate-roulette-service</PackageProjectUrl>
@@ -15,7 +15,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="DateOnlyTimeOnly.AspNet" Version="1.0.3" />
+    <PackageReference Include="DateOnlyTimeOnly.AspNet" Version="2.1.1" />
     <PackageReference Include="Google.Protobuf" Version="3.22.1" />
     <PackageReference Include="Grpc.Tools" Version="2.53.0">
       <PrivateAssets>all</PrivateAssets>

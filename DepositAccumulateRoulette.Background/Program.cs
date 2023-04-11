@@ -33,10 +33,8 @@ builder.Logging
 builder.Services
 	.AddRouting(options => options.LowercaseUrls = true)
 	.AddControllers()
-	.AddMvcOptions(mvcOptions => mvcOptions
-		.UseDateOnlyTimeOnlyStringConverters()
-		.AddWebApiToolkitFilters())
-	.AddJsonOptions(jsonOptions => jsonOptions.UseDateOnlyTimeOnlyStringConverters());
+	.Services
+	.AddDateOnlyTimeOnlyStringConverters();
 
 builder.Services
 	.AddMessageQueue()
@@ -102,7 +100,7 @@ builder.Services.AddSwaggerGen(c =>
 		Title = "DepositAccumulateRoulette.BackgroundService",
 		Version = "v1"
 	});
-	c.UseDateOnlyTimeOnlyStringConverters();
+
 	c.ApplyWebApiToolkitSupport();
 });
 

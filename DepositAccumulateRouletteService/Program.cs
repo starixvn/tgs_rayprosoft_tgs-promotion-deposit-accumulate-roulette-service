@@ -79,12 +79,8 @@ builder.Services
 builder.Services
 	.AddRouting(options => options.LowercaseUrls = true)
 	.AddControllers()
-	.AddMvcOptions(mvcOptions =>
-	{
-		mvcOptions
-			.UseDateOnlyTimeOnlyStringConverters();
-	})
-	.AddJsonOptions(jsonOptions => jsonOptions.UseDateOnlyTimeOnlyStringConverters());
+	.Services
+	.AddDateOnlyTimeOnlyStringConverters();
 
 builder.Services
 	.AddSingleton<IConfigureOptions<OtlpExporterOptions>>(
@@ -124,10 +120,7 @@ builder.Services
 	.AddInterceptionService()
 	.AddServiceUtiltiyInterceptors();
 
-builder.Services.AddSwaggerGen(c =>
-{
-	c.UseDateOnlyTimeOnlyStringConverters();
-});
+builder.Services.AddSwaggerGen();
 
 builder.Services.AddHealthChecks();
 
