@@ -5,6 +5,9 @@ metadata:
 data:
   appsettings.json: | 
     {
+      "DepositAccumulateRouletteBackground": {
+        "PromotionBaseUrl": "http://promotion-api"
+      }
     }
   monitor.settings.json: | 
     {
