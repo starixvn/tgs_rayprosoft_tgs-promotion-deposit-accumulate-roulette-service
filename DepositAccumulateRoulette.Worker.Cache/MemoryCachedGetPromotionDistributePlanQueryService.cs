@@ -28,12 +28,12 @@ internal class MemoryCachedGetPromotionDistributePlanQueryService : IGetService<
 	{
 		var cacheKey = $"DistributePlan:{query.PromotionId}:{query.ConditionHash}";
 
-		var plan = await _memoryCache.GetOrCreateAsync(cacheKey, async entry =>
+		var plan = (await _memoryCache.GetOrCreateAsync(cacheKey, async entry =>
 		{
 			_ = entry.SetAbsoluteExpiration(TimeSpan.FromHours(8D));
 
 			return await _sourceService.GetAsync(query, cancellationToken).ConfigureAwait(false);
-		}).ConfigureAwait(false);
+		}).ConfigureAwait(false))!;
 
 		_logger.LogInformation("Query Promotion Distribution Plan by Key: {key}, planId: {planId}", cacheKey, plan.Id);
 

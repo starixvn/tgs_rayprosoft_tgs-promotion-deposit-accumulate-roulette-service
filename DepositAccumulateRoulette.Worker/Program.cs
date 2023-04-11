@@ -1,10 +1,12 @@
-﻿using Hangfire;
+﻿using FluentdForward.OpenTelemetry.MessagePack;
+using Hangfire;
 using Hangfire.MemoryStorage;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Npgsql;
 using OpenTelemetry.Exporter;
 using OpenTelemetry.Instrumentation.AspNetCore;
+using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using Tgs.Promotion.DepositAccumulateRoulette.Worker;
@@ -23,10 +25,12 @@ builder.Logging
 		options.ParseStateValues = true;
 		_ = options.AddFluentdForwardExporter(fluentOptions =>
 		{
-			var nodeIp = builder.Configuration.GetValue<string>("NODE_IP");
+			var nodeIp = builder.Configuration.GetValue<string>("NODE_IP")!;
 			fluentOptions.Host = nodeIp;
-			fluentOptions.Tag = builder.Configuration.GetValue<string>("OTEL_SERVICE_NAME");
-			fluentOptions.UseMessagePack();
+			fluentOptions.Tag = builder.Configuration.GetValue<string>("OTEL_SERVICE_NAME")!;
+			fluentOptions.UseMessagePack(LogRecordFormatterResolver.GetResolverInstanceWithExtendInfo(
+				"MachineName",
+				() => Environment.MachineName));
 		});
 	});
 
@@ -36,7 +40,7 @@ builder.Services
 		.ConfigQueueOptions((options, sp) =>
 		{
 			var config = sp.GetRequiredService<IConfiguration>();
-			options.Url = config.GetConnectionString("Nats");
+			options.Url = config.GetConnectionString("Nats")!;
 		})
 		.AddProcessor<BidProcessor>(
 			"tgs.promotion.depositaccumulateroulette.bid",
@@ -57,7 +61,7 @@ builder.Services
 	.AddSingleton<IRedisConnectionManager>(sp =>
 	{
 		var config = sp.GetRequiredService<IConfiguration>();
-		return new RedisConnectionManager(config.GetConnectionString("Redis"));
+		return new RedisConnectionManager(config.GetConnectionString("Redis")!);
 	})
 	.AddMemoryCache()
 	.AddDepositAccumulateRouletteCommon()
@@ -77,17 +81,17 @@ builder.Services
 	.AddDepositAccumulateRouletteServiceClient((options, sp) =>
 	{
 		var config = sp.GetRequiredService<IConfiguration>();
-		options.BaseUrl = config.GetValue<Uri>("DepositAccumulateRouletteWorker:DepositAccumulateRouletteServiceBaseUrl");
+		options.BaseUrl = config.GetValue<Uri>("DepositAccumulateRouletteWorker:DepositAccumulateRouletteServiceBaseUrl")!;
 	})
 	.AddPromotionClientServices((options, sp) =>
 	{
 		var config = sp.GetRequiredService<IConfiguration>();
-		options.Url = config.GetValue<Uri>("DepositAccumulateRouletteWorker:PromotionBaseUrl");
+		options.Url = config.GetValue<Uri>("DepositAccumulateRouletteWorker:PromotionBaseUrl")!;
 	})
 	.AddPlayerServiceClient((options, sp) =>
 	{
 		var config = sp.GetRequiredService<IConfiguration>();
-		options.BaseUrl = config.GetValue<Uri>("DepositAccumulateRouletteWorker:PlayerBaseUrl");
+		options.BaseUrl = config.GetValue<Uri>("DepositAccumulateRouletteWorker:PlayerBaseUrl")!;
 	});
 
 builder.Services
@@ -95,21 +99,9 @@ builder.Services
 	.AddHangfireServer();
 
 builder.Services
-	.AddSingleton<IConfigureOptions<OtlpExporterOptions>>(
-		sp => new ConfigureNamedOptions<OtlpExporterOptions>(
-			Options.DefaultName,
-			exporterOptions =>
-			{
-				var config = sp.GetRequiredService<IConfiguration>();
-				var nodeIp = config.GetValue<string>("NODE_IP");
-
-				if (!string.IsNullOrWhiteSpace(nodeIp))
-					exporterOptions.Endpoint = new Uri($"http://{nodeIp}:4317");
-
-				config.GetSection("Opentelemetry:Tracing").Bind(exporterOptions);
-			}))
-	.AddOpenTelemetryTracing(traceBuilder => traceBuilder
-		.SetResourceBuilder(ResourceBuilder.CreateDefault().AddEnvironmentVariableDetector())
+	.AddOpenTelemetry()
+	.ConfigureResource(_ => ResourceBuilder.CreateDefault().AddEnvironmentVariableDetector())
+	.WithTracing(tracerProviderBuilder => tracerProviderBuilder
 		.AddSource("Tgs.*")
 		.AddSource("TGS.*")
 		.AddAspNetCoreInstrumentation()
@@ -117,6 +109,12 @@ builder.Services
 		.AddNpgsql()
 		.AddProfileViewExporter()
 		.AddOtlpExporter())
+	.WithMetrics(meterProviderBuilder => meterProviderBuilder
+		.AddAspNetCoreInstrumentation()
+		.AddHttpClientInstrumentation()
+		.AddRuntimeInstrumentation()
+		.AddOtlpExporter())
+	.Services
 	.AddProfileViewer()
 	.Configure<AspNetCoreInstrumentationOptions>(
 		options => options.Filter = httpContext
@@ -131,11 +129,10 @@ builder.Services
 builder.Services
 	.AddRouting(options => options.LowercaseUrls = true)
 	.AddControllers()
-	.AddMvcOptions(mvcOptions => mvcOptions
-		.UseDateOnlyTimeOnlyStringConverters())
-	.AddJsonOptions(jsonOptions => jsonOptions.UseDateOnlyTimeOnlyStringConverters());
+	.Services
+	.AddDateOnlyTimeOnlyStringConverters();
 
-builder.Services.AddSwaggerGen(c => c.UseDateOnlyTimeOnlyStringConverters());
+builder.Services.AddSwaggerGen();
 
 builder.Services
 	.AddInterceptionService()
