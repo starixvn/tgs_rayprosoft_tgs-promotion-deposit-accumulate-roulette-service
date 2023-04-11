@@ -13,24 +13,6 @@ internal class BackgroundRepository : IBackgroundRepository
 		_context = context ?? throw new ArgumentNullException(nameof(context));
 	}
 
-	public IAsyncEnumerable<PromotionInfo> GetValidDepositAccumulateRoulettePromotionsAsync(
-		DateOnly processDate,
-		CancellationToken cancellationToken = default)
-	{
-		var processTime = new DateTimeOffset(
-			processDate.Year, processDate.Month, processDate.Day, 0, 0, 0, TimeSpan.FromHours(8D)).UtcDateTime;
-
-		var promotions = _context.Promotions
-			.Where(p => p.Status == 0
-						&& p.PromotionType == "DepositAccumulateRoulette"
-						&& p.From <= processTime
-						&& (p.To > processTime || (processTime - p.To).Days <= 1))
-			.Select(p => new PromotionInfo(p.Id, p.From, p.To, p.BrandId, p.CampaignDetail))
-			.AsAsyncEnumerable();
-
-		return promotions;
-	}
-
 	public IAsyncEnumerable<DepositFormInfo> GetApprovedDepositFormsAsync(
 		IEnumerable<Guid> brandIds,
 		DateOnly processDate,

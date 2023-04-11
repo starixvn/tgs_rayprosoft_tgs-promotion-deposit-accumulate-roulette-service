@@ -58,6 +58,11 @@ builder.Services
 	{
 		var config = sp.GetRequiredService<IConfiguration>();
 		_ = dbOptions.UseNpgsql(config.GetConnectionString("Tgs"));
+	})
+	.AddPromotionClientServices((options, sp) =>
+	{
+		var config = sp.GetRequiredService<IConfiguration>();
+		options.Url = config.GetValue<Uri>("DepositAccumulateRouletteBackground:PromotionBaseUrl")!;
 	});
 
 builder.Services

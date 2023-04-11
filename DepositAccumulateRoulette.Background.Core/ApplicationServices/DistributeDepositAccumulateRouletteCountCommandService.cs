@@ -1,5 +1,4 @@
 ﻿using System.Runtime.CompilerServices;
-using Tgs.Promotion.DepositAccumulateRoulette.Common;
 using Tgs.ServiceUtility;
 
 namespace Tgs.Promotion.DepositAccumulateRoulette.Background.ApplicationServices;
@@ -8,21 +7,23 @@ internal class DistributeDepositAccumulateRouletteCountCommandService
 	: IQueryService<DistributeDepositAccumulateRouletteCountCommand, DepositAccumulateRouletteEventAddInfo>
 {
 	private readonly IBackgroundRepository _backgroundRepository;
-	private readonly DepositAccumulateRouletteSerializer _serializer;
+	private readonly IQueryService<ValidPromotionListQuery, PromotionInfo> _promotionListQueryService;
 
 	public DistributeDepositAccumulateRouletteCountCommandService(
 		IBackgroundRepository backgroundRepository,
-		DepositAccumulateRouletteSerializer serializer)
+		IQueryService<ValidPromotionListQuery, PromotionInfo> promotionListQueryService)
 	{
 		_backgroundRepository = backgroundRepository ?? throw new ArgumentNullException(nameof(backgroundRepository));
-		_serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
+		_promotionListQueryService = promotionListQueryService ?? throw new ArgumentNullException(nameof(promotionListQueryService));
 	}
 
-	public async IAsyncEnumerable<DepositAccumulateRouletteEventAddInfo> QueryAsync(DistributeDepositAccumulateRouletteCountCommand command,
+	public async IAsyncEnumerable<DepositAccumulateRouletteEventAddInfo> QueryAsync(
+		DistributeDepositAccumulateRouletteCountCommand command,
 		[EnumeratorCancellation] CancellationToken cancellationToken = default)
 	{
-		var promotions = await _backgroundRepository
-			.GetValidDepositAccumulateRoulettePromotionsAsync(command.ProcessDate, cancellationToken)
+		var promotions = await _promotionListQueryService.QueryAsync(
+				new ValidPromotionListQuery(command.ProcessDate), 
+				cancellationToken)
 			.ToArrayAsync(cancellationToken)
 			.ConfigureAwait(false);
 
@@ -43,9 +44,7 @@ internal class DistributeDepositAccumulateRouletteCountCommandService
 
 		foreach (var promotion in promotions)
 		{
-			var settings = _serializer.Deserialize<DepositAccumulateRouletteSettings>(promotion.CampaignDetail);
-
-			if (settings?.DepositItems is null)
+			if (!promotion.CampaignDetail.DepositItems.Any())
 				continue;
 
 			var depositAccumulateItems =
@@ -64,7 +63,7 @@ internal class DistributeDepositAccumulateRouletteCountCommandService
 
 			foreach (var item in depositAccumulateItems)
 			{
-				var reachedItem = settings.DepositItems
+				var reachedItem = promotion.CampaignDetail.DepositItems
 					.Where(set => set.AccumulateAmount <= item.DepositAmount)
 					.MaxBy(set => set.AccumulateAmount);
 
