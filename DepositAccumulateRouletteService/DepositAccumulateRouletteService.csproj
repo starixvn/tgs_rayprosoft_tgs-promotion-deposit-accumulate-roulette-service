@@ -35,9 +35,9 @@
     <PackageReference Include="StackExchange.Redis" Version="2.6.104" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
     <PackageReference Include="Tgs.Interceptors" Version="0.2.1" />
-    <PackageReference Include="Tgs.MessageQueue.Nats" Version="2.1.6" />
-    <PackageReference Include="Tgs.PlayerService.Client" Version="0.0.27" />
-    <PackageReference Include="Tgs.Promotion.Client" Version="1.0.37" />
+    <PackageReference Include="Tgs.MessageQueue.Nats" Version="2.3.0" />
+    <PackageReference Include="Tgs.PlayerService.Client" Version="0.0.29" />
+    <PackageReference Include="Tgs.Promotion.Client" Version="1.0.41" />
   </ItemGroup>
 
   <ItemGroup>
