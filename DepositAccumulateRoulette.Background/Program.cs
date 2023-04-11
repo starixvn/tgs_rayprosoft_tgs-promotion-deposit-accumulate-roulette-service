@@ -23,9 +23,9 @@ builder.Logging
 		options.ParseStateValues = true;
 		_ = options.AddFluentdForwardExporter(fluentOptions =>
 		{
-			var nodeIp = builder.Configuration.GetValue<string>("NODE_IP");
+			var nodeIp = builder.Configuration.GetValue<string>("NODE_IP")!;
 			fluentOptions.Host = nodeIp;
-			fluentOptions.Tag = builder.Configuration.GetValue<string>("OTEL_SERVICE_NAME");
+			fluentOptions.Tag = builder.Configuration.GetValue<string>("OTEL_SERVICE_NAME")!;
 			fluentOptions.UseMessagePack(LogRecordFormatterResolver.GetResolverInstanceWithExtendInfo(
 				"MachineName",
 				() => Environment.MachineName));
@@ -44,7 +44,7 @@ builder.Services
 		.ConfigQueueOptions((options, sp) =>
 		{
 			var config = sp.GetRequiredService<IConfiguration>();
-			options.Url = config.GetConnectionString("Nats");
+			options.Url = config.GetConnectionString("Nats")!;
 		})
 		.AddReplyHandler<DistributeDepositAccumulateRouletteCountHandler>(
 			"tgs.promotion.depositaccumulateroulette.background.roulettecount.distribute",

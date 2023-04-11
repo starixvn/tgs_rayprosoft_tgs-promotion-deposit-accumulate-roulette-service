@@ -655,10 +655,7 @@ internal class DepositAccumulateRouletteTests
 		var fakeWorkerClient = Substitute.For<IDepositAccumulateRouletteWorkerClient>();
 
 		await using var web = new TestDepositAccumulateRouletteServiceApplication(builder =>
-			builder.ConfigureServices(services =>
-			{
-				_ = services.AddSingleton(fakeWorkerClient);
-			}));
+			builder.ConfigureServices(services => _ = services.AddSingleton(fakeWorkerClient)));
 
 		var httpClient = web.CreateClient();
 
@@ -686,10 +683,7 @@ internal class DepositAccumulateRouletteTests
 		var fakeWorkerClient = Substitute.For<IDepositAccumulateRouletteWorkerClient>();
 
 		await using var web = new TestDepositAccumulateRouletteServiceApplication(builder =>
-			builder.ConfigureServices(services =>
-			{
-				_ = services.AddSingleton(fakeWorkerClient);
-			}));
+			builder.ConfigureServices(services => _ = services.AddSingleton(fakeWorkerClient)));
 
 		var httpClient = web.CreateClient();
 
@@ -730,10 +724,7 @@ internal class DepositAccumulateRouletteTests
 		var fakeWorkerClient = Substitute.For<IDepositAccumulateRouletteWorkerClient>();
 
 		await using var web = new TestDepositAccumulateRouletteServiceApplication(builder =>
-			builder.ConfigureServices(services =>
-			{
-				_ = services.AddSingleton(fakeWorkerClient);
-			}));
+			builder.ConfigureServices(services => _ = services.AddSingleton(fakeWorkerClient)));
 
 		var httpClient = web.CreateClient();
 

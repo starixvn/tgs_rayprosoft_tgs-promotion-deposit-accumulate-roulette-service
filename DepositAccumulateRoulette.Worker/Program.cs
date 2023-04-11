@@ -25,9 +25,9 @@ builder.Logging
 		options.ParseStateValues = true;
 		_ = options.AddFluentdForwardExporter(fluentOptions =>
 		{
-			var nodeIp = builder.Configuration.GetValue<string>("NODE_IP");
+			var nodeIp = builder.Configuration.GetValue<string>("NODE_IP")!;
 			fluentOptions.Host = nodeIp;
-			fluentOptions.Tag = builder.Configuration.GetValue<string>("OTEL_SERVICE_NAME");
+			fluentOptions.Tag = builder.Configuration.GetValue<string>("OTEL_SERVICE_NAME")!;
 			fluentOptions.UseMessagePack(LogRecordFormatterResolver.GetResolverInstanceWithExtendInfo(
 				"MachineName",
 				() => Environment.MachineName));
@@ -40,7 +40,7 @@ builder.Services
 		.ConfigQueueOptions((options, sp) =>
 		{
 			var config = sp.GetRequiredService<IConfiguration>();
-			options.Url = config.GetConnectionString("Nats");
+			options.Url = config.GetConnectionString("Nats")!;
 		})
 		.AddProcessor<BidProcessor>(
 			"tgs.promotion.depositaccumulateroulette.bid",
@@ -61,7 +61,7 @@ builder.Services
 	.AddSingleton<IRedisConnectionManager>(sp =>
 	{
 		var config = sp.GetRequiredService<IConfiguration>();
-		return new RedisConnectionManager(config.GetConnectionString("Redis"));
+		return new RedisConnectionManager(config.GetConnectionString("Redis")!);
 	})
 	.AddMemoryCache()
 	.AddDepositAccumulateRouletteCommon()
@@ -81,17 +81,17 @@ builder.Services
 	.AddDepositAccumulateRouletteServiceClient((options, sp) =>
 	{
 		var config = sp.GetRequiredService<IConfiguration>();
-		options.BaseUrl = config.GetValue<Uri>("DepositAccumulateRouletteWorker:DepositAccumulateRouletteServiceBaseUrl");
+		options.BaseUrl = config.GetValue<Uri>("DepositAccumulateRouletteWorker:DepositAccumulateRouletteServiceBaseUrl")!;
 	})
 	.AddPromotionClientServices((options, sp) =>
 	{
 		var config = sp.GetRequiredService<IConfiguration>();
-		options.Url = config.GetValue<Uri>("DepositAccumulateRouletteWorker:PromotionBaseUrl");
+		options.Url = config.GetValue<Uri>("DepositAccumulateRouletteWorker:PromotionBaseUrl")!;
 	})
 	.AddPlayerServiceClient((options, sp) =>
 	{
 		var config = sp.GetRequiredService<IConfiguration>();
-		options.BaseUrl = config.GetValue<Uri>("DepositAccumulateRouletteWorker:PlayerBaseUrl");
+		options.BaseUrl = config.GetValue<Uri>("DepositAccumulateRouletteWorker:PlayerBaseUrl")!;
 	});
 
 builder.Services

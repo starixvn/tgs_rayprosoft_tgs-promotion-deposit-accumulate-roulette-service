@@ -20,11 +20,11 @@ internal class MemoryCachedShuffleService : IShuffleService
 	{
 		var key = $"Deck:{promotionId}";
 
-		return await _memoryCache.GetOrCreateAsync(key, async entry =>
+		return (await _memoryCache.GetOrCreateAsync(key, async entry =>
 		{
 			_ = entry.SetAbsoluteExpiration(TimeSpan.FromHours(6D));
 
 			return await _shuffleService.ShuffleAsync(promotionId, items).ConfigureAwait(false);
-		}).ConfigureAwait(false);
+		}).ConfigureAwait(false))!;
 	}
 }
