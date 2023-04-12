@@ -50,10 +50,7 @@ internal class PromotionTests
 			.Returns(promotionInfo);
 
 		_ = fakePromotionServiceClient.GetPromotionRuleAsync<GetDepositAccumulateRoulettePromotionQueryService.PromotionRule>(Arg.Is(query.PromotionId))
-			.Returns(new GetDepositAccumulateRoulettePromotionQueryService.PromotionRule
-			{
-				CompaignDetail = settings
-			});
+			.Returns(new GetDepositAccumulateRoulettePromotionQueryService.PromotionRule(settings));
 
 		var expected = new DepositAccumulateRoulettePromotionInfo(
 			promotionInfo.Id,
@@ -92,7 +89,7 @@ internal class PromotionTests
 
 		var settings = new DepositAccumulateRouletteSettings(depositItems, rouletteItems);
 
-		var sut = new MemoryCachedGetDepositAccumulateRoulettePromotionQueryService(
+		var sut = new CachedGetDepositAccumulateRoulettePromotionQueryService(
 			fakeMemoryCache,
 			fakeSourceService);
 
@@ -145,7 +142,7 @@ internal class PromotionTests
 
 		var settings = new DepositAccumulateRouletteSettings(depositItems, rouletteItems);
 
-		var sut = new MemoryCachedGetDepositAccumulateRoulettePromotionQueryService(
+		var sut = new CachedGetDepositAccumulateRoulettePromotionQueryService(
 			fakeMemoryCache,
 			fakeSourceService);
 
