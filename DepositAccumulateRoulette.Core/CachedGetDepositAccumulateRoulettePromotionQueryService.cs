@@ -4,12 +4,13 @@ using Tgs.ServiceUtility;
 
 namespace Tgs.Promotion.DepositAccumulateRouletteService;
 
-internal class MemoryCachedGetDepositAccumulateRoulettePromotionQueryService : IGetService<GetDepositAccumulateRoulettePromotionQuery, DepositAccumulateRoulettePromotionInfo?>
+internal class CachedGetDepositAccumulateRoulettePromotionQueryService
+	: IGetService<GetDepositAccumulateRoulettePromotionQuery, DepositAccumulateRoulettePromotionInfo?>
 {
 	private readonly IMemoryCache _memoryCache;
 	private readonly IGetService<GetDepositAccumulateRoulettePromotionQuery, DepositAccumulateRoulettePromotionInfo?> _sourceService;
 
-	public MemoryCachedGetDepositAccumulateRoulettePromotionQueryService(
+	public CachedGetDepositAccumulateRoulettePromotionQueryService(
 		IMemoryCache memoryCache,
 		IGetService<GetDepositAccumulateRoulettePromotionQuery, DepositAccumulateRoulettePromotionInfo?> sourceService)
 	{

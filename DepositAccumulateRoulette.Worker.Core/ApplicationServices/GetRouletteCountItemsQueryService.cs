@@ -46,8 +46,11 @@ internal class GetRouletteCountItemsQueryService
 
 			foreach (var info in infos)
 			{
-				var usedCount = await GetRouletteUsedCountAsync(promotionId, query.PlayerCode, info, cancellationToken)
-					.ConfigureAwait(false);
+				var usedCount = await GetRouletteUsedCountAsync(
+						promotionId, 
+						query.PlayerCode, 
+						info, 
+						cancellationToken).ConfigureAwait(false);
 
 				var availableCount = info.RouletteCount < usedCount ? 0 : info.RouletteCount - usedCount;
 

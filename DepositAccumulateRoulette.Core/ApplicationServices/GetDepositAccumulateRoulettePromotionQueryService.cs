@@ -39,11 +39,8 @@ internal class GetDepositAccumulateRoulettePromotionQueryService
 			mainInfo.EventDuring,
 			mainInfo.PromotionLimitAmount,
 			mainInfo.IsAutoSent,
-			rule.CompaignDetail);
+			rule.CampaignDetail);
 	}
 
-	internal class PromotionRule
-	{
-		public DepositAccumulateRouletteSettings CompaignDetail { get; init; } = default!;
-	}
+	internal record PromotionRule(DepositAccumulateRouletteSettings CampaignDetail);
 }

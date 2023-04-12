@@ -1,4 +1,5 @@
 ﻿using System.Runtime.CompilerServices;
+using Tgs.Promotion.DepositAccumulateRoulette.Common;
 using Tgs.ServiceUtility;
 
 namespace Tgs.Promotion.DepositAccumulateRoulette.Background.ApplicationServices;
@@ -40,54 +41,58 @@ internal class DistributeDepositAccumulateRouletteCountCommandService
 		if (depositForms.Length == 0)
 			yield break;
 
-		var depositAccumulateEvents = new List<DepositAccumulateRouletteEventAddInfo>();
+		var addEvents = new List<DepositAccumulateRouletteEventAddInfo>();
 
-		foreach (var promotion in promotions)
+		foreach (var promotion in promotions.Where(p => p.CampaignDetail.DepositItems.Any()))
 		{
-			if (!promotion.CampaignDetail.DepositItems.Any())
-				continue;
-
-			var depositAccumulateItems =
-				(from info in depositForms
-				 where info.PromotionId == promotion.Id
-				 group info by info.PlayerCode
-					into g
-				 select new
-				 {
-					 PlayerCode = g.Key,
-					 DepositAmount = g.ToArray().Sum(form => form.ActualAmount ?? form.Amount)
-				 }).ToArray();
-
-			if (depositAccumulateItems.Length == 0)
-				continue;
-
-			foreach (var item in depositAccumulateItems)
-			{
-				var reachedItem = promotion.CampaignDetail.DepositItems
-					.Where(set => set.AccumulateAmount <= item.DepositAmount)
-					.MaxBy(set => set.AccumulateAmount);
-
-				if (reachedItem is not null)
+			var playerDepositItems =
+				from info in depositForms
+				where info.PromotionId == promotion.Id
+				group info by info.PlayerCode
+				into g
+				select new
 				{
-					depositAccumulateEvents.Add(
-						new DepositAccumulateRouletteEventAddInfo(
-							item.PlayerCode,
-							promotion.BrandId,
-							promotion.Id,
-							reachedItem.RouletteCount,
-							item.DepositAmount));
-				}
-			}
+					PlayerCode = g.Key,
+					TotalDepositAmount = g.Sum(form =>
+					{
+						var amount = form.ActualAmount ?? form.Amount;
+						return Math.Ceiling(amount);
+					})
+				};
+
+			var addItems =
+				from item in playerDepositItems
+				let rouletteCount = GetDistributeRouletteCount(promotion.CampaignDetail.DepositItems, item.TotalDepositAmount)
+				where rouletteCount > 0
+				select new DepositAccumulateRouletteEventAddInfo(
+					item.PlayerCode,
+					promotion.BrandId, 
+					promotion.Id,
+					rouletteCount, 
+					item.TotalDepositAmount);
+
+			addEvents.AddRange(addItems);
 		}
 
-		if (depositAccumulateEvents.Count == 0)
+		if (addEvents.Count == 0)
 			yield break;
 
 		await _backgroundRepository
-			.AddDepositAccumulateRouletteEventsAsync(command.ProcessDate, depositAccumulateEvents, cancellationToken)
+			.AddDepositAccumulateRouletteEventsAsync(command.ProcessDate, addEvents, cancellationToken)
 			.ConfigureAwait(false);
 
-		foreach (var addEvt in depositAccumulateEvents)
-			yield return addEvt;
+		foreach (var evt in addEvents)
+			yield return evt;
+	}
+
+	private static int GetDistributeRouletteCount(
+		IEnumerable<DepositAccumulateItem> depositSettings, 
+		decimal totalDepositAmount)
+	{
+		var reachedItem = depositSettings
+			.Where(set => set.AccumulateAmount <= totalDepositAmount)
+			.MaxBy(set => set.AccumulateAmount);
+
+		return reachedItem?.RouletteCount ?? 0;
 	}
 }

@@ -62,8 +62,5 @@ public class RouletteProcessor : IMessageProcessor
 		}.ToByteArray();
 	}
 
-	internal class PromotionRule
-	{
-		public DepositAccumulateRouletteSettings CompaignDetail { get; init; } = default!;
-	}
+	internal record PromotionRule(DepositAccumulateRouletteSettings CampaignDetail);
 }

@@ -35,15 +35,15 @@ internal class PromotionService : IPromotionService
 		// 查詢日期: 以每日 8:00 UTC+8 為準
 		var queryDate = DateOnly.FromDateTime(now.ToOffset(TimeSpan.FromHours(8 - 8)).DateTime);
 
-		var events = await _storeRepository
+		var storedIds = await _storeRepository
 			.GetPlayerAvailablePromotionIdsAsync(playerCode, queryDate)
 			.ToArrayAsync(cancellationToken)
 			.ConfigureAwait(false);
 
-		if (events.Length > 0)
+		if (storedIds.Length > 0)
 		{
-			foreach (var evt in events)
-				yield return evt;
+			foreach (var id in storedIds)
+				yield return id;
 		}
 		else
 		{
@@ -77,8 +77,8 @@ internal class PromotionService : IPromotionService
 					playerCode, queryDate, allPromotionIds, expiry)
 				.ConfigureAwait(false);
 
-			foreach (var evt in allPromotionIds)
-				yield return evt;
+			foreach (var id in allPromotionIds)
+				yield return id;
 		}
 	}
 }

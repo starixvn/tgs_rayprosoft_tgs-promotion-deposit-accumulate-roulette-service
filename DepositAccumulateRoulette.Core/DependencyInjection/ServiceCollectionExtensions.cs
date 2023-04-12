@@ -26,7 +26,7 @@ public static class ServiceCollectionExtensions
 
 		_ = services.Decorate<
 			IGetService<GetDepositAccumulateRoulettePromotionQuery, DepositAccumulateRoulettePromotionInfo?>,
-			MemoryCachedGetDepositAccumulateRoulettePromotionQueryService>();
+			CachedGetDepositAccumulateRoulettePromotionQueryService>();
 
 		return services;
 	}

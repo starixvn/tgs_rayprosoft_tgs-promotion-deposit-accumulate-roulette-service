@@ -174,13 +174,11 @@ internal class DepositAccumulateRouletteTests
 				Arg.Any<CancellationToken>())
 			.Returns(promotionInfo);
 
-		_ = fakePromotionServiceClient.GetPromotionRuleAsync<GetDepositAccumulateRoulettePromotionQueryService.PromotionRule>(
+		_ = fakePromotionServiceClient
+			.GetPromotionRuleAsync<GetDepositAccumulateRoulettePromotionQueryService.PromotionRule>(
 				Arg.Is(promotionId),
 				Arg.Any<CancellationToken>())
-			.Returns(new GetDepositAccumulateRoulettePromotionQueryService.PromotionRule
-			{
-				CompaignDetail = settings
-			});
+			.Returns(new GetDepositAccumulateRoulettePromotionQueryService.PromotionRule(settings));
 
 		_ = fakeRouletteServiceClient.GetDepositAccumulateRoulettePromotionAsync(
 				Arg.Is(promotionId),
@@ -382,10 +380,11 @@ internal class DepositAccumulateRouletteTests
 				Arg.Any<CancellationToken>())
 			.Returns(promotionInfo);
 
-		_ = fakePromotionServiceClient.GetPromotionRuleAsync<GetDepositAccumulateRoulettePromotionQueryService.PromotionRule>(
+		_ = fakePromotionServiceClient
+			.GetPromotionRuleAsync<GetDepositAccumulateRoulettePromotionQueryService.PromotionRule>(
 				Arg.Is(promotionId),
 				Arg.Any<CancellationToken>())
-			.Returns(new GetDepositAccumulateRoulettePromotionQueryService.PromotionRule { CompaignDetail = settings });
+			.Returns(new GetDepositAccumulateRoulettePromotionQueryService.PromotionRule(settings));
 
 		_ = fakeRouletteServiceClient.GetDepositAccumulateRoulettePromotionAsync(
 				Arg.Is(promotionId),
@@ -593,10 +592,11 @@ internal class DepositAccumulateRouletteTests
 				Arg.Any<CancellationToken>())
 			.Returns(promotionInfo);
 
-		_ = fakePromotionServiceClient.GetPromotionRuleAsync<GetDepositAccumulateRoulettePromotionQueryService.PromotionRule>(
+		_ = fakePromotionServiceClient
+			.GetPromotionRuleAsync<GetDepositAccumulateRoulettePromotionQueryService.PromotionRule>(
 				Arg.Is(promotionId),
 				Arg.Any<CancellationToken>())
-			.Returns(new GetDepositAccumulateRoulettePromotionQueryService.PromotionRule { CompaignDetail = settings });
+			.Returns(new GetDepositAccumulateRoulettePromotionQueryService.PromotionRule(settings));
 
 		_ = fakeRouletteServiceClient.GetDepositAccumulateRoulettePromotionAsync(
 				Arg.Is(promotionId),

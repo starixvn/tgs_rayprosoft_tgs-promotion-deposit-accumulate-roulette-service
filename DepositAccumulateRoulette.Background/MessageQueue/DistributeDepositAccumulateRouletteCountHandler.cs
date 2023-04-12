@@ -29,17 +29,17 @@ internal class DistributeDepositAccumulateRouletteCountHandler : IMessageHandler
 
 		var command = new DistributeDepositAccumulateRouletteCountCommand(requestDate.Value);
 
-		var distributeEvents = await _distributeCommandService
-			.QueryAsync(command, cancellationToken)
-			.ToArrayAsync(cancellationToken);
+		var distributeEvents = _distributeCommandService
+			.QueryAsync(command, cancellationToken);
 
-		var clearCacheInfos = distributeEvents.Select(evt =>
-				new ClearCacheInfo(evt.PromotionId, evt.PlayerCode))
-			.Distinct();
+		var clearCacheInfos = await distributeEvents
+			.Select(evt => new ClearCacheInfo(evt.PromotionId, evt.PlayerCode))
+			.Distinct()
+			.ToArrayAsync(cancellationToken)
+			.ConfigureAwait(false);
 
 		await _clearCacheCommandService.ExecuteAsync(
 			new ClearExpiredEventCacheCommand(clearCacheInfos),
-			cancellationToken)
-			.ConfigureAwait(false);
+			cancellationToken).ConfigureAwait(false);
 	}
 }
