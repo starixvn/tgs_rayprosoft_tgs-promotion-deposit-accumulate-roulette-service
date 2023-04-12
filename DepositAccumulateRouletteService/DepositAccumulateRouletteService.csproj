@@ -42,7 +42,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DepositAccumulateRoulette.Common\DepositAccumulateRoulette.Common.csproj" />
-    <ProjectReference Include="..\DepositAccumulateRoulette.Core\DepositAccumulateRoulette.Core.csproj" />
+    <ProjectReference Include="..\DepositAccumulateRouletteService.Core\DepositAccumulateRouletteService.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -43,9 +43,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DepositAccumulateRoulette.W
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DepositAccumulateRoulette.Worker.Cache.UnitTests", "DepositAccumulateRoulette.Worker.Cache.UnitTests\DepositAccumulateRoulette.Worker.Cache.UnitTests.csproj", "{F5F5ABE5-1E99-4BD6-9C4E-A5D8111B2F47}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DepositAccumulateRoulette.Core", "DepositAccumulateRoulette.Core\DepositAccumulateRoulette.Core.csproj", "{CA5015EA-6210-4AA0-81C5-E326B1392775}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DepositAccumulateRouletteService.Core", "DepositAccumulateRouletteService.Core\DepositAccumulateRouletteService.Core.csproj", "{C924367B-2CC9-469B-9EE7-29407DF1E982}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DepositAccumulateRoulette.Core.UnitTests", "DepositAccumulateRoulette.Core.UnitTests\DepositAccumulateRoulette.Core.UnitTests.csproj", "{3661DF3D-0CB4-491C-90F7-87648A30C08A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DepositAccumulateRouletteService.Core.UnitTests", "DepositAccumulateRouletteService.Core.UnitTests\DepositAccumulateRouletteService.Core.UnitTests.csproj", "{C68324DF-9268-4A81-9084-90150EC4A2CD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -121,14 +121,14 @@ Global
 		{F5F5ABE5-1E99-4BD6-9C4E-A5D8111B2F47}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F5F5ABE5-1E99-4BD6-9C4E-A5D8111B2F47}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F5F5ABE5-1E99-4BD6-9C4E-A5D8111B2F47}.Release|Any CPU.Build.0 = Release|Any CPU
-		{CA5015EA-6210-4AA0-81C5-E326B1392775}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CA5015EA-6210-4AA0-81C5-E326B1392775}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CA5015EA-6210-4AA0-81C5-E326B1392775}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CA5015EA-6210-4AA0-81C5-E326B1392775}.Release|Any CPU.Build.0 = Release|Any CPU
-		{3661DF3D-0CB4-491C-90F7-87648A30C08A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3661DF3D-0CB4-491C-90F7-87648A30C08A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3661DF3D-0CB4-491C-90F7-87648A30C08A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3661DF3D-0CB4-491C-90F7-87648A30C08A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C924367B-2CC9-469B-9EE7-29407DF1E982}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C924367B-2CC9-469B-9EE7-29407DF1E982}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C924367B-2CC9-469B-9EE7-29407DF1E982}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C924367B-2CC9-469B-9EE7-29407DF1E982}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C68324DF-9268-4A81-9084-90150EC4A2CD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C68324DF-9268-4A81-9084-90150EC4A2CD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C68324DF-9268-4A81-9084-90150EC4A2CD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C68324DF-9268-4A81-9084-90150EC4A2CD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
