@@ -10,7 +10,7 @@ WORKDIR /src
 COPY ["nuget.config", "."]
 COPY ["DepositAccumulateRouletteService/DepositAccumulateRouletteService.csproj", "DepositAccumulateRouletteService/"]
 COPY ["DepositAccumulateRoulette.Common/DepositAccumulateRoulette.Common.csproj", "DepositAccumulateRoulette.Common/"]
-COPY ["DepositAccumulateRoulette.Core/DepositAccumulateRoulette.Core.csproj", "DepositAccumulateRoulette.Core/"]
+COPY ["DepositAccumulateRouletteService.Core/DepositAccumulateRouletteService.Core.csproj", "DepositAccumulateRouletteService.Core/"]
 RUN dotnet restore "DepositAccumulateRouletteService/DepositAccumulateRouletteService.csproj"
 COPY . .
 WORKDIR "/src/DepositAccumulateRouletteService"
