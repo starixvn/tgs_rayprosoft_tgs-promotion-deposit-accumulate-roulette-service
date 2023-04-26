@@ -26,7 +26,7 @@ serviceAccount:
 
 podAnnotations:
   prometheus.io/path: /metrics
-  prometheus.io/port: "52325"
+  prometheus.io/port: "8889"
   prometheus.io/scrape: "true"
 
 podSecurityContext: {}

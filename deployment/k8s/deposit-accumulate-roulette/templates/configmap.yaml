@@ -11,21 +11,35 @@ data:
         "DepositAccumulateRouletteWorkerBaseUrl": "http://tgs-deposit-accumulate-roulette-worker"
       }
     }
-  monitor.settings.json: | 
-    {
-      "Logging":{
-        "Console": {
-          "FormatterName": "json",
-          "FormatterOptions": {
-            "IncludeScopes": "True",
-            "TimestampFormat": "HH:mm:ss "
-          }
-        },
-        "LogLevel": {
-          "Default": "Warning",
-          "Microsoft": "Warning",
-          "Microsoft.Diagnostics": "Warning",
-          "Microsoft.Hosting.Lifetime": "Information"
-        }
-      }
-    }
+  otel-collector-config.yaml: |
+    receivers:
+      otlp:
+        protocols:
+          grpc:
+    
+    processors:
+      batch:
+
+    exporters:
+      otlp:
+        endpoint: "$NODE_IP:4317"
+        tls:
+          insecure: true
+      prometheus:
+        endpoint: "0.0.0.0:8889"
+        namespace: "{{ .Release.Name }}"
+
+    extensions:
+      health_check:
+        endpoint: 0.0.0.0:13133
+        
+    service:
+      extensions: [health_check]
+      pipelines:
+        traces:
+          receivers: [otlp]
+          processors: [batch]     
+          exporters: [otlp]
+        metrics:
+          receivers: [otlp]
+          exporters: [prometheus]
