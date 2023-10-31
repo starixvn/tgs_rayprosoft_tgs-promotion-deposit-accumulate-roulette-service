@@ -87,9 +87,10 @@ builder.Services
 builder.Services
 	.AddOpenTelemetry()
 	.ConfigureResource(_ => ResourceBuilder.CreateDefault().AddEnvironmentVariableDetector())
-	.WithTracing(tracerProviderBuilder => tracerProviderBuilder 
+	.WithTracing(tracerProviderBuilder => tracerProviderBuilder
 		.AddSource("Tgs.*")
 		.AddSource("TGS.*")
+		.AddSource("Valhalla.*")
 		.AddAspNetCoreInstrumentation()
 		.AddHttpClientInstrumentation()
 		.AddNpgsql()
