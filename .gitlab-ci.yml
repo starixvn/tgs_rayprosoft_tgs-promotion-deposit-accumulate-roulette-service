@@ -52,7 +52,7 @@ push-k8s-template:
     - push_k8s_template $HelmTemplateBackgroundFolderName $BackgroundImageName $Tag
 
 deploy-service-dev:
-  extends: .deploy_template
+  extends: .deploy-template
   variables:
     namespace: dev
     kube_config: KubeConfig_Raypro_dev
@@ -71,7 +71,7 @@ deploy-service-dev:
     - deploy_k8s $TgsServiceSettingKey $HelmTemplateServiceFolderName $namespace
 
 deploy-worker-dev:
-  extends: .deploy_template
+  extends: .deploy-template
   variables:
     namespace: dev
     kube_config: KubeConfig_Raypro_dev
@@ -90,7 +90,7 @@ deploy-worker-dev:
     - deploy_k8s $TgsWorkerSettingKey $HelmTemplateWorkerFolderName $namespace
 
 deploy-background-dev:
-  extends: .deploy_template
+  extends: .deploy-template
   stage: deploy-dev
   variables:
     namespace: dev
@@ -116,7 +116,7 @@ deploy-background-dev:
       EOF
 
 deploy-service-staging:
-  extends: .deploy_template
+  extends: .deploy-template
   stage: deploy-staging
   variables:
     namespace: staging
@@ -134,7 +134,7 @@ deploy-service-staging:
     - deploy_k8s $TgsServiceSettingKey $HelmTemplateServiceFolderName $namespace
 
 deploy-worker-staging:
-  extends: .deploy_template
+  extends: .deploy-template
   stage: deploy-staging
   variables:
     namespace: staging
@@ -176,7 +176,7 @@ deploy-background-staging:
       EOF
 
 deploy-service-prod:
-  extends: .deploy_template
+  extends: .deploy-template
   stage: deploy-prod
   variables:
     namespace: prod
@@ -194,7 +194,7 @@ deploy-service-prod:
     - deploy_k8s $TgsServiceSettingKey $HelmTemplateServiceFolderName $namespace
 
 deploy-worker-prod:
-  extends: .deploy_template
+  extends: .deploy-template
   stage: deploy-prod
   variables:
     namespace: prod
@@ -212,7 +212,7 @@ deploy-worker-prod:
     - deploy_k8s $TgsWorkerSettingKey $HelmTemplateWorkerFolderName $namespace
 
 deploy-background-prod:
-  extends: .deploy_template
+  extends: .deploy-template
   stage: deploy-prod
   variables:
     namespace: prod
