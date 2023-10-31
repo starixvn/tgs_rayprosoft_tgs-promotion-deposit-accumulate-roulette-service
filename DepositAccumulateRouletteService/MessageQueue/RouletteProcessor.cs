@@ -29,20 +29,16 @@ public class RouletteProcessor : IMessageProcessor
 	{
 		var request = RouletteRequest.Parser.ParseFrom(data.Span);
 
-		var player = await _playerServiceClient.GetPlayerInfoAsync(request.PlayerCode, cancellationToken)
-			.ConfigureAwait(false);
-
-		if (player is null)
-			throw new InvalidOperationException($"Can't find player with code {request.PlayerCode}");
+		_ = await _playerServiceClient.GetPlayerInfoAsync(request.PlayerCode, cancellationToken)
+			.ConfigureAwait(false)
+			?? throw new InvalidOperationException($"Can't find player with code {request.PlayerCode}");
 
 		var promotion = await _getPromotionService
 			.GetAsync(
 				new GetDepositAccumulateRoulettePromotionQuery(request.PromotionId),
 				cancellationToken)
-			.ConfigureAwait(false);
-
-		if (promotion is null)
-			throw new InvalidOperationException($"Promotion with id {request.PromotionId} does not exist");
+			.ConfigureAwait(false)
+			?? throw new InvalidOperationException($"Promotion with id {request.PromotionId} does not exist");
 
 		if (!promotion.CampaignDetail.RouletteItems.Any())
 			throw new InvalidOperationException($"Promotion {request.PromotionId} does not have any roulette items.");
