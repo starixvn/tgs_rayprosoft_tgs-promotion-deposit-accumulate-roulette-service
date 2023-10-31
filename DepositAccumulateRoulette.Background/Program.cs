@@ -75,6 +75,7 @@ builder.Services
 	.WithTracing(tracerProviderBuilder => tracerProviderBuilder
 		.AddSource("Tgs.*")
 		.AddSource("TGS.*")
+		.AddSource("Valhalla.*")
 		.AddAspNetCoreInstrumentation()
 		.AddHttpClientInstrumentation()
 		.AddNpgsql()
