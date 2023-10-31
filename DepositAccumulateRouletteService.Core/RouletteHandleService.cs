@@ -1,9 +1,9 @@
 ﻿using Google.Protobuf;
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
-using Tgs.MessageQueue;
 using Tgs.Promotion.DepositAccumulateRoulette.Common;
 using Tgs.Promotion.DepositAccumulateRoulette.Common.Protos;
+using Valhalla.MessageQueue;
 
 namespace Tgs.Promotion.DepositAccumulateRouletteService;
 

@@ -5,7 +5,6 @@ using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 using RouletteSvc::Tgs.Promotion.DepositAccumulateRouletteService.MessageQueue;
 using Tgs.DepositAccumulateRoulette.Clients;
-using Tgs.MessageQueue;
 using Tgs.PlayerService.Client;
 using Tgs.Promotion.Clients;
 using Tgs.Promotion.DepositAccumulateRoulette.Common;
@@ -15,6 +14,7 @@ using Tgs.Promotion.DepositAccumulateRoulette.Worker.ApplicationServices;
 using Tgs.Promotion.DepositAccumulateRoulette.Worker.Clients;
 using Tgs.Promotion.DepositAccumulateRouletteService.ApplicationServices;
 using Tgs.ServiceUtility;
+using Valhalla.MessageQueue;
 
 using Client = Tgs.DepositAccumulateRoulette.Clients;
 

@@ -1,7 +1,7 @@
 ﻿using Google.Protobuf;
-using Tgs.MessageQueue;
 using Tgs.Promotion.Clients.Protos;
 using Tgs.Promotion.DepositAccumulateRoulette.Common.Protos;
+using Valhalla.MessageQueue;
 
 namespace Tgs.Promotion.DepositAccumulateRouletteService.MessageQueue;
 

@@ -1,7 +1,7 @@
-﻿using Tgs.MessageQueue;
-using Tgs.Promotion.DepositAccumulateRoulette.Background.ApplicationServices;
+﻿using Tgs.Promotion.DepositAccumulateRoulette.Background.ApplicationServices;
 using Tgs.Promotion.DepositAccumulateRoulette.Background.Protos;
 using Tgs.ServiceUtility;
+using Valhalla.MessageQueue;
 
 namespace Tgs.Promotion.DepositAccumulateRoulette.Background.MessageQueue;
 

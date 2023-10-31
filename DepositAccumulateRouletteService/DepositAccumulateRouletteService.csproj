@@ -17,27 +17,27 @@
 
   <ItemGroup>
     <PackageReference Include="DateOnlyTimeOnly.AspNet.Swashbuckle" Version="2.1.1" />
-    <PackageReference Include="FluentdForward.OpenTelemetry.MessagePack" Version="0.2.0" />
-    <PackageReference Include="Google.Protobuf" Version="3.22.1" />
-    <PackageReference Include="Grpc.Tools" Version="2.53.0">
+    <PackageReference Include="FluentdForward.OpenTelemetry.MessagePack" Version="0.3.1" />
+    <PackageReference Include="Google.Protobuf" Version="3.24.4" />
+    <PackageReference Include="Grpc.Tools" Version="2.59.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.18.1" />
-    <PackageReference Include="Npgsql.OpenTelemetry" Version="7.0.2" />
-    <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.4.0" />
-    <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.4.0" />
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.19.5" />
+    <PackageReference Include="Npgsql.OpenTelemetry" Version="7.0.6" />
+    <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.6.0" />
+    <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.6.0" />
     <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.0.0-rc9.5" />
     <PackageReference Include="OpenTelemetry.Instrumentation.Http" Version="1.0.0-rc9.5" />
-    <PackageReference Include="OpenTelemetry.Instrumentation.Runtime" Version="1.0.0" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.Runtime" Version="1.5.1" />
+    <PackageReference Include="PhoenixToolkits.MessageQueue.Nats" Version="1.0.6" />
     <PackageReference Include="PhoenixToolkits.Protobuf.ExtendTypes" Version="0.0.6" />
     <PackageReference Include="ProfileViewer.OpenTelemetry.Exporter" Version="0.2.1" />
-    <PackageReference Include="StackExchange.Redis" Version="2.6.104" />
+    <PackageReference Include="StackExchange.Redis" Version="2.6.122" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
     <PackageReference Include="Tgs.Interceptors" Version="0.2.1" />
-    <PackageReference Include="Tgs.MessageQueue.Nats" Version="2.3.0" />
-    <PackageReference Include="Tgs.PlayerService.Client" Version="0.0.29" />
-    <PackageReference Include="Tgs.Promotion.Client" Version="1.0.41" />
+    <PackageReference Include="Tgs.PlayerService.Client" Version="0.0.45" />
+    <PackageReference Include="Tgs.Promotion.Client" Version="1.0.44" />
   </ItemGroup>
 
   <ItemGroup>

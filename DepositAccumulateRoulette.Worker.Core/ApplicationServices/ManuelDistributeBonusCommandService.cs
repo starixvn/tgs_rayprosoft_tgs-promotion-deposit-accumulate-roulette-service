@@ -6,20 +6,17 @@ namespace Tgs.Promotion.DepositAccumulateRoulette.Worker.ApplicationServices;
 internal class ManuelDistributeBonusCommandService : ICommandService<ManuelDistributeBonusCommand>
 {
 	private readonly ITgsRepository _tgsRepository;
-	private readonly IDepositAccumulateRouletteServiceClient _rouletteServiceClient;
 	private readonly IDistributePlanHasher _hasher;
 	private readonly ICommandService<DistributeBonusCommand> _distributeService;
 	private readonly ILogger<ManuelDistributeBonusCommandService> _logger;
 
 	public ManuelDistributeBonusCommandService(
 		ITgsRepository tgsRepository,
-		IDepositAccumulateRouletteServiceClient rouletteServiceClient,
 		IDistributePlanHasher hasher,
 		ICommandService<DistributeBonusCommand> distributeService,
 		ILogger<ManuelDistributeBonusCommandService> logger)
 	{
 		_tgsRepository = tgsRepository ?? throw new ArgumentNullException(nameof(tgsRepository));
-		_rouletteServiceClient = rouletteServiceClient ?? throw new ArgumentNullException(nameof(rouletteServiceClient));
 		_hasher = hasher ?? throw new ArgumentNullException(nameof(hasher));
 		_distributeService = distributeService ?? throw new ArgumentNullException(nameof(distributeService));
 		_logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -37,7 +34,7 @@ internal class ManuelDistributeBonusCommandService : ICommandService<ManuelDistr
 
 		if (rouletteRecordInfo == null)
 		{
-			_logger.LogInformation("Cannot find roulette record with id '{0}' to process manual distribute", command.RouletteRecordId);
+			_logger.LogInformation("Cannot find roulette record with id '{rouletteRecordId}' to process manual distribute", command.RouletteRecordId);
 			return;
 		}
 
