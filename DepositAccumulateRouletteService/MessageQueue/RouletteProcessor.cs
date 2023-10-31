@@ -1,11 +1,11 @@
 ﻿using Google.Protobuf;
-using Tgs.MessageQueue;
 using Tgs.PlayerService.Client;
 using Tgs.Promotion.DepositAccumulateRoulette.Common;
 using Tgs.Promotion.DepositAccumulateRoulette.Common.Protos;
 using Tgs.Promotion.DepositAccumulateRouletteService.ApplicationServices;
 using Tgs.Promotion.DepositAccumulateRouletteService.Protos;
 using Tgs.ServiceUtility;
+using Valhalla.MessageQueue;
 
 namespace Tgs.Promotion.DepositAccumulateRouletteService.MessageQueue;
 

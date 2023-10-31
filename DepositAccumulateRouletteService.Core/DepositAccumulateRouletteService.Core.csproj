@@ -11,11 +11,11 @@
     <PackageReference Include="DateOnlyTimeOnly.AspNet" Version="2.1.1" />
     <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="7.0.0" />
     <PackageReference Include="PagingUtility.AsyncEnumerable" Version="1.1.0" />
+    <PackageReference Include="PhoenixToolkits.MessageQueue" Version="1.0.3" />
     <PackageReference Include="Scrutor" Version="4.2.2" />
-    <PackageReference Include="StackExchange.Redis" Version="2.6.104" />
-    <PackageReference Include="Tgs.MessageQueue" Version="2.3.0" />
-    <PackageReference Include="Tgs.PlayerService.Client" Version="0.0.29" />
-    <PackageReference Include="Tgs.Promotion.Client" Version="1.0.41" />
+    <PackageReference Include="StackExchange.Redis" Version="2.6.122" />
+    <PackageReference Include="Tgs.PlayerService.Client" Version="0.0.45" />
+    <PackageReference Include="Tgs.Promotion.Client" Version="1.0.44" />
     <PackageReference Include="TGS.ServiceUtility" Version="0.2.0" />
   </ItemGroup>
 
