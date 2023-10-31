@@ -152,6 +152,7 @@ deploy-worker-staging:
     - deploy_k8s $TgsWorkerSettingKey $HelmTemplateWorkerFolderName $namespace
 
 deploy-background-staging:
+  extends: .deploy-template
   stage: deploy-staging
   variables:
     namespace: staging
