@@ -50,7 +50,7 @@ internal class RouletteServiceTests
 			.ShuffleAsync(
 				Arg.Is(command.EventInfo.PromotionId),
 				Arg.Any<IEnumerable<RouletteItem>>())
-			.Returns(new[] { 0, 1, 2 });
+			.Returns([0, 1, 2]);
 
 		_ = fakeStatisticsService.IncreaseRouletteUsedCountAsync(
 				Arg.Is(command.EventInfo.PromotionId),

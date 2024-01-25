@@ -4,13 +4,11 @@ using Tgs.ServiceUtility;
 
 namespace Tgs.Promotion.DepositAccumulateRouletteService.ApplicationServices;
 
-internal class GetDepositAccumulateRoulettePromotionQueryService
-	: IGetService<GetDepositAccumulateRoulettePromotionQuery, DepositAccumulateRoulettePromotionInfo?>
+internal class GetDepositAccumulateRoulettePromotionQueryService(
+	IPromotionServiceClient promotionServiceClient)
+		: IGetService<GetDepositAccumulateRoulettePromotionQuery, DepositAccumulateRoulettePromotionInfo?>
 {
-	private readonly IPromotionServiceClient _promotionServiceClient;
-
-	public GetDepositAccumulateRoulettePromotionQueryService(
-		IPromotionServiceClient promotionServiceClient) => _promotionServiceClient = promotionServiceClient ?? throw new ArgumentNullException(nameof(promotionServiceClient));
+	private readonly IPromotionServiceClient _promotionServiceClient = promotionServiceClient ?? throw new ArgumentNullException(nameof(promotionServiceClient));
 
 	public async ValueTask<DepositAccumulateRoulettePromotionInfo?> GetAsync(GetDepositAccumulateRoulettePromotionQuery query,
 		CancellationToken cancellationToken = default)

@@ -5,12 +5,10 @@ using Valhalla.MessageQueue;
 
 namespace Tgs.Promotion.DepositAccumulateRouletteService.MessageQueue;
 
-public class RouletteCountItemsQueryProcessor : IMessageProcessor<ReadOnlyMemory<byte>, ReadOnlyMemory<byte>>
+public class RouletteCountItemsQueryProcessor(
+	IMessageSender messageSender) : IMessageProcessor<ReadOnlyMemory<byte>, ReadOnlyMemory<byte>>
 {
-	private readonly IMessageSender _messageSender;
-
-	public RouletteCountItemsQueryProcessor(
-		IMessageSender messageSender) => _messageSender = messageSender ?? throw new ArgumentNullException(nameof(messageSender));
+	private readonly IMessageSender _messageSender = messageSender ?? throw new ArgumentNullException(nameof(messageSender));
 
 	public async ValueTask<ReadOnlyMemory<byte>> HandleAsync(
 		string subject,
@@ -45,5 +43,4 @@ public class RouletteCountItemsQueryProcessor : IMessageProcessor<ReadOnlyMemory
 
 		return response.ToByteArray();
 	}
-
 }

@@ -5,21 +5,14 @@ using Tgs.ServiceUtility;
 
 namespace Tgs.Promotion.DepositAccumulateRoulette.Worker.ApplicationServices;
 
-internal class PlayRouletteCommandService : IGetService<PlayRouletteCommand, PlayRouletteResult>
+internal class PlayRouletteCommandService(
+	IShuffleService shuffleService,
+	IStatisticsService statisticsService,
+	ITgsRepository tgsRepository) : IGetService<PlayRouletteCommand, PlayRouletteResult>
 {
-	private readonly IShuffleService _shuffleService;
-	private readonly IStatisticsService _statisticsService;
-	private readonly ITgsRepository _tgsRepository;
-
-	public PlayRouletteCommandService(
-		IShuffleService shuffleService,
-		IStatisticsService statisticsService,
-		ITgsRepository tgsRepository)
-	{
-		_shuffleService = shuffleService ?? throw new ArgumentNullException(nameof(shuffleService));
-		_statisticsService = statisticsService ?? throw new ArgumentNullException(nameof(statisticsService));
-		_tgsRepository = tgsRepository ?? throw new ArgumentNullException(nameof(tgsRepository));
-	}
+	private readonly IShuffleService _shuffleService = shuffleService ?? throw new ArgumentNullException(nameof(shuffleService));
+	private readonly IStatisticsService _statisticsService = statisticsService ?? throw new ArgumentNullException(nameof(statisticsService));
+	private readonly ITgsRepository _tgsRepository = tgsRepository ?? throw new ArgumentNullException(nameof(tgsRepository));
 
 	public async ValueTask<PlayRouletteResult> GetAsync(
 		PlayRouletteCommand command,

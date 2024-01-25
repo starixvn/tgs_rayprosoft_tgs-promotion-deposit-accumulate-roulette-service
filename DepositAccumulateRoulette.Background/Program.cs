@@ -69,6 +69,7 @@ builder.Services
 	.AddHangfire((_, configuration) => configuration.UseMemoryStorage())
 	.AddHangfireServer();
 
+var excludeExtensions = new[] { "html", "ico", "png", "jpg" };
 builder.Services
 	.AddOpenTelemetry()
 	.ConfigureResource(_ => ResourceBuilder.CreateDefault().AddEnvironmentVariableDetector())
@@ -82,7 +83,7 @@ builder.Services
 				&& !httpContext.Request.Path.StartsWithSegments("/healthz")
 				&& !httpContext.Request.Path.StartsWithSegments("/profiler/")
 				&& !httpContext.Request.Path.StartsWithSegments("/metrics")
-				&& !new[] { "html", "ico", "png", "jpg" }.Any(
+				&& !excludeExtensions.Any(
 					ext => httpContext.Request.Path.Value.EndsWith($".{ext}")))
 		.AddHttpClientInstrumentation()
 		.AddNpgsql()

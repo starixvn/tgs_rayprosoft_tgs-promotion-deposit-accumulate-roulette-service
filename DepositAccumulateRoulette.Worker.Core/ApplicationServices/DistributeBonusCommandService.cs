@@ -3,18 +3,12 @@ using Tgs.ServiceUtility;
 
 namespace Tgs.Promotion.DepositAccumulateRoulette.Worker.ApplicationServices;
 
-internal class DistributeBonusCommandService : ICommandService<DistributeBonusCommand>
+internal class DistributeBonusCommandService(
+	IPromotionServiceClient promotionServiceClient,
+	IGetService<GetPromotionDistributePlanQuery, PromotionDistributePlanInfo> getDistributePlanService) : ICommandService<DistributeBonusCommand>
 {
-	private readonly IPromotionServiceClient _promotionServiceClient;
-	private readonly IGetService<GetPromotionDistributePlanQuery, PromotionDistributePlanInfo> _getDistributePlanService;
-
-	public DistributeBonusCommandService(
-		IPromotionServiceClient promotionServiceClient,
-		IGetService<GetPromotionDistributePlanQuery, PromotionDistributePlanInfo> getDistributePlanService)
-	{
-		_promotionServiceClient = promotionServiceClient ?? throw new ArgumentNullException(nameof(promotionServiceClient));
-		_getDistributePlanService = getDistributePlanService ?? throw new ArgumentNullException(nameof(getDistributePlanService));
-	}
+	private readonly IPromotionServiceClient _promotionServiceClient = promotionServiceClient ?? throw new ArgumentNullException(nameof(promotionServiceClient));
+	private readonly IGetService<GetPromotionDistributePlanQuery, PromotionDistributePlanInfo> _getDistributePlanService = getDistributePlanService ?? throw new ArgumentNullException(nameof(getDistributePlanService));
 
 	public async ValueTask ExecuteAsync(
 		DistributeBonusCommand command,

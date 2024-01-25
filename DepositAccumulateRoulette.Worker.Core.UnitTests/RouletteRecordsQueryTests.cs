@@ -30,8 +30,8 @@ internal class RouletteRecordsQueryTests
 
 		var query = new RouletteRecordsConditionQuery(
 			Guid.NewGuid(),
-			new[] { "player1", "player2" },
-			new[] { Guid.NewGuid() },
+			["player1", "player2"],
+			[Guid.NewGuid()],
 			DateTimeOffset.Parse("2022-11-10 00:00:00+08:00"),
 			DateTimeOffset.Parse("2022-11-17 00:00:00+08:00"));
 

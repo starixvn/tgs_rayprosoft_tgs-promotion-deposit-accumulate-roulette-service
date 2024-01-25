@@ -14,8 +14,7 @@ public class BidProcessor : IMessageProcessor<ReadOnlyMemory<byte>, ReadOnlyMemo
 		IRedisConnectionManager redisConnectionManager,
 		ILogger<BidProcessor> logger)
 	{
-		if (redisConnectionManager is null)
-			throw new ArgumentNullException(nameof(redisConnectionManager));
+		ArgumentNullException.ThrowIfNull(redisConnectionManager);
 
 		_redisDatabase = redisConnectionManager.Database;
 		_logger = logger ?? throw new ArgumentNullException(nameof(logger));

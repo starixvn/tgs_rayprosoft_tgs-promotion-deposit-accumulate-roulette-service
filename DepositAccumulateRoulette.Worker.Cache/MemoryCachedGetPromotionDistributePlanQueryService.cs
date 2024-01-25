@@ -6,21 +6,14 @@ using Tgs.ServiceUtility;
 
 namespace Tgs.Promotion.DepositAccumulateRoulette.Worker.Cache;
 
-internal class MemoryCachedGetPromotionDistributePlanQueryService : IGetService<GetPromotionDistributePlanQuery, PromotionDistributePlanInfo>
+internal class MemoryCachedGetPromotionDistributePlanQueryService(
+	IGetService<GetPromotionDistributePlanQuery, PromotionDistributePlanInfo> sourceService,
+	IMemoryCache memoryCache,
+	ILogger<MemoryCachedGetPromotionDistributePlanQueryService> logger) : IGetService<GetPromotionDistributePlanQuery, PromotionDistributePlanInfo>
 {
-	private readonly IGetService<GetPromotionDistributePlanQuery, PromotionDistributePlanInfo> _sourceService;
-	private readonly IMemoryCache _memoryCache;
-	private readonly ILogger<MemoryCachedGetPromotionDistributePlanQueryService> _logger;
-
-	public MemoryCachedGetPromotionDistributePlanQueryService(
-		IGetService<GetPromotionDistributePlanQuery, PromotionDistributePlanInfo> sourceService,
-		IMemoryCache memoryCache,
-		ILogger<MemoryCachedGetPromotionDistributePlanQueryService> logger)
-	{
-		_sourceService = sourceService ?? throw new ArgumentNullException(nameof(sourceService));
-		_memoryCache = memoryCache ?? throw new ArgumentNullException(nameof(memoryCache));
-		_logger = logger ?? throw new ArgumentNullException(nameof(logger));
-	}
+	private readonly IGetService<GetPromotionDistributePlanQuery, PromotionDistributePlanInfo> _sourceService = sourceService ?? throw new ArgumentNullException(nameof(sourceService));
+	private readonly IMemoryCache _memoryCache = memoryCache ?? throw new ArgumentNullException(nameof(memoryCache));
+	private readonly ILogger<MemoryCachedGetPromotionDistributePlanQueryService> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
 	public async ValueTask<PromotionDistributePlanInfo> GetAsync(
 		GetPromotionDistributePlanQuery query,

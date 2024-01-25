@@ -2,13 +2,11 @@
 
 namespace Tgs.Promotion.DepositAccumulateRoulette.Worker.ApplicationServices;
 
-internal class RouletteRecordsConditionQueryService :
+internal class RouletteRecordsConditionQueryService(
+	ITgsRepository tgsRepository) :
 	IQueryService<RouletteRecordsConditionQuery, RouletteRecordInfo>
 {
-	private readonly ITgsRepository _tgsRepository;
-
-	public RouletteRecordsConditionQueryService(
-		ITgsRepository tgsRepository) => _tgsRepository = tgsRepository ?? throw new ArgumentNullException(nameof(tgsRepository));
+	private readonly ITgsRepository _tgsRepository = tgsRepository ?? throw new ArgumentNullException(nameof(tgsRepository));
 
 	public IAsyncEnumerable<RouletteRecordInfo> QueryAsync(RouletteRecordsConditionQuery query,
 		CancellationToken cancellationToken = default)

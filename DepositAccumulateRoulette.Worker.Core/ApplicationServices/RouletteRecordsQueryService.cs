@@ -2,12 +2,10 @@
 
 namespace Tgs.Promotion.DepositAccumulateRoulette.Worker.ApplicationServices;
 
-internal class RouletteRecordsQueryService : IQueryService<RouletteRecordsQuery, RouletteRecordInfo>
+internal class RouletteRecordsQueryService(
+	ITgsRepository tgsRepository) : IQueryService<RouletteRecordsQuery, RouletteRecordInfo>
 {
-	private readonly ITgsRepository _tgsRepository;
-
-	public RouletteRecordsQueryService(
-		ITgsRepository tgsRepository) => _tgsRepository = tgsRepository;
+	private readonly ITgsRepository _tgsRepository = tgsRepository;
 
 	public IAsyncEnumerable<RouletteRecordInfo> QueryAsync(
 		RouletteRecordsQuery query,

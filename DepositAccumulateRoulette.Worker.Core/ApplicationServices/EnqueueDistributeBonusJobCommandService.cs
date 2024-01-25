@@ -3,12 +3,10 @@ using Tgs.ServiceUtility;
 
 namespace Tgs.Promotion.DepositAccumulateRoulette.Worker.ApplicationServices;
 
-internal class EnqueueDistributeBonusJobCommandService : ICommandService<EnqueueDistributeBonusJobCommand>
+internal class EnqueueDistributeBonusJobCommandService(
+	IBackgroundJobClient backgroundJobClient) : ICommandService<EnqueueDistributeBonusJobCommand>
 {
-	private readonly IBackgroundJobClient _backgroundJobClient;
-
-	public EnqueueDistributeBonusJobCommandService(
-		IBackgroundJobClient backgroundJobClient) => _backgroundJobClient = backgroundJobClient ?? throw new ArgumentNullException(nameof(backgroundJobClient));
+	private readonly IBackgroundJobClient _backgroundJobClient = backgroundJobClient ?? throw new ArgumentNullException(nameof(backgroundJobClient));
 
 	public ValueTask ExecuteAsync(
 		EnqueueDistributeBonusJobCommand command,

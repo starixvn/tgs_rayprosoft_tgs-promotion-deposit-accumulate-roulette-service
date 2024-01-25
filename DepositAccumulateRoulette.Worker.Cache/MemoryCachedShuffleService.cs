@@ -3,18 +3,12 @@ using Tgs.Promotion.DepositAccumulateRoulette.Common;
 
 namespace Tgs.Promotion.DepositAccumulateRoulette.Worker.Cache;
 
-internal class MemoryCachedShuffleService : IShuffleService
+internal class MemoryCachedShuffleService(
+	IMemoryCache memoryCache,
+	IShuffleService shuffleService) : IShuffleService
 {
-	private readonly IMemoryCache _memoryCache;
-	private readonly IShuffleService _shuffleService;
-
-	public MemoryCachedShuffleService(
-		IMemoryCache memoryCache,
-		IShuffleService shuffleService)
-	{
-		_memoryCache = memoryCache ?? throw new ArgumentNullException(nameof(memoryCache));
-		_shuffleService = shuffleService ?? throw new ArgumentNullException(nameof(shuffleService));
-	}
+	private readonly IMemoryCache _memoryCache = memoryCache ?? throw new ArgumentNullException(nameof(memoryCache));
+	private readonly IShuffleService _shuffleService = shuffleService ?? throw new ArgumentNullException(nameof(shuffleService));
 
 	public async ValueTask<int[]> ShuffleAsync(Guid promotionId, IEnumerable<RouletteItem> items)
 	{

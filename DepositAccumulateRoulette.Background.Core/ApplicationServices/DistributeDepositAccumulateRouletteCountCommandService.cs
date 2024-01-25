@@ -4,19 +4,13 @@ using Tgs.ServiceUtility;
 
 namespace Tgs.Promotion.DepositAccumulateRoulette.Background.ApplicationServices;
 
-internal class DistributeDepositAccumulateRouletteCountCommandService
-	: IQueryService<DistributeDepositAccumulateRouletteCountCommand, DepositAccumulateRouletteEventAddInfo>
+internal class DistributeDepositAccumulateRouletteCountCommandService(
+	IBackgroundRepository backgroundRepository,
+	IQueryService<ValidPromotionListQuery, PromotionInfo> promotionListQueryService)
+		: IQueryService<DistributeDepositAccumulateRouletteCountCommand, DepositAccumulateRouletteEventAddInfo>
 {
-	private readonly IBackgroundRepository _backgroundRepository;
-	private readonly IQueryService<ValidPromotionListQuery, PromotionInfo> _promotionListQueryService;
-
-	public DistributeDepositAccumulateRouletteCountCommandService(
-		IBackgroundRepository backgroundRepository,
-		IQueryService<ValidPromotionListQuery, PromotionInfo> promotionListQueryService)
-	{
-		_backgroundRepository = backgroundRepository ?? throw new ArgumentNullException(nameof(backgroundRepository));
-		_promotionListQueryService = promotionListQueryService ?? throw new ArgumentNullException(nameof(promotionListQueryService));
-	}
+	private readonly IBackgroundRepository _backgroundRepository = backgroundRepository ?? throw new ArgumentNullException(nameof(backgroundRepository));
+	private readonly IQueryService<ValidPromotionListQuery, PromotionInfo> _promotionListQueryService = promotionListQueryService ?? throw new ArgumentNullException(nameof(promotionListQueryService));
 
 	public async IAsyncEnumerable<DepositAccumulateRouletteEventAddInfo> QueryAsync(
 		DistributeDepositAccumulateRouletteCountCommand command,

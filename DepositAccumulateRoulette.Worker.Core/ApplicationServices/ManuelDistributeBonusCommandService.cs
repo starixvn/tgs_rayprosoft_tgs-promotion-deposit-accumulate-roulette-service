@@ -3,24 +3,16 @@ using Tgs.ServiceUtility;
 
 namespace Tgs.Promotion.DepositAccumulateRoulette.Worker.ApplicationServices;
 
-internal class ManuelDistributeBonusCommandService : ICommandService<ManuelDistributeBonusCommand>
+internal class ManuelDistributeBonusCommandService(
+	ITgsRepository tgsRepository,
+	IDistributePlanHasher hasher,
+	ICommandService<DistributeBonusCommand> distributeService,
+	ILogger<ManuelDistributeBonusCommandService> logger) : ICommandService<ManuelDistributeBonusCommand>
 {
-	private readonly ITgsRepository _tgsRepository;
-	private readonly IDistributePlanHasher _hasher;
-	private readonly ICommandService<DistributeBonusCommand> _distributeService;
-	private readonly ILogger<ManuelDistributeBonusCommandService> _logger;
-
-	public ManuelDistributeBonusCommandService(
-		ITgsRepository tgsRepository,
-		IDistributePlanHasher hasher,
-		ICommandService<DistributeBonusCommand> distributeService,
-		ILogger<ManuelDistributeBonusCommandService> logger)
-	{
-		_tgsRepository = tgsRepository ?? throw new ArgumentNullException(nameof(tgsRepository));
-		_hasher = hasher ?? throw new ArgumentNullException(nameof(hasher));
-		_distributeService = distributeService ?? throw new ArgumentNullException(nameof(distributeService));
-		_logger = logger ?? throw new ArgumentNullException(nameof(logger));
-	}
+	private readonly ITgsRepository _tgsRepository = tgsRepository ?? throw new ArgumentNullException(nameof(tgsRepository));
+	private readonly IDistributePlanHasher _hasher = hasher ?? throw new ArgumentNullException(nameof(hasher));
+	private readonly ICommandService<DistributeBonusCommand> _distributeService = distributeService ?? throw new ArgumentNullException(nameof(distributeService));
+	private readonly ILogger<ManuelDistributeBonusCommandService> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
 	public async ValueTask ExecuteAsync(
 		ManuelDistributeBonusCommand command,

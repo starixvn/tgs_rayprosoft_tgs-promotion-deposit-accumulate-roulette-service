@@ -2,12 +2,10 @@
 
 namespace Tgs.Promotion.DepositAccumulateRoulette.Worker.ApplicationServices;
 
-internal class GetRouletteRecordQueryService : IGetService<GetRouletteRecordQuery, RouletteRecordInfo?>
+internal class GetRouletteRecordQueryService(
+	ITgsRepository tgsRepository) : IGetService<GetRouletteRecordQuery, RouletteRecordInfo?>
 {
-	private readonly ITgsRepository _tgsRepository;
-
-	public GetRouletteRecordQueryService(
-		ITgsRepository tgsRepository) => _tgsRepository = tgsRepository ?? throw new ArgumentNullException(nameof(tgsRepository));
+	private readonly ITgsRepository _tgsRepository = tgsRepository ?? throw new ArgumentNullException(nameof(tgsRepository));
 
 	public async ValueTask<RouletteRecordInfo?> GetAsync(
 		GetRouletteRecordQuery query,

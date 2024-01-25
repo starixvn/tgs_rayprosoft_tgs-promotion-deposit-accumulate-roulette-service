@@ -10,12 +10,10 @@ namespace Tgs.Promotion.DepositAccumulateRouletteService.IntegrationTests;
 
 extern alias RouletteSvc;
 
-internal class TestDepositAccumulateRouletteServiceApplication : WebApplicationFactory<RouletteSvc.Program>
+internal class TestDepositAccumulateRouletteServiceApplication(
+	Action<IWebHostBuilder>? webHostConfiguration = null) : WebApplicationFactory<RouletteSvc.Program>
 {
-	private readonly Action<IWebHostBuilder>? _webHostConfiguration;
-
-	public TestDepositAccumulateRouletteServiceApplication(
-		Action<IWebHostBuilder>? webHostConfiguration = null) => _webHostConfiguration = webHostConfiguration;
+	private readonly Action<IWebHostBuilder>? _webHostConfiguration = webHostConfiguration;
 
 	protected override void ConfigureWebHost(IWebHostBuilder builder)
 	{

@@ -4,27 +4,18 @@ using Tgs.Promotion.Clients;
 
 namespace Tgs.Promotion.DepositAccumulateRoulette.Worker;
 
-internal class PromotionService : IPromotionService
+internal class PromotionService(
+	ISystemClock systemClock,
+	ITgsRepository tgsRepository,
+	IStoreRepository storeRepository,
+	IPromotionServiceClient promotionServiceClient,
+	IPlayerServiceClient playerServiceClient) : IPromotionService
 {
-	private readonly ISystemClock _systemClock;
-	private readonly ITgsRepository _tgsRepository;
-	private readonly IStoreRepository _storeRepository;
-	private readonly IPromotionServiceClient _promotionServiceClient;
-	private readonly IPlayerServiceClient _playerServiceClient;
-
-	public PromotionService(
-		ISystemClock systemClock,
-		ITgsRepository tgsRepository,
-		IStoreRepository storeRepository,
-		IPromotionServiceClient promotionServiceClient,
-		IPlayerServiceClient playerServiceClient)
-	{
-		_systemClock = systemClock ?? throw new ArgumentNullException(nameof(systemClock));
-		_tgsRepository = tgsRepository ?? throw new ArgumentNullException(nameof(tgsRepository));
-		_storeRepository = storeRepository ?? throw new ArgumentNullException(nameof(storeRepository));
-		_promotionServiceClient = promotionServiceClient ?? throw new ArgumentNullException(nameof(promotionServiceClient));
-		_playerServiceClient = playerServiceClient ?? throw new ArgumentNullException(nameof(playerServiceClient));
-	}
+	private readonly ISystemClock _systemClock = systemClock ?? throw new ArgumentNullException(nameof(systemClock));
+	private readonly ITgsRepository _tgsRepository = tgsRepository ?? throw new ArgumentNullException(nameof(tgsRepository));
+	private readonly IStoreRepository _storeRepository = storeRepository ?? throw new ArgumentNullException(nameof(storeRepository));
+	private readonly IPromotionServiceClient _promotionServiceClient = promotionServiceClient ?? throw new ArgumentNullException(nameof(promotionServiceClient));
+	private readonly IPlayerServiceClient _playerServiceClient = playerServiceClient ?? throw new ArgumentNullException(nameof(playerServiceClient));
 
 	public async IAsyncEnumerable<Guid> GetPlayerAvailablePromotionIdsAsync(
 		string playerCode,

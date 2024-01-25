@@ -7,7 +7,8 @@ using System.Web;
 
 namespace Tgs.Promotion.DepositAccumulateRouletteService;
 
-internal class DepositAccumulateRouletteWorkerClient : IDepositAccumulateRouletteWorkerClient
+internal class DepositAccumulateRouletteWorkerClient(
+	HttpClient httpClient) : IDepositAccumulateRouletteWorkerClient
 {
 	private static readonly JsonSerializerOptions _SerializerOptions = new()
 	{
@@ -20,10 +21,7 @@ internal class DepositAccumulateRouletteWorkerClient : IDepositAccumulateRoulett
 		}
 	};
 
-	private readonly HttpClient _httpClient;
-
-	public DepositAccumulateRouletteWorkerClient(
-		HttpClient httpClient) => _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
+	private readonly HttpClient _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
 
 	public async IAsyncEnumerable<RouletteRecordInfo> QueryRouletteRecordsAsync(
 		Guid promotionId,

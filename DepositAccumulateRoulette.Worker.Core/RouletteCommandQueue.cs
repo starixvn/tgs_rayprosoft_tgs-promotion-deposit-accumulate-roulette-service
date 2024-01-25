@@ -47,8 +47,7 @@ internal class RouletteCommandQueue : IRouletteQueueStore, IDisposable
 		_playerServiceClient = playerServiceClient ?? throw new ArgumentNullException(nameof(playerServiceClient));
 		_rouletteServiceClient = rouletteServiceClient ?? throw new ArgumentNullException(nameof(rouletteServiceClient));
 
-		if (systemClock is null)
-			throw new ArgumentNullException(nameof(systemClock));
+		ArgumentNullException.ThrowIfNull(systemClock);
 
 		_today = DateOnly.FromDateTime(systemClock.UtcNow.ToOffset(TimeSpan.FromHours(8D)).DateTime);
 	}

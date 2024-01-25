@@ -4,17 +4,15 @@ using Tgs.Promotion.DepositAccumulateRoulette.Worker;
 
 namespace Tgs.Promotion.DepositAccumulateRoulette.Repositories;
 
-internal class StoreRepository : IStoreRepository
+internal class StoreRepository(
+	IDatabase redisDatabase) : IStoreRepository
 {
 	private static readonly string _KeyPrefix = "Promotion:DepositAccumulateRoulette";
 	private static readonly decimal _ExchangeRate = 1_000_000M;
 
 	private static readonly JsonSerializerOptions _DepositEventJsonSerializerOptions = new();
 
-	private readonly IDatabase _redisDatabase;
-
-	public StoreRepository(
-		IDatabase redisDatabase) => _redisDatabase = redisDatabase ?? throw new ArgumentNullException(nameof(redisDatabase));
+	private readonly IDatabase _redisDatabase = redisDatabase ?? throw new ArgumentNullException(nameof(redisDatabase));
 
 	public async ValueTask<decimal> IncrementTotalDistributeAmountAsync(
 		Guid promotionId,

@@ -3,25 +3,17 @@ using Tgs.ServiceUtility;
 
 namespace Tgs.Promotion.DepositAccumulateRoulette.Worker.ApplicationServices;
 
-internal class GetRouletteCountItemsQueryService
-	: IQueryService<GetRouletteCountItemsQuery, RouletteCountItemInfo>
+internal class GetRouletteCountItemsQueryService(
+	IPromotionService promotionService,
+	IDepositAccumulateRouletteEventService eventService,
+	ITgsRepository tgsRepository,
+	IStoreRepository storeRepository)
+		: IQueryService<GetRouletteCountItemsQuery, RouletteCountItemInfo>
 {
-	private readonly IPromotionService _promotionService;
-	private readonly ITgsRepository _tgsRepository;
-	private readonly IStoreRepository _storeRepository;
-	private readonly IDepositAccumulateRouletteEventService _eventService;
-
-	public GetRouletteCountItemsQueryService(
-		IPromotionService promotionService,
-		IDepositAccumulateRouletteEventService eventService,
-		ITgsRepository tgsRepository,
-		IStoreRepository storeRepository)
-	{
-		_promotionService = promotionService ?? throw new ArgumentNullException(nameof(promotionService));
-		_tgsRepository = tgsRepository ?? throw new ArgumentNullException(nameof(tgsRepository));
-		_storeRepository = storeRepository ?? throw new ArgumentNullException(nameof(storeRepository));
-		_eventService = eventService ?? throw new ArgumentNullException(nameof(eventService));
-	}
+	private readonly IPromotionService _promotionService = promotionService ?? throw new ArgumentNullException(nameof(promotionService));
+	private readonly ITgsRepository _tgsRepository = tgsRepository ?? throw new ArgumentNullException(nameof(tgsRepository));
+	private readonly IStoreRepository _storeRepository = storeRepository ?? throw new ArgumentNullException(nameof(storeRepository));
+	private readonly IDepositAccumulateRouletteEventService _eventService = eventService ?? throw new ArgumentNullException(nameof(eventService));
 
 	public async IAsyncEnumerable<RouletteCountItemInfo> QueryAsync(
 		GetRouletteCountItemsQuery query,

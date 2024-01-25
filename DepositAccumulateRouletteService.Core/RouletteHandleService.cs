@@ -7,21 +7,14 @@ using Valhalla.MessageQueue;
 
 namespace Tgs.Promotion.DepositAccumulateRouletteService;
 
-internal class RouletteHandleService : IRouletteHandleService
+internal class RouletteHandleService(
+	IDatabase redisDatabase,
+	IMessageSender messageSender,
+	ILogger<RouletteHandleService> logger) : IRouletteHandleService
 {
-	private readonly IDatabase _redisDatabase;
-	private readonly IMessageSender _messageSender;
-	private readonly ILogger<RouletteHandleService> _logger;
-
-	public RouletteHandleService(
-		IDatabase redisDatabase,
-		IMessageSender messageSender,
-		ILogger<RouletteHandleService> logger)
-	{
-		_redisDatabase = redisDatabase ?? throw new ArgumentNullException(nameof(redisDatabase));
-		_messageSender = messageSender ?? throw new ArgumentNullException(nameof(messageSender));
-		_logger = logger ?? throw new ArgumentNullException(nameof(logger));
-	}
+	private readonly IDatabase _redisDatabase = redisDatabase ?? throw new ArgumentNullException(nameof(redisDatabase));
+	private readonly IMessageSender _messageSender = messageSender ?? throw new ArgumentNullException(nameof(messageSender));
+	private readonly ILogger<RouletteHandleService> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
 	public async ValueTask<RouletteResult> RequestAsync(
 		RouletteTaskRequest request,

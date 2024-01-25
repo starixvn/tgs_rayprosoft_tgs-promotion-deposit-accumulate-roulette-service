@@ -4,12 +4,10 @@ using Tgs.ServiceUtility;
 
 namespace Tgs.Promotion.DepositAccumulateRoulette.Background.ApplicationServices;
 
-internal class ValidPromotionListQueryService : IQueryService<ValidPromotionListQuery, PromotionInfo>
+internal class ValidPromotionListQueryService(
+	IPromotionServiceClient promotionServiceClient) : IQueryService<ValidPromotionListQuery, PromotionInfo>
 {
-	private readonly IPromotionServiceClient _promotionServiceClient;
-
-	public ValidPromotionListQueryService(
-		IPromotionServiceClient promotionServiceClient) => _promotionServiceClient = promotionServiceClient ?? throw new ArgumentNullException(nameof(promotionServiceClient));
+	private readonly IPromotionServiceClient _promotionServiceClient = promotionServiceClient ?? throw new ArgumentNullException(nameof(promotionServiceClient));
 
 	public IAsyncEnumerable<PromotionInfo> QueryAsync(
 		ValidPromotionListQuery query,

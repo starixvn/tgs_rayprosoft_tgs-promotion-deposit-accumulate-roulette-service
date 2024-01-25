@@ -4,15 +4,13 @@ using Tgs.Promotion.DepositAccumulateRoulette.Common;
 
 namespace Tgs.Promotion.DepositAccumulateRoulette.Worker;
 
-internal class RouletteCommandQueueManager
+internal class RouletteCommandQueueManager(
+	IServiceProvider serviceProvider)
 {
-	private readonly IServiceProvider _serviceProvider;
+	private readonly IServiceProvider _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
 
 	private readonly ConcurrentDictionary<string, RouletteCommandQueue> _queuePool = new();
 	private readonly CancellationTokenSource _cancellationTokenSource = new();
-
-	public RouletteCommandQueueManager(
-		IServiceProvider serviceProvider) => _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
 
 	public async Task<RouletteResult> RequestAsync(RouletteCommandRequest request)
 	{

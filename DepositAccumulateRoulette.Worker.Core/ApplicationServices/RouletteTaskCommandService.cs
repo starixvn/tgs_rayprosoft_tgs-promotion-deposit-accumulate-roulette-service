@@ -3,12 +3,10 @@ using Tgs.ServiceUtility;
 
 namespace Tgs.Promotion.DepositAccumulateRoulette.Worker.ApplicationServices;
 
-internal class RouletteTaskCommandService : IGetService<RouletteTaskCommand, RouletteResult>
+internal class RouletteTaskCommandService(
+	RouletteCommandQueueManager queueManager) : IGetService<RouletteTaskCommand, RouletteResult>
 {
-	private readonly RouletteCommandQueueManager _queueManager;
-
-	public RouletteTaskCommandService(
-		RouletteCommandQueueManager queueManager) => _queueManager = queueManager ?? throw new ArgumentNullException(nameof(queueManager));
+	private readonly RouletteCommandQueueManager _queueManager = queueManager ?? throw new ArgumentNullException(nameof(queueManager));
 
 	public async ValueTask<RouletteResult> GetAsync(
 		RouletteTaskCommand command,

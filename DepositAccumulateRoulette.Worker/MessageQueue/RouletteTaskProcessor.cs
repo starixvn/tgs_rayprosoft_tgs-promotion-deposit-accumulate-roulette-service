@@ -19,8 +19,7 @@ public class RouletteTaskProcessor : IMessageProcessor<ReadOnlyMemory<byte>, Rea
 	{
 		_rouletteService = rouletteService ?? throw new ArgumentNullException(nameof(rouletteService));
 
-		if (redisConnectionManager is null)
-			throw new ArgumentNullException(nameof(redisConnectionManager));
+		ArgumentNullException.ThrowIfNull(redisConnectionManager);
 
 		_redisDatabase = redisConnectionManager.Database;
 	}

@@ -9,21 +9,14 @@ using Valhalla.MessageQueue;
 
 namespace Tgs.Promotion.DepositAccumulateRouletteService.MessageQueue;
 
-public class RouletteProcessor : IMessageProcessor<ReadOnlyMemory<byte>, ReadOnlyMemory<byte>>
+public class RouletteProcessor(
+	IPlayerServiceClient playerServiceClient,
+	IGetService<GetDepositAccumulateRoulettePromotionQuery, DepositAccumulateRoulettePromotionInfo?> getPromotionService,
+	IRouletteHandleService handleService) : IMessageProcessor<ReadOnlyMemory<byte>, ReadOnlyMemory<byte>>
 {
-	private readonly IPlayerServiceClient _playerServiceClient;
-	private readonly IGetService<GetDepositAccumulateRoulettePromotionQuery, DepositAccumulateRoulettePromotionInfo?> _getPromotionService;
-	private readonly IRouletteHandleService _handleService;
-
-	public RouletteProcessor(
-		IPlayerServiceClient playerServiceClient,
-		IGetService<GetDepositAccumulateRoulettePromotionQuery, DepositAccumulateRoulettePromotionInfo?> getPromotionService,
-		IRouletteHandleService handleService)
-	{
-		_playerServiceClient = playerServiceClient ?? throw new ArgumentNullException(nameof(playerServiceClient));
-		_getPromotionService = getPromotionService ?? throw new ArgumentNullException(nameof(getPromotionService));
-		_handleService = handleService ?? throw new ArgumentNullException(nameof(handleService));
-	}
+	private readonly IPlayerServiceClient _playerServiceClient = playerServiceClient ?? throw new ArgumentNullException(nameof(playerServiceClient));
+	private readonly IGetService<GetDepositAccumulateRoulettePromotionQuery, DepositAccumulateRoulettePromotionInfo?> _getPromotionService = getPromotionService ?? throw new ArgumentNullException(nameof(getPromotionService));
+	private readonly IRouletteHandleService _handleService = handleService ?? throw new ArgumentNullException(nameof(handleService));
 
 	public async ValueTask<ReadOnlyMemory<byte>> HandleAsync(
 		string subject,
