@@ -1,9 +1,8 @@
 ﻿using System.Net;
 using System.Net.Http.Json;
 using System.Runtime.CompilerServices;
-using System.Text.Json.Serialization;
 using System.Text.Json;
-using DateOnlyTimeOnly.AspNet.Converters;
+using System.Text.Json.Serialization;
 using System.Web;
 
 namespace Tgs.Promotion.DepositAccumulateRouletteService;
@@ -18,17 +17,13 @@ internal class DepositAccumulateRouletteWorkerClient : IDepositAccumulateRoulett
 		Converters =
 		{
 			new JsonStringEnumConverter(),
-			new DateOnlyJsonConverter()
 		}
 	};
 
 	private readonly HttpClient _httpClient;
 
 	public DepositAccumulateRouletteWorkerClient(
-		HttpClient httpClient)
-	{
-		_httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
-	}
+		HttpClient httpClient) => _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
 
 	public async IAsyncEnumerable<RouletteRecordInfo> QueryRouletteRecordsAsync(
 		Guid promotionId,
@@ -69,7 +64,9 @@ internal class DepositAccumulateRouletteWorkerClient : IDepositAccumulateRoulett
 			queryStrings.Add("playerCode", playerCode);
 
 		if (paging.ShowAll == true)
+		{
 			queryStrings.Add("all", "true");
+		}
 		else
 		{
 			if (paging.Page != null)

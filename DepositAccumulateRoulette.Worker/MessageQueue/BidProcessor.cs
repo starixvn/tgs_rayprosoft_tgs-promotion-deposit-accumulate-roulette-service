@@ -5,7 +5,7 @@ using Valhalla.MessageQueue;
 
 namespace Tgs.Promotion.DepositAccumulateRoulette.Worker.MessageQueue;
 
-public class BidProcessor : IMessageProcessor
+public class BidProcessor : IMessageProcessor<ReadOnlyMemory<byte>, ReadOnlyMemory<byte>>
 {
 	private readonly IDatabase _redisDatabase;
 	private readonly ILogger<BidProcessor> _logger;
@@ -21,7 +21,11 @@ public class BidProcessor : IMessageProcessor
 		_logger = logger ?? throw new ArgumentNullException(nameof(logger));
 	}
 
-	public async ValueTask<ReadOnlyMemory<byte>> HandleAsync(ReadOnlyMemory<byte> data, CancellationToken cancellationToken = default)
+	public async ValueTask<ReadOnlyMemory<byte>> HandleAsync(
+		string subject,
+		ReadOnlyMemory<byte> data,
+		IEnumerable<MessageHeaderValue>? headerValues,
+		CancellationToken cancellationToken = default)
 	{
 		var request = BidRequest.Parser.ParseFrom(data.Span);
 
@@ -39,11 +43,13 @@ public class BidProcessor : IMessageProcessor
 		var response = new BidResponse();
 
 		if (isSet)
+		{
 			response.Subject = Environment.MachineName;
+		}
 		else
 		{
-			var subject = await _redisDatabase.StringGetAsync(redisKey).ConfigureAwait(false);
-			response.Subject = subject;
+			var resource = await _redisDatabase.StringGetAsync(redisKey).ConfigureAwait(false);
+			response.Subject = resource;
 		}
 
 		_logger.LogInformation(

@@ -1,4 +1,6 @@
-﻿namespace Tgs.Promotion.DepositAccumulateRoulette.Worker.Core.UnitTests;
+﻿using NUnit.Framework.Legacy;
+
+namespace Tgs.Promotion.DepositAccumulateRoulette.Worker.Core.UnitTests;
 
 internal class DistributePlanHasherTests
 {
@@ -14,7 +16,7 @@ internal class DistributePlanHasherTests
 
 		var actual = sut.GetHashCode(date, count);
 
-		Assert.AreEqual(expected, actual);
+		ClassicAssert.AreEqual(expected, actual);
 	}
 
 	[Test]
@@ -37,6 +39,6 @@ internal class DistributePlanHasherTests
 		var hash1 = sut.GetHashCode(item1.Date, item1.RouletteCount);
 		var hash2 = sut.GetHashCode(item2.Date, item2.RouletteCount);
 
-		Assert.AreEqual(hash1, hash2);
+		ClassicAssert.AreEqual(hash1, hash2);
 	}
 }

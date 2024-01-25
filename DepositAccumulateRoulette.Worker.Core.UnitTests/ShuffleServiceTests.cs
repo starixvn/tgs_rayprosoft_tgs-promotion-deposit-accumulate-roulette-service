@@ -1,4 +1,5 @@
-﻿using Tgs.Promotion.DepositAccumulateRoulette.Common;
+﻿using NUnit.Framework.Legacy;
+using Tgs.Promotion.DepositAccumulateRoulette.Common;
 
 namespace Tgs.Promotion.DepositAccumulateRoulette.Worker.Core.UnitTests;
 
@@ -27,19 +28,19 @@ internal class ShuffleServiceTests
 
 		var actual = await sut.ShuffleAsync(Guid.NewGuid(), rouletteItems).ConfigureAwait(false);
 
-		Assert.AreEqual(10000, actual.Length);
+		ClassicAssert.AreEqual(10000, actual.Length);
 
-		Assert.AreEqual(0, actual.Count(item => item == 0));
-		Assert.AreEqual(0, actual.Count(item => item == 1));
-		Assert.AreEqual(0, actual.Count(item => item == 2));
-		Assert.AreEqual(0, actual.Count(item => item == 3));
-		Assert.AreEqual(200, actual.Count(item => item == 4));
-		Assert.AreEqual(300, actual.Count(item => item == 5));
-		Assert.AreEqual(400, actual.Count(item => item == 6));
-		Assert.AreEqual(600, actual.Count(item => item == 7));
-		Assert.AreEqual(2500, actual.Count(item => item == 8));
-		Assert.AreEqual(2000, actual.Count(item => item == 9));
-		Assert.AreEqual(3000, actual.Count(item => item == 10));
-		Assert.AreEqual(1000, actual.Count(item => item == 11));
+		ClassicAssert.AreEqual(0, actual.Count(item => item == 0));
+		ClassicAssert.AreEqual(0, actual.Count(item => item == 1));
+		ClassicAssert.AreEqual(0, actual.Count(item => item == 2));
+		ClassicAssert.AreEqual(0, actual.Count(item => item == 3));
+		ClassicAssert.AreEqual(200, actual.Count(item => item == 4));
+		ClassicAssert.AreEqual(300, actual.Count(item => item == 5));
+		ClassicAssert.AreEqual(400, actual.Count(item => item == 6));
+		ClassicAssert.AreEqual(600, actual.Count(item => item == 7));
+		ClassicAssert.AreEqual(2500, actual.Count(item => item == 8));
+		ClassicAssert.AreEqual(2000, actual.Count(item => item == 9));
+		ClassicAssert.AreEqual(3000, actual.Count(item => item == 10));
+		ClassicAssert.AreEqual(1000, actual.Count(item => item == 11));
 	}
 }

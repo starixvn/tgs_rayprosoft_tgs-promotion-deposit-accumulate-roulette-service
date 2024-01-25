@@ -2,8 +2,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Tgs.PlayerService.Client;
 using Tgs.Promotion.DepositAccumulateRoulette.Common;
-using Tgs.Promotion.DepositAccumulateRoulette.Worker.ApplicationServices;
-using Tgs.ServiceUtility;
 
 namespace Tgs.Promotion.DepositAccumulateRoulette.Worker;
 
@@ -13,7 +11,7 @@ internal class RouletteCommandQueue : IRouletteQueueStore, IDisposable
 	private readonly IPlayerServiceClient _playerServiceClient;
 	private readonly IDepositAccumulateRouletteServiceClient _rouletteServiceClient;
 
-	private readonly BlockingCollection<IRouletteCommand> _rouletteCommands = new();
+	private readonly BlockingCollection<IRouletteCommand> _rouletteCommands = [];
 
 	private readonly DateOnly _today;
 

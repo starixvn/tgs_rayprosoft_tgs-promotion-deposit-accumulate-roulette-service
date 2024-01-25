@@ -29,7 +29,7 @@ internal class RouletteHandleService : IRouletteHandleService
 	{
 		var machineName = await GetProcessSubjectAsync(request.PlayerCode, request.PromotionId, cancellationToken).ConfigureAwait(false);
 
-		var data = await _messageSender.RequestAsync(
+		var data = await _messageSender.RequestAsync<ReadOnlyMemory<byte>, ReadOnlyMemory<byte>>(
 			$"tgs.promotion.depositaccumulateroulette.worker.{machineName}.roulette",
 			request.ToByteArray(),
 			cancellationToken)
@@ -57,7 +57,7 @@ internal class RouletteHandleService : IRouletteHandleService
 			PlayerCode = playerCode
 		};
 
-		var responseData = await _messageSender.RequestAsync(
+		var responseData = await _messageSender.RequestAsync<ReadOnlyMemory<byte>, ReadOnlyMemory<byte>>(
 				"tgs.promotion.depositaccumulateroulette.bid",
 				bidRequest.ToByteArray(),
 				cancellationToken)

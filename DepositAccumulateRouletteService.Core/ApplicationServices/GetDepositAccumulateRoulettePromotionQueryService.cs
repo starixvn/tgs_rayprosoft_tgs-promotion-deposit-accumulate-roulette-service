@@ -10,10 +10,7 @@ internal class GetDepositAccumulateRoulettePromotionQueryService
 	private readonly IPromotionServiceClient _promotionServiceClient;
 
 	public GetDepositAccumulateRoulettePromotionQueryService(
-		IPromotionServiceClient promotionServiceClient)
-	{
-		_promotionServiceClient = promotionServiceClient ?? throw new ArgumentNullException(nameof(promotionServiceClient));
-	}
+		IPromotionServiceClient promotionServiceClient) => _promotionServiceClient = promotionServiceClient ?? throw new ArgumentNullException(nameof(promotionServiceClient));
 
 	public async ValueTask<DepositAccumulateRoulettePromotionInfo?> GetAsync(GetDepositAccumulateRoulettePromotionQuery query,
 		CancellationToken cancellationToken = default)

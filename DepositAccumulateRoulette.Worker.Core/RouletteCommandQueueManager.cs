@@ -12,10 +12,7 @@ internal class RouletteCommandQueueManager
 	private readonly CancellationTokenSource _cancellationTokenSource = new();
 
 	public RouletteCommandQueueManager(
-		IServiceProvider serviceProvider)
-	{
-		_serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
-	}
+		IServiceProvider serviceProvider) => _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
 
 	public async Task<RouletteResult> RequestAsync(RouletteCommandRequest request)
 	{
@@ -29,8 +26,10 @@ internal class RouletteCommandQueueManager
 				request.PromotionId));
 
 		if (!queue.IsStartProcess)
+		{
 			await queue.StartProcessAsync(_cancellationTokenSource.Token)
 				.ConfigureAwait(false);
+		}
 
 		var command = new RouletteCommand(new TaskCompletionSource<RouletteResult>());
 		queue.Enqueue(command);

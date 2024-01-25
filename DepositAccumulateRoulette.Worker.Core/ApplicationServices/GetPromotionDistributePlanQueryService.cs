@@ -8,10 +8,7 @@ internal class GetPromotionDistributePlanQueryService : IGetService<GetPromotion
 	private readonly IPromotionServiceClient _promotionServiceClient;
 
 	public GetPromotionDistributePlanQueryService(
-		IPromotionServiceClient promotionServiceClient)
-	{
-		_promotionServiceClient = promotionServiceClient ?? throw new ArgumentNullException(nameof(promotionServiceClient));
-	}
+		IPromotionServiceClient promotionServiceClient) => _promotionServiceClient = promotionServiceClient ?? throw new ArgumentNullException(nameof(promotionServiceClient));
 
 	public ValueTask<PromotionDistributePlanInfo> GetAsync(
 		GetPromotionDistributePlanQuery query,

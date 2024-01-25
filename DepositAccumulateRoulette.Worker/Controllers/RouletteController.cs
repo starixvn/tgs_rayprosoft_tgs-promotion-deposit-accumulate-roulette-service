@@ -21,6 +21,7 @@ public class RouletteController : ControllerBase
 				new RouletteRecordsQuery(promotionId, playerCode), HttpContext.RequestAborted);
 
 		await foreach (var info in rouletteRecordInfos)
+		{
 			yield return new RouletteRecordViewModel
 			{
 				RouletteId = info.RecordId,
@@ -30,6 +31,7 @@ public class RouletteController : ControllerBase
 				ItemIndex = info.ItemIndex,
 				CreatedOn = info.CreatedOn
 			};
+		}
 	}
 
 	[HttpGet("records/{brandId}", Name = "QueryRouletteRecordsByConditions")]
@@ -63,6 +65,7 @@ public class RouletteController : ControllerBase
 			.ConfigureAwait(false);
 
 		foreach (var info in records)
+		{
 			yield return new RouletteRecordViewModel
 			{
 				RouletteId = info.RecordId,
@@ -72,6 +75,7 @@ public class RouletteController : ControllerBase
 				ItemIndex = info.ItemIndex,
 				CreatedOn = info.CreatedOn
 			};
+		}
 	}
 
 	[HttpGet("record/{brandId}/{recordId}", Name = "GetRouletteRecord")]

@@ -1,5 +1,6 @@
 ﻿using ExpectedObjects;
 using NSubstitute;
+using NUnit.Framework.Legacy;
 using Tgs.PlayerService.Client;
 using Tgs.Promotion.Clients;
 using Tgs.Promotion.DepositAccumulateRoulette.Worker.ApplicationServices;

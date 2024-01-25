@@ -2,10 +2,8 @@
 using Hangfire;
 using Hangfire.MemoryStorage;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
+using NATS.Client.Core;
 using Npgsql;
-using OpenTelemetry.Exporter;
-using OpenTelemetry.Instrumentation.AspNetCore;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
@@ -35,13 +33,15 @@ builder.Logging
 	});
 
 builder.Services
+	.AddKeyedSingleton(
+		"Nats",
+		(sp, _) => new NatsConnection(NatsOpts.Default with
+		{
+			Url = builder.Configuration.GetConnectionString("Nats")!
+		}))
 	.AddMessageQueue()
 	.AddNatsMessageQueue(natsConfig => natsConfig
-		.ConfigQueueOptions((options, sp) =>
-		{
-			var config = sp.GetRequiredService<IConfiguration>();
-			options.Url = config.GetConnectionString("Nats")!;
-		})
+		.ConfigureResolveConnection(sp => sp.GetRequiredKeyedService<NatsConnection>("Nats"))
 		.AddProcessor<BidProcessor>(
 			"tgs.promotion.depositaccumulateroulette.bid",
 			"tgs.promotion.depositaccumulateroulette.bid")
@@ -105,7 +105,14 @@ builder.Services
 		.AddSource("Tgs.*")
 		.AddSource("TGS.*")
 		.AddSource("Valhalla.*")
-		.AddAspNetCoreInstrumentation()
+		.AddAspNetCoreInstrumentation(options => options.Filter =
+			httpContext => !httpContext.Request.Path.HasValue
+			   || !httpContext.Request.Path.StartsWithSegments("/swagger")
+			   && !httpContext.Request.Path.StartsWithSegments("/healthz")
+			   && !httpContext.Request.Path.StartsWithSegments("/profiler/")
+			   && !httpContext.Request.Path.StartsWithSegments("/metrics")
+			   && !new[] { "html", "ico", "png", "jpg" }.Any(
+				   ext => httpContext.Request.Path.Value.EndsWith($".{ext}")))
 		.AddHttpClientInstrumentation()
 		.AddNpgsql()
 		.AddProfileViewExporter()
@@ -116,22 +123,11 @@ builder.Services
 		.AddRuntimeInstrumentation()
 		.AddOtlpExporter())
 	.Services
-	.AddProfileViewer()
-	.Configure<AspNetCoreInstrumentationOptions>(
-		options => options.Filter = httpContext
-			=> !httpContext.Request.Path.HasValue
-			   || !httpContext.Request.Path.StartsWithSegments("/swagger")
-			   && !httpContext.Request.Path.StartsWithSegments("/healthz")
-			   && !httpContext.Request.Path.StartsWithSegments("/profiler/")
-			   && !httpContext.Request.Path.StartsWithSegments("/metrics")
-			   && !new[] { "html", "ico", "png", "jpg" }.Any(
-				   ext => httpContext.Request.Path.Value.EndsWith($".{ext}")));
+	.AddProfileViewer();
 
 builder.Services
 	.AddRouting(options => options.LowercaseUrls = true)
-	.AddControllers()
-	.Services
-	.AddDateOnlyTimeOnlyStringConverters();
+	.AddControllers();
 
 builder.Services.AddSwaggerGen();
 

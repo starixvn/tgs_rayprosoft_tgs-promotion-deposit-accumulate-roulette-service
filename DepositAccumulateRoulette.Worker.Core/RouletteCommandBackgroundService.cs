@@ -6,10 +6,7 @@ internal class RouletteCommandBackgroundService : BackgroundService
 {
 	private readonly RouletteCommandQueueManager _rouletteCommandQueueManager;
 
-	public RouletteCommandBackgroundService(RouletteCommandQueueManager rouletteCommandQueueManager)
-	{
-		_rouletteCommandQueueManager = rouletteCommandQueueManager ?? throw new ArgumentNullException(nameof(rouletteCommandQueueManager));
-	}
+	public RouletteCommandBackgroundService(RouletteCommandQueueManager rouletteCommandQueueManager) => _rouletteCommandQueueManager = rouletteCommandQueueManager ?? throw new ArgumentNullException(nameof(rouletteCommandQueueManager));
 
 	protected override Task ExecuteAsync(CancellationToken stoppingToken)
 	{

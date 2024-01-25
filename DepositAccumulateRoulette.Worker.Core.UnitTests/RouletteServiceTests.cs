@@ -1,5 +1,5 @@
 ﻿using NSubstitute;
-using Tgs.PlayerService.Client;
+using NUnit.Framework.Legacy;
 using Tgs.Promotion.DepositAccumulateRoulette.Common;
 using Tgs.Promotion.DepositAccumulateRoulette.Worker.ApplicationServices;
 
@@ -61,8 +61,8 @@ internal class RouletteServiceTests
 
 		var actual = await sut.GetAsync(command);
 
-		Assert.IsNotNull(actual);
-		Assert.AreNotEqual(-1, actual.Result!.ItemIndex);
+		ClassicAssert.IsNotNull(actual);
+		ClassicAssert.AreNotEqual(-1, actual.Result!.ItemIndex);
 
 		_ = fakeTgsRepository
 			.Received(1)
@@ -120,7 +120,7 @@ internal class RouletteServiceTests
 
 		var actual = await sut.GetAsync(command);
 
-		Assert.IsNull(actual.Result);
+		ClassicAssert.IsNull(actual.Result);
 
 		_ = fakeTgsRepository
 			.DidNotReceive()

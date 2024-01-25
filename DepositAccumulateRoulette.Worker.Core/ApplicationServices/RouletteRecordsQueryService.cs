@@ -7,10 +7,7 @@ internal class RouletteRecordsQueryService : IQueryService<RouletteRecordsQuery,
 	private readonly ITgsRepository _tgsRepository;
 
 	public RouletteRecordsQueryService(
-		ITgsRepository tgsRepository)
-	{
-		_tgsRepository = tgsRepository;
-	}
+		ITgsRepository tgsRepository) => _tgsRepository = tgsRepository;
 
 	public IAsyncEnumerable<RouletteRecordInfo> QueryAsync(
 		RouletteRecordsQuery query,

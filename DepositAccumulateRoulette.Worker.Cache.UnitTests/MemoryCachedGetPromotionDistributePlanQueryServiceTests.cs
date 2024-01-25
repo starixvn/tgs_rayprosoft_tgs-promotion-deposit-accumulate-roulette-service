@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using NSubstitute;
+using NUnit.Framework.Legacy;
 using Tgs.Promotion.Clients;
 using Tgs.Promotion.DepositAccumulateRoulette.Worker.ApplicationServices;
 using Tgs.ServiceUtility;
@@ -34,7 +35,7 @@ internal class MemoryCachedGetPromotionDistributePlanQueryServiceTests
 
 		var actual = await sut.GetAsync(query);
 
-		Assert.AreEqual(expected, actual);
+		ClassicAssert.AreEqual(expected, actual);
 
 		_ = fakePromotionDistributePlanService
 			.DidNotReceive()
@@ -71,7 +72,7 @@ internal class MemoryCachedGetPromotionDistributePlanQueryServiceTests
 
 		var actual = await sut.GetAsync(query);
 
-		Assert.AreEqual(expected, actual);
+		ClassicAssert.AreEqual(expected, actual);
 
 		_ = fakePromotionDistributePlanService
 			.Received(1)

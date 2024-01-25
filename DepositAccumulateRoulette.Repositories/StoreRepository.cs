@@ -1,5 +1,4 @@
 ﻿using System.Text.Json;
-using DateOnlyTimeOnly.AspNet.Converters;
 using StackExchange.Redis;
 using Tgs.Promotion.DepositAccumulateRoulette.Worker;
 
@@ -10,18 +9,12 @@ internal class StoreRepository : IStoreRepository
 	private static readonly string _KeyPrefix = "Promotion:DepositAccumulateRoulette";
 	private static readonly decimal _ExchangeRate = 1_000_000M;
 
-	private static readonly JsonSerializerOptions _DepositEventJsonSerializerOptions = new()
-	{
-		Converters = { new DateOnlyJsonConverter() }
-	};
+	private static readonly JsonSerializerOptions _DepositEventJsonSerializerOptions = new();
 
 	private readonly IDatabase _redisDatabase;
 
 	public StoreRepository(
-		IDatabase redisDatabase)
-	{
-		_redisDatabase = redisDatabase ?? throw new ArgumentNullException(nameof(redisDatabase));
-	}
+		IDatabase redisDatabase) => _redisDatabase = redisDatabase ?? throw new ArgumentNullException(nameof(redisDatabase));
 
 	public async ValueTask<decimal> IncrementTotalDistributeAmountAsync(
 		Guid promotionId,

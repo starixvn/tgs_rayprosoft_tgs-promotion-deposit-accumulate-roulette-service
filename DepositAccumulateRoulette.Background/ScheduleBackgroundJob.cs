@@ -8,10 +8,7 @@ public class ScheduleBackgroundJob
 {
 	private readonly IMessageSender _messageSender;
 
-	public ScheduleBackgroundJob(IMessageSender messageSender)
-	{
-		_messageSender = messageSender ?? throw new ArgumentNullException(nameof(messageSender));
-	}
+	public ScheduleBackgroundJob(IMessageSender messageSender) => _messageSender = messageSender ?? throw new ArgumentNullException(nameof(messageSender));
 
 	public Task ExecuteAsync(DateOnly processDate, string subject)
 	{

@@ -8,10 +8,7 @@ internal class BackgroundRepository : IBackgroundRepository
 	private readonly TgsContext _context;
 
 	public BackgroundRepository(
-		TgsContext context)
-	{
-		_context = context ?? throw new ArgumentNullException(nameof(context));
-	}
+		TgsContext context) => _context = context ?? throw new ArgumentNullException(nameof(context));
 
 	public IAsyncEnumerable<DepositFormInfo> GetApprovedDepositFormsAsync(
 		IEnumerable<Guid> brandIds,

@@ -5,17 +5,18 @@ using Valhalla.MessageQueue;
 
 namespace Tgs.Promotion.DepositAccumulateRouletteService.MessageQueue;
 
-internal class DepositAccumulateRouletteSettingProcessor : IMessageProcessor
+internal class DepositAccumulateRouletteSettingProcessor : IMessageProcessor<ReadOnlyMemory<byte>, ReadOnlyMemory<byte>>
 {
 	private readonly DepositAccumulateRouletteSerializer _serializer;
 
 	public DepositAccumulateRouletteSettingProcessor(
-		DepositAccumulateRouletteSerializer serializer)
-	{
-		_serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
-	}
+		DepositAccumulateRouletteSerializer serializer) => _serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
 
-	public ValueTask<ReadOnlyMemory<byte>> HandleAsync(ReadOnlyMemory<byte> data, CancellationToken cancellationToken = default)
+	public ValueTask<ReadOnlyMemory<byte>> HandleAsync(
+		string subject,
+		ReadOnlyMemory<byte> data,
+		IEnumerable<MessageHeaderValue>? headerValues,
+		CancellationToken cancellationToken = default)
 	{
 		var request = CampaignDetailRequest.Parser.ParseFrom(data.Span);
 

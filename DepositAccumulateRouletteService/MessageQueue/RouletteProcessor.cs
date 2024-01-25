@@ -9,7 +9,7 @@ using Valhalla.MessageQueue;
 
 namespace Tgs.Promotion.DepositAccumulateRouletteService.MessageQueue;
 
-public class RouletteProcessor : IMessageProcessor
+public class RouletteProcessor : IMessageProcessor<ReadOnlyMemory<byte>, ReadOnlyMemory<byte>>
 {
 	private readonly IPlayerServiceClient _playerServiceClient;
 	private readonly IGetService<GetDepositAccumulateRoulettePromotionQuery, DepositAccumulateRoulettePromotionInfo?> _getPromotionService;
@@ -25,7 +25,11 @@ public class RouletteProcessor : IMessageProcessor
 		_handleService = handleService ?? throw new ArgumentNullException(nameof(handleService));
 	}
 
-	public async ValueTask<ReadOnlyMemory<byte>> HandleAsync(ReadOnlyMemory<byte> data, CancellationToken cancellationToken = default)
+	public async ValueTask<ReadOnlyMemory<byte>> HandleAsync(
+		string subject,
+		ReadOnlyMemory<byte> data,
+		IEnumerable<MessageHeaderValue>? headerValues,
+		CancellationToken cancellationToken = default)
 	{
 		var request = RouletteRequest.Parser.ParseFrom(data.Span);
 

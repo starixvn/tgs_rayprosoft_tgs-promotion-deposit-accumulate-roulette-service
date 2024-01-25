@@ -15,10 +15,7 @@ internal class DepositAccumulateRouletteServiceClient : IDepositAccumulateRoulet
 
 	private readonly HttpClient _httpClient;
 
-	public DepositAccumulateRouletteServiceClient(HttpClient httpClient)
-	{
-		_httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
-	}
+	public DepositAccumulateRouletteServiceClient(HttpClient httpClient) => _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
 
 	public async ValueTask<DepositAccumulateRoulettePromotion?> GetDepositAccumulateRoulettePromotionAsync(
 		Guid promotionId,

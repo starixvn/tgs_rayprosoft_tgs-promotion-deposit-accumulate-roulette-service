@@ -57,7 +57,7 @@ spec:
                   key: redis
           ports:
             - name: http
-              containerPort: 80
+              containerPort: 8080
               protocol: TCP
           volumeMounts:
             - mountPath: /config/appsettings.json
@@ -78,7 +78,7 @@ spec:
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
         - name: monitor
-          image: otel/opentelemetry-collector:0.75.0
+          image: otel/opentelemetry-collector:0.92.0
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           args: 
             - --config=/etc/otel/config.yaml

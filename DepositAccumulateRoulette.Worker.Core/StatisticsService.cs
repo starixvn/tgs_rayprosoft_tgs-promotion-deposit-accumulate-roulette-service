@@ -5,10 +5,7 @@ internal class StatisticsService : IStatisticsService
 	private readonly IStoreRepository _storeRepository;
 
 	public StatisticsService(
-		IStoreRepository storeRepository)
-	{
-		_storeRepository = storeRepository ?? throw new ArgumentNullException(nameof(storeRepository));
-	}
+		IStoreRepository storeRepository) => _storeRepository = storeRepository ?? throw new ArgumentNullException(nameof(storeRepository));
 
 	public ValueTask<decimal> IncrementTotalDistributeAmountAsync(
 		Guid promotionId,

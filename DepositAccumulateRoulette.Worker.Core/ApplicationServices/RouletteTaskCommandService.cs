@@ -8,10 +8,7 @@ internal class RouletteTaskCommandService : IGetService<RouletteTaskCommand, Rou
 	private readonly RouletteCommandQueueManager _queueManager;
 
 	public RouletteTaskCommandService(
-		RouletteCommandQueueManager queueManager)
-	{
-		_queueManager = queueManager ?? throw new ArgumentNullException(nameof(queueManager));
-	}
+		RouletteCommandQueueManager queueManager) => _queueManager = queueManager ?? throw new ArgumentNullException(nameof(queueManager));
 
 	public async ValueTask<RouletteResult> GetAsync(
 		RouletteTaskCommand command,

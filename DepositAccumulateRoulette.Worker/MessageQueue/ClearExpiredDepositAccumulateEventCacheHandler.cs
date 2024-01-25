@@ -3,17 +3,18 @@ using Valhalla.MessageQueue;
 
 namespace Tgs.Promotion.DepositAccumulateRoulette.Worker.MessageQueue;
 
-public class ClearExpiredDepositAccumulateEventCacheHandler : IMessageHandler
+public class ClearExpiredDepositAccumulateEventCacheHandler : IMessageHandler<ReadOnlyMemory<byte>>
 {
 	private readonly IStoreRepository _storeRepository;
 
 	public ClearExpiredDepositAccumulateEventCacheHandler(
-		IStoreRepository storeRepository)
-	{
-		_storeRepository = storeRepository ?? throw new ArgumentNullException(nameof(storeRepository));
-	}
+		IStoreRepository storeRepository) => _storeRepository = storeRepository ?? throw new ArgumentNullException(nameof(storeRepository));
 
-	public ValueTask HandleAsync(ReadOnlyMemory<byte> data, CancellationToken cancellationToken = default)
+	public ValueTask HandleAsync(
+		string subject,
+		ReadOnlyMemory<byte> data,
+		IEnumerable<MessageHeaderValue>? headerValues,
+		CancellationToken cancellationToken = default)
 	{
 		var request = ClearEventCacheRequest.Parser.ParseFrom(data.Span);
 

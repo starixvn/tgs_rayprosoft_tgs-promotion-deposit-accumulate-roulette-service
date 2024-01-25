@@ -8,10 +8,7 @@ internal class EnqueueDistributeBonusJobCommandService : ICommandService<Enqueue
 	private readonly IBackgroundJobClient _backgroundJobClient;
 
 	public EnqueueDistributeBonusJobCommandService(
-		IBackgroundJobClient backgroundJobClient)
-	{
-		_backgroundJobClient = backgroundJobClient ?? throw new ArgumentNullException(nameof(backgroundJobClient));
-	}
+		IBackgroundJobClient backgroundJobClient) => _backgroundJobClient = backgroundJobClient ?? throw new ArgumentNullException(nameof(backgroundJobClient));
 
 	public ValueTask ExecuteAsync(
 		EnqueueDistributeBonusJobCommand command,

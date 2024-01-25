@@ -1,26 +1,25 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <RootNamespace>Tgs.Promotion.DepositAccumulateRoulette.Worker</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="DateOnlyTimeOnly.AspNet" Version="2.1.1" />
-    <PackageReference Include="Hangfire.AspNetCore" Version="1.8.6" />
-    <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="7.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="7.0.0" />
+    <PackageReference Include="Hangfire.AspNetCore" Version="1.8.9" />
+    <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="8.0.0" />
     <PackageReference Include="murmurhash" Version="1.0.3" />
-    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="7.0.11" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.0" />
     <PackageReference Include="PagingUtility.AsyncEnumerable" Version="1.1.0" />
-    <PackageReference Include="PhoenixToolkits.MessageQueue" Version="1.0.3" />
+    <PackageReference Include="PhoenixToolkits.MessageQueue" Version="2.1.0" />
     <PackageReference Include="Scrutor" Version="4.2.2" />
-    <PackageReference Include="StackExchange.Redis" Version="2.6.122" />
+    <PackageReference Include="StackExchange.Redis" Version="2.7.17" />
     <PackageReference Include="System.Linq.Async" Version="6.0.1" />
-    <PackageReference Include="Tgs.PlayerService.Client" Version="0.0.45" />
-    <PackageReference Include="Tgs.Promotion.Client" Version="1.0.44" />
+    <PackageReference Include="Tgs.PlayerService.Client" Version="0.2.1" />
+    <PackageReference Include="Tgs.Promotion.Client" Version="1.0.47" />
     <PackageReference Include="TGS.ServiceUtility" Version="0.2.0" />
   </ItemGroup>
 

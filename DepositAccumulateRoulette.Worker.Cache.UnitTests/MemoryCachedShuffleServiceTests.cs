@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using NSubstitute;
+using NUnit.Framework.Legacy;
 using Tgs.Promotion.DepositAccumulateRoulette.Common;
 
 namespace Tgs.Promotion.DepositAccumulateRoulette.Worker.Cache.UnitTests;

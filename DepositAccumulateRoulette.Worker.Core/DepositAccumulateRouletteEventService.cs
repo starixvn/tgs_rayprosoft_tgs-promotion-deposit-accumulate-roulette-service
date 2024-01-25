@@ -41,12 +41,14 @@ internal class DepositAccumulateRouletteEventService : IDepositAccumulateRoulett
 				.ConfigureAwait(false);
 
 			if (info.RouletteCount > count)
+			{
 				return new RouletteEventCountInfo(
 					info.PlayerCode,
 					info.PromotionId,
 					info.Date,
 					info.RouletteCount,
 					count.Value);
+			}
 		}
 
 		return null;

@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
+using NUnit.Framework.Legacy;
 using Tgs.PlayerService.Client;
 using Tgs.Promotion.DepositAccumulateRoulette.Common;
-using Tgs.Promotion.DepositAccumulateRoulette.Worker.ApplicationServices;
 using Tgs.Promotion.DepositAccumulateRoulette.Worker.Clients;
 using Tgs.ServiceUtility;
 
@@ -79,7 +79,7 @@ internal class RouletteQueueTests
 
 		await command.Promise.Task;
 
-		Assert.IsTrue(command.IsExecuted);
+		ClassicAssert.IsTrue(command.IsExecuted);
 	}
 
 	[Test]

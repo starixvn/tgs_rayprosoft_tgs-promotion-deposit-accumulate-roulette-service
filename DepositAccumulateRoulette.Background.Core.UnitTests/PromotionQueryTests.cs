@@ -1,4 +1,5 @@
 ﻿using NSubstitute;
+using NUnit.Framework.Legacy;
 using Tgs.Promotion.Clients;
 using Tgs.Promotion.DepositAccumulateRoulette.Background.ApplicationServices;
 using Tgs.Promotion.DepositAccumulateRoulette.Common;
@@ -49,11 +50,11 @@ internal class PromotionQueryTests
 						new(Guid.NewGuid(), "iphone 13 pro", 3M, 0M, 0M)
 					})));
 
-			var query = new ValidPromotionListQuery(processDate);
+		var query = new ValidPromotionListQuery(processDate);
 
 		var actual = await sut.QueryAsync(query).ToArrayAsync();
 
-		Assert.AreEqual(1, actual.Length);
+		ClassicAssert.AreEqual(1, actual.Length);
 	}
 
 	[Test]
@@ -98,11 +99,11 @@ internal class PromotionQueryTests
 						new(Guid.NewGuid(), "iphone 13 pro", 3M, 0M, 0M)
 					})));
 
-			var query = new ValidPromotionListQuery(processDate);
+		var query = new ValidPromotionListQuery(processDate);
 
 		var actual = await sut.QueryAsync(query).ToArrayAsync();
 
-		Assert.AreEqual(1, actual.Length);
+		ClassicAssert.AreEqual(1, actual.Length);
 	}
 
 	[Test]
@@ -136,12 +137,12 @@ internal class PromotionQueryTests
 		_ = fakePromotionClient.GetPromotionRuleAsync<ValidPromotionListQueryService.PromotionRule>(
 				Arg.Any<Guid>(),
 				Arg.Any<CancellationToken>())
-			.Returns((ValidPromotionListQueryService.PromotionRule?) null);
+			.Returns((ValidPromotionListQueryService.PromotionRule?)null);
 
 		var query = new ValidPromotionListQuery(processDate);
 
 		var actual = await sut.QueryAsync(query).ToArrayAsync();
 
-		Assert.AreEqual(0, actual.Length);
+		ClassicAssert.AreEqual(0, actual.Length);
 	}
 }

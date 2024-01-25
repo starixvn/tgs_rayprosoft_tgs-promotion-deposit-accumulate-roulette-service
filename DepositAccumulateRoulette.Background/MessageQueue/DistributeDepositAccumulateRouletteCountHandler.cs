@@ -5,7 +5,7 @@ using Valhalla.MessageQueue;
 
 namespace Tgs.Promotion.DepositAccumulateRoulette.Background.MessageQueue;
 
-internal class DistributeDepositAccumulateRouletteCountHandler : IMessageHandler
+internal class DistributeDepositAccumulateRouletteCountHandler : IMessageHandler<ReadOnlyMemory<byte>>
 {
 	private readonly IQueryService<DistributeDepositAccumulateRouletteCountCommand, DepositAccumulateRouletteEventAddInfo> _distributeCommandService;
 	private readonly ICommandService<ClearExpiredEventCacheCommand> _clearCacheCommandService;
@@ -18,7 +18,11 @@ internal class DistributeDepositAccumulateRouletteCountHandler : IMessageHandler
 		_clearCacheCommandService = clearCacheCommandService ?? throw new ArgumentNullException(nameof(clearCacheCommandService));
 	}
 
-	public async ValueTask HandleAsync(ReadOnlyMemory<byte> data, CancellationToken cancellationToken = default)
+	public async ValueTask HandleAsync(
+		string subject,
+		ReadOnlyMemory<byte> data,
+		IEnumerable<MessageHeaderValue>? headerValues,
+		CancellationToken cancellationToken = default)
 	{
 		var request = ProcessRequest.Parser.ParseFrom(data.Span);
 

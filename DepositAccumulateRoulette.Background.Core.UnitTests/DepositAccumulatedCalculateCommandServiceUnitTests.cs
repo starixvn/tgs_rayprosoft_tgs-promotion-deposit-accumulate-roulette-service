@@ -1,4 +1,5 @@
 ﻿using NSubstitute;
+using NUnit.Framework.Legacy;
 using Tgs.Promotion.DepositAccumulateRoulette.Background.ApplicationServices;
 using Tgs.Promotion.DepositAccumulateRoulette.Common;
 using Tgs.ServiceUtility;
@@ -117,7 +118,7 @@ internal class DepositAccumulatedCalculateCommandServiceUnitTests
 
 		var actual = await sut.QueryAsync(command).ToArrayAsync();
 
-		Assert.AreEqual(0, actual.Length);
+		ClassicAssert.AreEqual(0, actual.Length);
 
 		_ = fakeBackgroundRepository
 			.DidNotReceive()
@@ -183,7 +184,7 @@ internal class DepositAccumulatedCalculateCommandServiceUnitTests
 
 		var actual = await sut.QueryAsync(command).ToArrayAsync();
 
-		Assert.AreEqual(0, actual.Length);
+		ClassicAssert.AreEqual(0, actual.Length);
 
 		_ = fakeBackgroundRepository
 			.DidNotReceive()
@@ -250,7 +251,7 @@ internal class DepositAccumulatedCalculateCommandServiceUnitTests
 
 		var actual = await sut.QueryAsync(command).ToArrayAsync();
 
-		Assert.AreEqual(0, actual.Length);
+		ClassicAssert.AreEqual(0, actual.Length);
 
 		_ = fakeBackgroundRepository
 			.DidNotReceive()
@@ -320,7 +321,7 @@ internal class DepositAccumulatedCalculateCommandServiceUnitTests
 
 		var actual = await sut.QueryAsync(command).ToArrayAsync();
 
-		Assert.AreEqual(0, actual.Length);
+		ClassicAssert.AreEqual(0, actual.Length);
 
 		_ = fakeBackgroundRepository
 			.DidNotReceive()

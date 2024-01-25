@@ -8,18 +8,18 @@ using Protos = Tgs.Promotion.DepositAccumulateRoulette.Common.Protos;
 
 namespace Tgs.Promotion.DepositAccumulateRoulette.Worker.MessageQueue;
 
-public class RouletteCountItemsQueryProcessor : IMessageProcessor
+public class RouletteCountItemsQueryProcessor : IMessageProcessor<ReadOnlyMemory<byte>, ReadOnlyMemory<byte>>
 {
 	private readonly IQueryService<GetRouletteCountItemsQuery, RouletteCountItemInfo> _queryService;
 
 	public RouletteCountItemsQueryProcessor(
-		IQueryService<GetRouletteCountItemsQuery, RouletteCountItemInfo> queryService)
-	{
-		_queryService = queryService ?? throw new ArgumentNullException(nameof(queryService));
-	}
+		IQueryService<GetRouletteCountItemsQuery, RouletteCountItemInfo> queryService) => _queryService = queryService ?? throw new ArgumentNullException(nameof(queryService));
 
 	public async ValueTask<ReadOnlyMemory<byte>> HandleAsync(
-		ReadOnlyMemory<byte> data, CancellationToken cancellationToken = default)
+		string subject,
+		ReadOnlyMemory<byte> data,
+		IEnumerable<MessageHeaderValue>? headerValues,
+		CancellationToken cancellationToken = default)
 	{
 		var request = RouletteCountItemsQueryRequest.Parser.ParseFrom(data.Span);
 

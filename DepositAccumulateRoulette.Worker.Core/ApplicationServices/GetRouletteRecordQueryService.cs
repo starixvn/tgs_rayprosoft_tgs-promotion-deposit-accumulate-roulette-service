@@ -7,10 +7,7 @@ internal class GetRouletteRecordQueryService : IGetService<GetRouletteRecordQuer
 	private readonly ITgsRepository _tgsRepository;
 
 	public GetRouletteRecordQueryService(
-		ITgsRepository tgsRepository)
-	{
-		_tgsRepository = tgsRepository ?? throw new ArgumentNullException(nameof(tgsRepository));
-	}
+		ITgsRepository tgsRepository) => _tgsRepository = tgsRepository ?? throw new ArgumentNullException(nameof(tgsRepository));
 
 	public async ValueTask<RouletteRecordInfo?> GetAsync(
 		GetRouletteRecordQuery query,

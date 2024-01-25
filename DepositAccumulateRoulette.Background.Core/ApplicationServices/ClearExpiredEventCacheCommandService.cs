@@ -10,10 +10,7 @@ internal class ClearExpiredEventCacheCommandService : ICommandService<ClearExpir
 	private readonly IMessageSender _messageSender;
 
 	public ClearExpiredEventCacheCommandService(
-		IMessageSender messageSender)
-	{
-		_messageSender = messageSender ?? throw new ArgumentNullException(nameof(messageSender));
-	}
+		IMessageSender messageSender) => _messageSender = messageSender ?? throw new ArgumentNullException(nameof(messageSender));
 
 	public async ValueTask ExecuteAsync(
 		ClearExpiredEventCacheCommand command,

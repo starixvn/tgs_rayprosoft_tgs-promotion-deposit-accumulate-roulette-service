@@ -15,10 +15,7 @@ internal class TestDepositAccumulateRouletteServiceApplication : WebApplicationF
 	private readonly Action<IWebHostBuilder>? _webHostConfiguration;
 
 	public TestDepositAccumulateRouletteServiceApplication(
-		Action<IWebHostBuilder>? webHostConfiguration = null)
-	{
-		_webHostConfiguration = webHostConfiguration;
-	}
+		Action<IWebHostBuilder>? webHostConfiguration = null) => _webHostConfiguration = webHostConfiguration;
 
 	protected override void ConfigureWebHost(IWebHostBuilder builder)
 	{

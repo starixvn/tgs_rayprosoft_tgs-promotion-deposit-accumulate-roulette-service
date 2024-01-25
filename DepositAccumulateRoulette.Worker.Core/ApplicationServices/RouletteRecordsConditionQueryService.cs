@@ -8,10 +8,7 @@ internal class RouletteRecordsConditionQueryService :
 	private readonly ITgsRepository _tgsRepository;
 
 	public RouletteRecordsConditionQueryService(
-		ITgsRepository tgsRepository)
-	{
-		_tgsRepository = tgsRepository ?? throw new ArgumentNullException(nameof(tgsRepository));
-	}
+		ITgsRepository tgsRepository) => _tgsRepository = tgsRepository ?? throw new ArgumentNullException(nameof(tgsRepository));
 
 	public IAsyncEnumerable<RouletteRecordInfo> QueryAsync(RouletteRecordsConditionQuery query,
 		CancellationToken cancellationToken = default)
