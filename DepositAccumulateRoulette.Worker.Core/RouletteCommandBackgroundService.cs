@@ -2,14 +2,9 @@
 
 namespace Tgs.Promotion.DepositAccumulateRoulette.Worker;
 
-internal class RouletteCommandBackgroundService : BackgroundService
+internal class RouletteCommandBackgroundService(RouletteCommandQueueManager rouletteCommandQueueManager) : BackgroundService
 {
-	private readonly RouletteCommandQueueManager _rouletteCommandQueueManager;
-
-	public RouletteCommandBackgroundService(RouletteCommandQueueManager rouletteCommandQueueManager)
-	{
-		_rouletteCommandQueueManager = rouletteCommandQueueManager ?? throw new ArgumentNullException(nameof(rouletteCommandQueueManager));
-	}
+	private readonly RouletteCommandQueueManager _rouletteCommandQueueManager = rouletteCommandQueueManager ?? throw new ArgumentNullException(nameof(rouletteCommandQueueManager));
 
 	protected override Task ExecuteAsync(CancellationToken stoppingToken)
 	{

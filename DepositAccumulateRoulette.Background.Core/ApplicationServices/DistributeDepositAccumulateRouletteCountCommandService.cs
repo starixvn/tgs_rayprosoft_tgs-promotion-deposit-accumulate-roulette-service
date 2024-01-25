@@ -4,26 +4,20 @@ using Tgs.ServiceUtility;
 
 namespace Tgs.Promotion.DepositAccumulateRoulette.Background.ApplicationServices;
 
-internal class DistributeDepositAccumulateRouletteCountCommandService
-	: IQueryService<DistributeDepositAccumulateRouletteCountCommand, DepositAccumulateRouletteEventAddInfo>
+internal class DistributeDepositAccumulateRouletteCountCommandService(
+	IBackgroundRepository backgroundRepository,
+	IQueryService<ValidPromotionListQuery, PromotionInfo> promotionListQueryService)
+		: IQueryService<DistributeDepositAccumulateRouletteCountCommand, DepositAccumulateRouletteEventAddInfo>
 {
-	private readonly IBackgroundRepository _backgroundRepository;
-	private readonly IQueryService<ValidPromotionListQuery, PromotionInfo> _promotionListQueryService;
-
-	public DistributeDepositAccumulateRouletteCountCommandService(
-		IBackgroundRepository backgroundRepository,
-		IQueryService<ValidPromotionListQuery, PromotionInfo> promotionListQueryService)
-	{
-		_backgroundRepository = backgroundRepository ?? throw new ArgumentNullException(nameof(backgroundRepository));
-		_promotionListQueryService = promotionListQueryService ?? throw new ArgumentNullException(nameof(promotionListQueryService));
-	}
+	private readonly IBackgroundRepository _backgroundRepository = backgroundRepository ?? throw new ArgumentNullException(nameof(backgroundRepository));
+	private readonly IQueryService<ValidPromotionListQuery, PromotionInfo> _promotionListQueryService = promotionListQueryService ?? throw new ArgumentNullException(nameof(promotionListQueryService));
 
 	public async IAsyncEnumerable<DepositAccumulateRouletteEventAddInfo> QueryAsync(
 		DistributeDepositAccumulateRouletteCountCommand command,
 		[EnumeratorCancellation] CancellationToken cancellationToken = default)
 	{
 		var promotions = await _promotionListQueryService.QueryAsync(
-				new ValidPromotionListQuery(command.ProcessDate), 
+				new ValidPromotionListQuery(command.ProcessDate),
 				cancellationToken)
 			.ToArrayAsync(cancellationToken)
 			.ConfigureAwait(false);
@@ -66,9 +60,9 @@ internal class DistributeDepositAccumulateRouletteCountCommandService
 				where rouletteCount > 0
 				select new DepositAccumulateRouletteEventAddInfo(
 					item.PlayerCode,
-					promotion.BrandId, 
+					promotion.BrandId,
 					promotion.Id,
-					rouletteCount, 
+					rouletteCount,
 					item.TotalDepositAmount);
 
 			addEvents.AddRange(addItems);
@@ -86,7 +80,7 @@ internal class DistributeDepositAccumulateRouletteCountCommandService
 	}
 
 	private static int GetDistributeRouletteCount(
-		IEnumerable<DepositAccumulateItem> depositSettings, 
+		IEnumerable<DepositAccumulateItem> depositSettings,
 		decimal totalDepositAmount)
 	{
 		var reachedItem = depositSettings

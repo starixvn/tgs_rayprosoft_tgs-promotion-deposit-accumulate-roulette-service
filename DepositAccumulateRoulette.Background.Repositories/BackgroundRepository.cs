@@ -3,15 +3,10 @@ using Tgs.Promotion.DepositAccumulateRoulette.Background.Repositories.Entities;
 
 namespace Tgs.Promotion.DepositAccumulateRoulette.Background.Repositories;
 
-internal class BackgroundRepository : IBackgroundRepository
+internal class BackgroundRepository(
+	TgsContext context) : IBackgroundRepository
 {
-	private readonly TgsContext _context;
-
-	public BackgroundRepository(
-		TgsContext context)
-	{
-		_context = context ?? throw new ArgumentNullException(nameof(context));
-	}
+	private readonly TgsContext _context = context ?? throw new ArgumentNullException(nameof(context));
 
 	public IAsyncEnumerable<DepositFormInfo> GetApprovedDepositFormsAsync(
 		IEnumerable<Guid> brandIds,

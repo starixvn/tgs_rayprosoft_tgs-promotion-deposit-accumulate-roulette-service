@@ -1,4 +1,5 @@
 ﻿using NSubstitute;
+using NUnit.Framework.Legacy;
 
 namespace Tgs.Promotion.DepositAccumulateRoulette.Worker.Core.UnitTests;
 
@@ -23,7 +24,7 @@ internal class StatisticsServiceTests
 
 		var actual = await sut.IncrementTotalDistributeAmountAsync(promotionId, distributeAmount);
 
-		Assert.AreEqual(expected, actual);
+		ClassicAssert.AreEqual(expected, actual);
 	}
 
 	[Test]
@@ -43,7 +44,7 @@ internal class StatisticsServiceTests
 
 		var (actual, _) = await sut.IncreaseRouletteUsedCountAsync(promotionId, playerCode, date).ConfigureAwait(false);
 
-		Assert.IsTrue(actual);
+		ClassicAssert.IsTrue(actual);
 
 		_ = fakeStoreRepository
 			.Received(1)
@@ -70,7 +71,7 @@ internal class StatisticsServiceTests
 
 		var (actual, _) = await sut.IncreaseRouletteUsedCountAsync(promotionId, playerCode, date).ConfigureAwait(false);
 
-		Assert.IsFalse(actual);
+		ClassicAssert.IsFalse(actual);
 
 		_ = fakeStoreRepository
 			.DidNotReceive()

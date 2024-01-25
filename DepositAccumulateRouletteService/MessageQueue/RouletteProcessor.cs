@@ -9,23 +9,20 @@ using Valhalla.MessageQueue;
 
 namespace Tgs.Promotion.DepositAccumulateRouletteService.MessageQueue;
 
-public class RouletteProcessor : IMessageProcessor
+public class RouletteProcessor(
+	IPlayerServiceClient playerServiceClient,
+	IGetService<GetDepositAccumulateRoulettePromotionQuery, DepositAccumulateRoulettePromotionInfo?> getPromotionService,
+	IRouletteHandleService handleService) : IMessageProcessor<ReadOnlyMemory<byte>, ReadOnlyMemory<byte>>
 {
-	private readonly IPlayerServiceClient _playerServiceClient;
-	private readonly IGetService<GetDepositAccumulateRoulettePromotionQuery, DepositAccumulateRoulettePromotionInfo?> _getPromotionService;
-	private readonly IRouletteHandleService _handleService;
+	private readonly IPlayerServiceClient _playerServiceClient = playerServiceClient ?? throw new ArgumentNullException(nameof(playerServiceClient));
+	private readonly IGetService<GetDepositAccumulateRoulettePromotionQuery, DepositAccumulateRoulettePromotionInfo?> _getPromotionService = getPromotionService ?? throw new ArgumentNullException(nameof(getPromotionService));
+	private readonly IRouletteHandleService _handleService = handleService ?? throw new ArgumentNullException(nameof(handleService));
 
-	public RouletteProcessor(
-		IPlayerServiceClient playerServiceClient,
-		IGetService<GetDepositAccumulateRoulettePromotionQuery, DepositAccumulateRoulettePromotionInfo?> getPromotionService,
-		IRouletteHandleService handleService)
-	{
-		_playerServiceClient = playerServiceClient ?? throw new ArgumentNullException(nameof(playerServiceClient));
-		_getPromotionService = getPromotionService ?? throw new ArgumentNullException(nameof(getPromotionService));
-		_handleService = handleService ?? throw new ArgumentNullException(nameof(handleService));
-	}
-
-	public async ValueTask<ReadOnlyMemory<byte>> HandleAsync(ReadOnlyMemory<byte> data, CancellationToken cancellationToken = default)
+	public async ValueTask<ReadOnlyMemory<byte>> HandleAsync(
+		string subject,
+		ReadOnlyMemory<byte> data,
+		IEnumerable<MessageHeaderValue>? headerValues,
+		CancellationToken cancellationToken = default)
 	{
 		var request = RouletteRequest.Parser.ParseFrom(data.Span);
 

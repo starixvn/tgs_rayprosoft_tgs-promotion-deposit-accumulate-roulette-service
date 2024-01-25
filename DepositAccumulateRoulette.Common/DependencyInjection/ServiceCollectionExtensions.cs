@@ -4,8 +4,8 @@ namespace Microsoft.Extensions.DependencyInjection;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddDepositAccumulateRouletteCommon(
-        this IServiceCollection services)
-        => services
-            .AddSingleton<DepositAccumulateRouletteSerializer>();
+	public static IServiceCollection AddDepositAccumulateRouletteCommon(
+		this IServiceCollection services)
+		=> services
+			.AddSingleton<DepositAccumulateRouletteSerializer>();
 }

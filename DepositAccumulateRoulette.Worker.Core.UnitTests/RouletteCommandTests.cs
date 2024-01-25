@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using NSubstitute;
+using NUnit.Framework.Legacy;
 using Tgs.Promotion.DepositAccumulateRoulette.Common;
 using Tgs.Promotion.DepositAccumulateRoulette.Worker.ApplicationServices;
 using Tgs.ServiceUtility;
@@ -68,8 +69,8 @@ internal class RouletteCommandTests
 
 		var actual = await sut.Promise.Task;
 
-		Assert.IsNotNull(actual);
-		Assert.AreEqual(expected, actual);
+		ClassicAssert.IsNotNull(actual);
+		ClassicAssert.AreEqual(expected, actual);
 	}
 
 	[Test]
@@ -183,7 +184,7 @@ internal class RouletteCommandTests
 
 		var actual = await sut.Promise.Task;
 
-		Assert.IsNotNull(actual);
-		Assert.AreEqual(expected, actual);
+		ClassicAssert.IsNotNull(actual);
+		ClassicAssert.AreEqual(expected, actual);
 	}
 }

@@ -3,6 +3,7 @@
 using Hangfire;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
+using NUnit.Framework.Legacy;
 using RouletteSvc::Tgs.Promotion.DepositAccumulateRouletteService.MessageQueue;
 using Tgs.DepositAccumulateRoulette.Clients;
 using Tgs.PlayerService.Client;
@@ -189,7 +190,7 @@ internal class DepositAccumulateRouletteTests
 				promotionInfo.PromotionLimitAmount,
 				settings));
 
-		_ = fakeMessageSender.RequestAsync(
+		_ = fakeMessageSender.RequestAsync<ReadOnlyMemory<byte>, ReadOnlyMemory<byte>>(
 				Arg.Is("tgs.promotion.depositaccumulateroulette.roulette.play"),
 				Arg.Any<ReadOnlyMemory<byte>>())
 			.Returns(callInfo =>
@@ -198,14 +199,14 @@ internal class DepositAccumulateRouletteTests
 
 				var processor = ActivatorUtilities.CreateInstance<RouletteProcessor>(serviceScope.ServiceProvider);
 
-				return processor.HandleAsync(data).Result;
+				return processor.HandleAsync("test", data, null).Result;
 			});
 
 		var actual = await sut.RouletteAsync(promotionId, playerCode);
 
-		Assert.IsNotNull(actual);
-		Assert.AreNotEqual(Guid.Empty, actual.Id);
-		Assert.AreNotEqual(-1, actual.ItemIndex);
+		ClassicAssert.IsNotNull(actual);
+		ClassicAssert.AreNotEqual(Guid.Empty, actual.Id);
+		ClassicAssert.AreNotEqual(-1, actual.ItemIndex);
 	}
 
 	[Test]
@@ -395,7 +396,7 @@ internal class DepositAccumulateRouletteTests
 				promotionInfo.PromotionLimitAmount,
 				settings));
 
-		_ = fakeMessageSender.RequestAsync(
+		_ = fakeMessageSender.RequestAsync<ReadOnlyMemory<byte>, ReadOnlyMemory<byte>>(
 				Arg.Is("tgs.promotion.depositaccumulateroulette.roulette.play"),
 				Arg.Any<ReadOnlyMemory<byte>>())
 			.Returns(callInfo =>
@@ -404,16 +405,16 @@ internal class DepositAccumulateRouletteTests
 
 				var processor = ActivatorUtilities.CreateInstance<RouletteProcessor>(serviceScope.ServiceProvider);
 
-				return processor.HandleAsync(data).Result;
+				return processor.HandleAsync("test", data, null).Result;
 			});
 
 		for (var i = 0; i <= 2; i++)
 		{
 			var actual = await sut.RouletteAsync(promotionId, playerCode);
 
-			Assert.IsNotNull(actual);
-			Assert.AreNotEqual(Guid.Empty, actual.Id);
-			Assert.AreNotEqual(-1, actual.ItemIndex);
+			ClassicAssert.IsNotNull(actual);
+			ClassicAssert.AreNotEqual(Guid.Empty, actual.Id);
+			ClassicAssert.AreNotEqual(-1, actual.ItemIndex);
 
 			await Task.Delay(500);
 		}
@@ -607,7 +608,7 @@ internal class DepositAccumulateRouletteTests
 				promotionInfo.PromotionLimitAmount,
 				settings));
 
-		_ = fakeMessageSender.RequestAsync(
+		_ = fakeMessageSender.RequestAsync<ReadOnlyMemory<byte>, ReadOnlyMemory<byte>>(
 				Arg.Is("tgs.promotion.depositaccumulateroulette.roulette.play"),
 				Arg.Any<ReadOnlyMemory<byte>>())
 			.Returns(callInfo =>
@@ -616,24 +617,24 @@ internal class DepositAccumulateRouletteTests
 
 				var processor = ActivatorUtilities.CreateInstance<RouletteProcessor>(serviceScope.ServiceProvider);
 
-				return processor.HandleAsync(data).Result;
+				return processor.HandleAsync("test", data, null).Result;
 			});
 
 		for (var i = 0; i <= 1; i++)
 		{
 			var actual = await sut.RouletteAsync(promotionId, playerCode);
 
-			Assert.IsNotNull(actual);
-			Assert.AreNotEqual(Guid.Empty, actual.Id);
-			Assert.AreNotEqual(-1, actual.ItemIndex);
+			ClassicAssert.IsNotNull(actual);
+			ClassicAssert.AreNotEqual(Guid.Empty, actual.Id);
+			ClassicAssert.AreNotEqual(-1, actual.ItemIndex);
 
 			await Task.Delay(500);
 		}
 
 		var lastActual = await sut.RouletteAsync(promotionId, playerCode);
-		Assert.IsNotNull(lastActual);
-		Assert.IsNull(lastActual.Id);
-		Assert.AreEqual(-1, lastActual.ItemIndex);
+		ClassicAssert.IsNotNull(lastActual);
+		ClassicAssert.IsNull(lastActual.Id);
+		ClassicAssert.AreEqual(-1, lastActual.ItemIndex);
 
 		_ = fakeTgsRepository
 			.Received(2)

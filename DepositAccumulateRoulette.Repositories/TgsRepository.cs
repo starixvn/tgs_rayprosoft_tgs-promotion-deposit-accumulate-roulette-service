@@ -6,18 +6,12 @@ using Tgs.SerialNumberGenerator;
 
 namespace Tgs.Promotion.DepositAccumulateRoulette.Repositories;
 
-internal class TgsRepository : ITgsRepository
+internal class TgsRepository(
+	TgsContext context,
+	ISerialNumberGenerator serialNumberGenerator) : ITgsRepository
 {
-	private readonly TgsContext _context;
-	private readonly ISerialNumberGenerator _serialNumberGenerator;
-
-	public TgsRepository(
-		TgsContext context,
-		ISerialNumberGenerator serialNumberGenerator)
-	{
-		_context = context ?? throw new ArgumentNullException(nameof(context));
-		_serialNumberGenerator = serialNumberGenerator ?? throw new ArgumentNullException(nameof(serialNumberGenerator));
-	}
+	private readonly TgsContext _context = context ?? throw new ArgumentNullException(nameof(context));
+	private readonly ISerialNumberGenerator _serialNumberGenerator = serialNumberGenerator ?? throw new ArgumentNullException(nameof(serialNumberGenerator));
 
 	public async IAsyncEnumerable<DepositAccumulateRouletteEventInfo> GetDepositAccumulateRouletteEventInfosAsync(
 		Guid promotionId,

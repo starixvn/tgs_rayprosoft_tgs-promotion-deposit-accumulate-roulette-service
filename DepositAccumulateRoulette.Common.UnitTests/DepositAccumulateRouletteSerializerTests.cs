@@ -1,4 +1,6 @@
-﻿namespace Tgs.Promotion.DepositAccumulateRoulette.Common.UnitTests;
+﻿using NUnit.Framework.Legacy;
+
+namespace Tgs.Promotion.DepositAccumulateRoulette.Common.UnitTests;
 
 internal class DepositAccumulateRouletteSerializerTests
 {
@@ -8,20 +10,20 @@ internal class DepositAccumulateRouletteSerializerTests
 		var settings = @"
 {
   ""depositItems"": [
-    {
-      ""id"": ""ab85fad0-fa30-46ef-9963-693fdbe8deb5"",
-      ""rouletteCount"": 1,
-      ""accumulateAmount"": 1000
-    }
+	{
+	  ""id"": ""ab85fad0-fa30-46ef-9963-693fdbe8deb5"",
+	  ""rouletteCount"": 1,
+	  ""accumulateAmount"": 1000
+	}
   ],
   ""rouletteItems"": [
-    {
-      ""id"": ""1cd30c0a-a61c-49fc-ba95-0ba78bfbcbb1"",
-      ""bonus"": 0,
-      ""title"": ""iphone 13 pro"",
-      ""turnoverRate"": 3,
-      ""winningProbability"": 0
-    }
+	{
+	  ""id"": ""1cd30c0a-a61c-49fc-ba95-0ba78bfbcbb1"",
+	  ""bonus"": 0,
+	  ""title"": ""iphone 13 pro"",
+	  ""turnoverRate"": 3,
+	  ""winningProbability"": 0
+	}
   ]
 }";
 		var expected = new DepositAccumulateRouletteSettings(
@@ -38,7 +40,7 @@ internal class DepositAccumulateRouletteSerializerTests
 
 		var actual = sut.Deserialize<DepositAccumulateRouletteSettings>(settings);
 
-		Assert.IsNotNull(actual);
+		ClassicAssert.IsNotNull(actual);
 		CollectionAssert.AreEqual(expected.DepositItems, actual!.DepositItems);
 		CollectionAssert.AreEqual(expected.RouletteItems, actual!.RouletteItems);
 	}
@@ -60,7 +62,7 @@ internal class DepositAccumulateRouletteSerializerTests
 
 		var actual = sut.Serialize(settings);
 
-		Assert.IsNotNull(actual);
+		ClassicAssert.IsNotNull(actual);
 
 		var deserialized = sut.Deserialize<DepositAccumulateRouletteSettings>(actual);
 

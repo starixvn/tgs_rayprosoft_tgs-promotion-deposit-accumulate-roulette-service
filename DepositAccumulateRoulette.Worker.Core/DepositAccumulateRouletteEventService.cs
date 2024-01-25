@@ -2,21 +2,14 @@
 
 namespace Tgs.Promotion.DepositAccumulateRoulette.Worker;
 
-internal class DepositAccumulateRouletteEventService : IDepositAccumulateRouletteEventService
+internal class DepositAccumulateRouletteEventService(
+	ISystemClock systemClock,
+	ITgsRepository tgsRepository,
+	IStoreRepository storeRepository) : IDepositAccumulateRouletteEventService
 {
-	private readonly ISystemClock _systemClock;
-	private readonly ITgsRepository _tgsRepository;
-	private readonly IStoreRepository _storeRepository;
-
-	public DepositAccumulateRouletteEventService(
-		ISystemClock systemClock,
-		ITgsRepository tgsRepository,
-		IStoreRepository storeRepository)
-	{
-		_systemClock = systemClock ?? throw new ArgumentNullException(nameof(systemClock));
-		_tgsRepository = tgsRepository ?? throw new ArgumentNullException(nameof(tgsRepository));
-		_storeRepository = storeRepository ?? throw new ArgumentNullException(nameof(storeRepository));
-	}
+	private readonly ISystemClock _systemClock = systemClock ?? throw new ArgumentNullException(nameof(systemClock));
+	private readonly ITgsRepository _tgsRepository = tgsRepository ?? throw new ArgumentNullException(nameof(tgsRepository));
+	private readonly IStoreRepository _storeRepository = storeRepository ?? throw new ArgumentNullException(nameof(storeRepository));
 
 	public IAsyncEnumerable<DepositAccumulateRouletteEventInfo> QueryDepositAccumulateRouletteEventInfosAsync(
 		Guid promotionId,
@@ -41,12 +34,14 @@ internal class DepositAccumulateRouletteEventService : IDepositAccumulateRoulett
 				.ConfigureAwait(false);
 
 			if (info.RouletteCount > count)
+			{
 				return new RouletteEventCountInfo(
 					info.PlayerCode,
 					info.PromotionId,
 					info.Date,
 					info.RouletteCount,
 					count.Value);
+			}
 		}
 
 		return null;

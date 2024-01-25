@@ -1,17 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <RootNamespace>Tgs.Promotion.DepositAccumulateRoulette.Background</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="7.0.0" />
-    <PackageReference Include="PhoenixToolkits.MessageQueue" Version="1.0.3" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.0" />
+    <PackageReference Include="PhoenixToolkits.MessageQueue" Version="2.1.0" />
     <PackageReference Include="System.Linq.Async" Version="6.0.1" />
-    <PackageReference Include="Tgs.Promotion.Client" Version="1.0.44" />
+    <PackageReference Include="Tgs.Promotion.Client" Version="1.0.47" />
     <PackageReference Include="TGS.ServiceUtility" Version="0.2.0" />
   </ItemGroup>
 

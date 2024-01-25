@@ -22,7 +22,7 @@ internal class DistributeDepositAccumulateRouletteCountHandlerTests
 			ProcessDate = DateOnly.Parse("2022-07-01")
 		};
 
-		await sut.HandleAsync(request.ToByteArray(), CancellationToken.None);
+		await sut.HandleAsync("test", request.ToByteArray(), null);
 
 		_ = fakeDistributeCommandService.Received(1)
 			.QueryAsync(Arg.Is<DistributeDepositAccumulateRouletteCountCommand>(x => x.ProcessDate == (DateOnly)request.ProcessDate));

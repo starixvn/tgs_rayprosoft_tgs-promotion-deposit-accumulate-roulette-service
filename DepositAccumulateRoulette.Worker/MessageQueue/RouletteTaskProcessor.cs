@@ -8,7 +8,7 @@ using Valhalla.MessageQueue;
 
 namespace Tgs.Promotion.DepositAccumulateRoulette.Worker.MessageQueue;
 
-public class RouletteTaskProcessor : IMessageProcessor
+public class RouletteTaskProcessor : IMessageProcessor<ReadOnlyMemory<byte>, ReadOnlyMemory<byte>>
 {
 	private readonly IGetService<RouletteTaskCommand, RouletteResult> _rouletteService;
 	private readonly IDatabase _redisDatabase;
@@ -19,24 +19,25 @@ public class RouletteTaskProcessor : IMessageProcessor
 	{
 		_rouletteService = rouletteService ?? throw new ArgumentNullException(nameof(rouletteService));
 
-		if (redisConnectionManager is null)
-			throw new ArgumentNullException(nameof(redisConnectionManager));
+		ArgumentNullException.ThrowIfNull(redisConnectionManager);
 
 		_redisDatabase = redisConnectionManager.Database;
 	}
 
 	public async ValueTask<ReadOnlyMemory<byte>> HandleAsync(
+		string subject,
 		ReadOnlyMemory<byte> data,
+		IEnumerable<MessageHeaderValue>? headerValues,
 		CancellationToken cancellationToken = default)
 	{
 		var request = RouletteTaskRequest.Parser.ParseFrom(data.Span);
 
 		var redisKey = $"Promotion:DepositAccumulateRoulette:Worker:{request.PlayerCode}:{request.PromotionId.ToGuid()}";
 
-		var subject = await _redisDatabase.StringGetAsync(redisKey).ConfigureAwait(false);
+		var resource = await _redisDatabase.StringGetAsync(redisKey).ConfigureAwait(false);
 
-		if (!subject.HasValue || (string)subject! != Environment.MachineName)
-			throw new InvalidOperationException($"This machine ({Environment.MachineName}) not match {subject}");
+		if (!resource.HasValue || (string)resource! != Environment.MachineName)
+			throw new InvalidOperationException($"This machine ({Environment.MachineName}) not match {resource}");
 
 		_ = await _redisDatabase.KeyExpireAsync(
 			redisKey,

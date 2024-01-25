@@ -11,19 +11,19 @@ namespace Tgs.Promotion.DepositAccumulateRouletteService.Controllers;
 [ApiController]
 public class PromotionController : ControllerBase
 {
+	private static readonly JsonSerializerOptions _SerializerOptions = new()
+	{
+		PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+		WriteIndented = false,
+		DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault,
+		Converters = { new JsonStringEnumConverter() }
+	};
+
 	[HttpGet("{promotionId}", Name = "GetDepositAccumulateRoulettePromotion")]
 	public async ValueTask<PromotionViewModel?> GetDepositAccumulateRoulettePromotionAsync(
 		[FromServices] IGetService<GetDepositAccumulateRoulettePromotionQuery, DepositAccumulateRoulettePromotionInfo?> getService,
 		Guid promotionId)
 	{
-		var serializerOptions = new JsonSerializerOptions
-		{
-			PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-			WriteIndented = false,
-			DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault,
-			Converters = { new JsonStringEnumConverter() }
-		};
-
 		var promotion = await getService.GetAsync(
 			new GetDepositAccumulateRoulettePromotionQuery(promotionId),
 			HttpContext.RequestAborted)
@@ -37,7 +37,7 @@ public class PromotionController : ControllerBase
 				EventDuring = new EventDuring(promotion.EventDuring.From, promotion.EventDuring.To),
 				PromotionLimitAmount = promotion.PromotionLimitAmount,
 				IsAutoSent = promotion.IsAutoSent,
-				CampaignDetail = JsonSerializer.SerializeToDocument(promotion.CampaignDetail, serializerOptions)
+				CampaignDetail = JsonSerializer.SerializeToDocument(promotion.CampaignDetail, _SerializerOptions)
 			};
 	}
 }

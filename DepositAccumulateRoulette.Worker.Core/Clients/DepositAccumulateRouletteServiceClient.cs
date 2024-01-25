@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace Tgs.Promotion.DepositAccumulateRoulette.Worker.Clients;
 
-internal class DepositAccumulateRouletteServiceClient : IDepositAccumulateRouletteServiceClient
+internal class DepositAccumulateRouletteServiceClient(HttpClient httpClient) : IDepositAccumulateRouletteServiceClient
 {
 	private static readonly JsonSerializerOptions _SerializerOptions = new()
 	{
@@ -13,12 +13,7 @@ internal class DepositAccumulateRouletteServiceClient : IDepositAccumulateRoulet
 		Converters = { new JsonStringEnumConverter() }
 	};
 
-	private readonly HttpClient _httpClient;
-
-	public DepositAccumulateRouletteServiceClient(HttpClient httpClient)
-	{
-		_httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
-	}
+	private readonly HttpClient _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
 
 	public async ValueTask<DepositAccumulateRoulettePromotion?> GetDepositAccumulateRoulettePromotionAsync(
 		Guid promotionId,

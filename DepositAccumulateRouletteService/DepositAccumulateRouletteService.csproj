@@ -1,43 +1,37 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>Tgs.Promotion.DepositAccumulateRouletteService</RootNamespace>
     <UserSecretsId>ca6eb773-a393-4bec-8f92-7381c7d76a5d</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-    <DockerfileBuildArguments>--build-arg "BuildConfiguration=$(Configuration)"</DockerfileBuildArguments>
     <DockerfileTag Condition="$(DockerfileTag) == ''">deposit-accumulate-roulette</DockerfileTag>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Program.cs~RFe9b7748.TMP" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="DateOnlyTimeOnly.AspNet.Swashbuckle" Version="2.1.1" />
-    <PackageReference Include="FluentdForward.OpenTelemetry.MessagePack" Version="0.3.1" />
-    <PackageReference Include="Google.Protobuf" Version="3.24.4" />
-    <PackageReference Include="Grpc.Tools" Version="2.59.0">
+    <PackageReference Include="FluentdForward.OpenTelemetry.MessagePack" Version="0.3.7" />
+    <PackageReference Include="Google.Protobuf" Version="3.25.2" />
+    <PackageReference Include="Grpc.Tools" Version="2.60.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.19.5" />
-    <PackageReference Include="Npgsql.OpenTelemetry" Version="7.0.6" />
-    <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.6.0" />
-    <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.6.0" />
-    <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.0.0-rc9.5" />
-    <PackageReference Include="OpenTelemetry.Instrumentation.Http" Version="1.0.0-rc9.5" />
-    <PackageReference Include="OpenTelemetry.Instrumentation.Runtime" Version="1.5.1" />
-    <PackageReference Include="PhoenixToolkits.MessageQueue.Nats" Version="1.0.6" />
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.19.6" />
+    <PackageReference Include="Npgsql.OpenTelemetry" Version="8.0.1" />
+    <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.7.0" />
+    <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.7.0" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.7.0" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.Http" Version="1.7.0" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.Runtime" Version="1.7.0" />
+    <PackageReference Include="PhoenixToolkits.MessageQueue.Nats" Version="2.1.1" />
     <PackageReference Include="PhoenixToolkits.Protobuf.ExtendTypes" Version="0.0.6" />
-    <PackageReference Include="ProfileViewer.OpenTelemetry.Exporter" Version="0.2.1" />
-    <PackageReference Include="StackExchange.Redis" Version="2.6.122" />
+    <PackageReference Include="ProfileViewer.OpenTelemetry.Exporter" Version="0.3.1" />
+    <PackageReference Include="StackExchange.Redis" Version="2.7.17" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
     <PackageReference Include="Tgs.Interceptors" Version="0.2.1" />
-    <PackageReference Include="Tgs.PlayerService.Client" Version="0.0.45" />
-    <PackageReference Include="Tgs.Promotion.Client" Version="1.0.44" />
+    <PackageReference Include="Tgs.PlayerService.Client" Version="0.2.1" />
+    <PackageReference Include="Tgs.Promotion.Client" Version="1.0.47" />
   </ItemGroup>
 
   <ItemGroup>

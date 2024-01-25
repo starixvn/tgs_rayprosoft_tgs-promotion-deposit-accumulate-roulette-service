@@ -9,10 +9,7 @@ internal class DepositAccumulateRouletteClient : IDepositAccumulateRouletteClien
 	private readonly IMessageSender _messageSender;
 
 	public DepositAccumulateRouletteClient(
-		IMessageSender messageSender)
-	{
-		_messageSender = messageSender ?? throw new ArgumentNullException(nameof(messageSender));
-	}
+		IMessageSender messageSender) => _messageSender = messageSender ?? throw new ArgumentNullException(nameof(messageSender));
 
 	public async ValueTask<RouletteResult> RouletteAsync(
 		Guid promotionId,
@@ -25,7 +22,7 @@ internal class DepositAccumulateRouletteClient : IDepositAccumulateRouletteClien
 			PlayerCode = playerCode
 		};
 
-		var responseData = await _messageSender.RequestAsync(
+		var responseData = await _messageSender.RequestAsync<ReadOnlyMemory<byte>, ReadOnlyMemory<byte>>(
 				"tgs.promotion.depositaccumulateroulette.roulette.play",
 				request.ToByteArray(),
 				cancellationToken)

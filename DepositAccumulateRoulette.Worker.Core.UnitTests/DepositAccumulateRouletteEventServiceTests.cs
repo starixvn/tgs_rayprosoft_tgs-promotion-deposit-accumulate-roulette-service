@@ -1,6 +1,5 @@
-﻿using System.Reflection;
-using NSubstitute;
-using Tgs.Promotion.DepositAccumulateRoulette.Worker.ApplicationServices;
+﻿using NSubstitute;
+using NUnit.Framework.Legacy;
 
 namespace Tgs.Promotion.DepositAccumulateRoulette.Worker.Core.UnitTests;
 
@@ -293,8 +292,8 @@ internal class DepositAccumulateRouletteEventServiceTests
 			.GetAvailableRouletteCountEventAsync(promotionId, playerCode)
 			.ConfigureAwait(false);
 
-		Assert.IsNotNull(actual);
-		Assert.AreEqual(expected, actual);
+		ClassicAssert.IsNotNull(actual);
+		ClassicAssert.AreEqual(expected, actual);
 	}
 
 	[Test]
@@ -337,7 +336,7 @@ internal class DepositAccumulateRouletteEventServiceTests
 			.GetAvailableRouletteCountEventAsync(promotionId, playerCode)
 			.ConfigureAwait(false);
 
-		Assert.IsNull(actual);
+		ClassicAssert.IsNull(actual);
 	}
 
 	[Test]
@@ -383,6 +382,6 @@ internal class DepositAccumulateRouletteEventServiceTests
 			.GetAvailableRouletteCountEventAsync(promotionId, playerCode)
 			.ConfigureAwait(false);
 
-		Assert.IsNull(actual);
+		ClassicAssert.IsNull(actual);
 	}
 }

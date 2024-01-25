@@ -4,19 +4,13 @@ using Tgs.ServiceUtility;
 
 namespace Tgs.Promotion.DepositAccumulateRouletteService;
 
-internal class CachedGetDepositAccumulateRoulettePromotionQueryService
-	: IGetService<GetDepositAccumulateRoulettePromotionQuery, DepositAccumulateRoulettePromotionInfo?>
+internal class CachedGetDepositAccumulateRoulettePromotionQueryService(
+	IMemoryCache memoryCache,
+	IGetService<GetDepositAccumulateRoulettePromotionQuery, DepositAccumulateRoulettePromotionInfo?> sourceService)
+		: IGetService<GetDepositAccumulateRoulettePromotionQuery, DepositAccumulateRoulettePromotionInfo?>
 {
-	private readonly IMemoryCache _memoryCache;
-	private readonly IGetService<GetDepositAccumulateRoulettePromotionQuery, DepositAccumulateRoulettePromotionInfo?> _sourceService;
-
-	public CachedGetDepositAccumulateRoulettePromotionQueryService(
-		IMemoryCache memoryCache,
-		IGetService<GetDepositAccumulateRoulettePromotionQuery, DepositAccumulateRoulettePromotionInfo?> sourceService)
-	{
-		_memoryCache = memoryCache ?? throw new ArgumentNullException(nameof(memoryCache));
-		_sourceService = sourceService ?? throw new ArgumentNullException(nameof(sourceService));
-	}
+	private readonly IMemoryCache _memoryCache = memoryCache ?? throw new ArgumentNullException(nameof(memoryCache));
+	private readonly IGetService<GetDepositAccumulateRoulettePromotionQuery, DepositAccumulateRoulettePromotionInfo?> _sourceService = sourceService ?? throw new ArgumentNullException(nameof(sourceService));
 
 	public async ValueTask<DepositAccumulateRoulettePromotionInfo?> GetAsync(
 		GetDepositAccumulateRoulettePromotionQuery query,

@@ -23,9 +23,6 @@ public class SchedulerController : ControllerBase
 	[HttpPost("distribute/roulette/count/{processDate}", Name = "QueueProcessDistributeDepositAccumulateRouletteCountWithProcessDate")]
 	[SuccessStatusCode(202)]
 	public void QueueProcessDistributeDepositAccumulateRouletteCountCalculationWithProcessDate(
-		DateOnly processDate)
-	{
-		_ = BackgroundJob.Enqueue<ScheduleBackgroundJob>(job =>
-			job.ExecuteAsync(processDate, "tgs.promotion.depositaccumulateroulette.background.roulettecount.distribute"));
-	}
+		DateOnly processDate) => _ = BackgroundJob.Enqueue<ScheduleBackgroundJob>(job =>
+										  job.ExecuteAsync(processDate, "tgs.promotion.depositaccumulateroulette.background.roulettecount.distribute"));
 }

@@ -4,7 +4,6 @@ using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Web;
-using DateOnlyTimeOnly.AspNet.Converters;
 
 namespace Tgs.DepositAccumulateRoulette.Clients;
 
@@ -18,17 +17,13 @@ internal class DepositAccumulateRouletteServiceClient : IDepositAccumulateRoulet
 		Converters =
 		{
 			new JsonStringEnumConverter(),
-			new DateOnlyJsonConverter()
 		}
 	};
 
 	private readonly HttpClient _httpClient;
 
 	public DepositAccumulateRouletteServiceClient(
-		HttpClient httpClient)
-	{
-		_httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
-	}
+		HttpClient httpClient) => _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
 
 	public async IAsyncEnumerable<RouletteRecord> GetRouletteRecordsAsync(
 		Guid promotionId,

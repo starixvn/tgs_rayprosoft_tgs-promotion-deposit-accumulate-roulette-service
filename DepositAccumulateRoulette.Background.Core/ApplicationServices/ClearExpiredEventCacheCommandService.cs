@@ -5,15 +5,10 @@ using Valhalla.MessageQueue;
 
 namespace Tgs.Promotion.DepositAccumulateRoulette.Background.ApplicationServices;
 
-internal class ClearExpiredEventCacheCommandService : ICommandService<ClearExpiredEventCacheCommand>
+internal class ClearExpiredEventCacheCommandService(
+	IMessageSender messageSender) : ICommandService<ClearExpiredEventCacheCommand>
 {
-	private readonly IMessageSender _messageSender;
-
-	public ClearExpiredEventCacheCommandService(
-		IMessageSender messageSender)
-	{
-		_messageSender = messageSender ?? throw new ArgumentNullException(nameof(messageSender));
-	}
+	private readonly IMessageSender _messageSender = messageSender ?? throw new ArgumentNullException(nameof(messageSender));
 
 	public async ValueTask ExecuteAsync(
 		ClearExpiredEventCacheCommand command,

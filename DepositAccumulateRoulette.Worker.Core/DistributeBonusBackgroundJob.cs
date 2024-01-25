@@ -6,27 +6,18 @@ using Tgs.ServiceUtility;
 
 namespace Tgs.Promotion.DepositAccumulateRoulette.Worker;
 
-internal class DistributeBonusBackgroundJob
+internal class DistributeBonusBackgroundJob(
+	IPromotionServiceClient promotionServiceClient,
+	ITgsRepository tgsRepository,
+	IDistributePlanHasher hasher,
+	ICommandService<DistributeBonusCommand> distributeService,
+	ILogger<DistributeBonusBackgroundJob> logger)
 {
-	private readonly IPromotionServiceClient _promotionServiceClient;
-	private readonly ITgsRepository _tgsRepository;
-	private readonly IDistributePlanHasher _hasher;
-	private readonly ICommandService<DistributeBonusCommand> _distributeService;
-	private readonly ILogger<DistributeBonusBackgroundJob> _logger;
-
-	public DistributeBonusBackgroundJob(
-		IPromotionServiceClient promotionServiceClient,
-		ITgsRepository tgsRepository,
-		IDistributePlanHasher hasher,
-		ICommandService<DistributeBonusCommand> distributeService,
-		ILogger<DistributeBonusBackgroundJob> logger)
-	{
-		_promotionServiceClient = promotionServiceClient ?? throw new ArgumentNullException(nameof(promotionServiceClient));
-		_tgsRepository = tgsRepository ?? throw new ArgumentNullException(nameof(tgsRepository));
-		_hasher = hasher ?? throw new ArgumentNullException(nameof(hasher));
-		_distributeService = distributeService ?? throw new ArgumentNullException(nameof(distributeService));
-		_logger = logger ?? throw new ArgumentNullException(nameof(logger));
-	}
+	private readonly IPromotionServiceClient _promotionServiceClient = promotionServiceClient ?? throw new ArgumentNullException(nameof(promotionServiceClient));
+	private readonly ITgsRepository _tgsRepository = tgsRepository ?? throw new ArgumentNullException(nameof(tgsRepository));
+	private readonly IDistributePlanHasher _hasher = hasher ?? throw new ArgumentNullException(nameof(hasher));
+	private readonly ICommandService<DistributeBonusCommand> _distributeService = distributeService ?? throw new ArgumentNullException(nameof(distributeService));
+	private readonly ILogger<DistributeBonusBackgroundJob> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
 	[AutomaticRetry(Attempts = 0)]
 	public async Task ExecuteAsync(DistributeBonusScheduleInfo scheduleInfo)

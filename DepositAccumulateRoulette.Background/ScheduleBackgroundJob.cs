@@ -4,14 +4,9 @@ using Valhalla.MessageQueue;
 
 namespace Tgs.Promotion.DepositAccumulateRoulette.Background;
 
-public class ScheduleBackgroundJob
+public class ScheduleBackgroundJob(IMessageSender messageSender)
 {
-	private readonly IMessageSender _messageSender;
-
-	public ScheduleBackgroundJob(IMessageSender messageSender)
-	{
-		_messageSender = messageSender ?? throw new ArgumentNullException(nameof(messageSender));
-	}
+	private readonly IMessageSender _messageSender = messageSender ?? throw new ArgumentNullException(nameof(messageSender));
 
 	public Task ExecuteAsync(DateOnly processDate, string subject)
 	{
