@@ -12,6 +12,8 @@ using Tgs.Promotion.DepositAccumulateRoulette.Worker.MessageQueue;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.WebHost.UseSentry();
+
 builder.Configuration
 	.AddJsonFile("/config/appsettings.json", true)
 	.AddEnvironmentVariables();
@@ -23,9 +25,9 @@ builder.Logging
 		options.ParseStateValues = true;
 		_ = options.AddFluentdForwardExporter(fluentOptions =>
 		{
-			var nodeIp = builder.Configuration.GetValue<string>("NODE_IP")!;
+			var nodeIp = builder.Configuration.GetValue<string>("Otel:NodeIp")!;
 			fluentOptions.Host = nodeIp;
-			fluentOptions.Tag = builder.Configuration.GetValue<string>("OTEL_SERVICE_NAME")!;
+			fluentOptions.Tag = builder.Configuration.GetValue<string>("Otel:ServiceName")!;
 			fluentOptions.UseMessagePack(LogRecordFormatterResolver.GetResolverInstanceWithExtendInfo(
 				"MachineName",
 				() => Environment.MachineName));
@@ -101,7 +103,7 @@ builder.Services
 var excludeExtensions = new[] { "html", "ico", "png", "jpg" };
 builder.Services
 	.AddOpenTelemetry()
-	.ConfigureResource(_ => ResourceBuilder.CreateDefault().AddEnvironmentVariableDetector())
+	.ConfigureResource(_ => _.AddService(builder.Configuration.GetValue<string>("Otel:ServiceName")))
 	.WithTracing(tracerProviderBuilder => tracerProviderBuilder
 		.AddSource("Tgs.*")
 		.AddSource("TGS.*")
@@ -117,7 +119,7 @@ builder.Services
 		.AddHttpClientInstrumentation()
 		.AddNpgsql()
 		.AddProfileViewExporter()
-		.AddOtlpExporter())
+		.AddOtlpExporter(options => options.Endpoint = builder.Configuration.GetValue<Uri>("Otel:Collector")))
 	.WithMetrics(meterProviderBuilder => meterProviderBuilder
 		.AddAspNetCoreInstrumentation()
 		.AddHttpClientInstrumentation()
@@ -148,5 +150,7 @@ app.UseSwaggerUI();
 app.MapHealthChecks("/healthz");
 
 app.MapHangfireDashboard();
+
+SentrySdk.CaptureMessage($"Started result DepositAccumulateWorker service at {DateTime.Now.ToString()}");
 
 app.Run();
